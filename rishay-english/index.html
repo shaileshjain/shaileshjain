@@ -1,0 +1,991 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>Rishay's English Paper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Kalam:wght@400;700&display=swap">
+<style>
+/* Layout: a single exam sheet on a blue-ruled exercise-book page, red margin line on the left,
+   sections A–D in order, a sticky answer bar at the bottom, teacher's red-pen marks on top. */
+:root{
+  --page:#e8edf6;
+  --paper:#fdfdfb;
+  --ink:#1c2652;
+  --ink-soft:#5a6390;
+  --rule:#d9e3f2;
+  --margin:#e0656b;
+  --pen:#2d58cf;
+  --pen-soft:#e4ebfb;
+  --marigold:#e39b2d;
+  --good:#1d8657;
+  --good-soft:#e2f4ea;
+  --bad:#c4433c;
+  --bad-soft:#fbe7e5;
+  --line:#c9d3e6;
+  --font-display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --font-body:"Literata", Georgia, "Times New Roman", serif;
+  --font-hand:"Kalam", "Comic Sans MS", cursive;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#0d1224; --paper:#151c33; --ink:#e6eaf9; --ink-soft:#a1aad0; --rule:#222c4b;
+    --margin:#d4686e; --pen:#8eaeff; --pen-soft:#212c50; --marigold:#f0b65a;
+    --good:#52c690; --good-soft:#163527; --bad:#f0827a; --bad-soft:#3a1d1e; --line:#2c3758;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#0d1224; --paper:#151c33; --ink:#e6eaf9; --ink-soft:#a1aad0; --rule:#222c4b;
+  --margin:#d4686e; --pen:#8eaeff; --pen-soft:#212c50; --marigold:#f0b65a;
+  --good:#52c690; --good-soft:#163527; --bad:#f0827a; --bad-soft:#3a1d1e; --line:#2c3758;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;padding-inline:16px;padding-block:20px 0}
+.wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--font-display);line-height:1.15;text-wrap:balance;margin:0}
+button,select,textarea,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pen);outline-offset:2px;border-radius:6px}
+
+/* masthead */
+.mast{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 20px}
+.eyebrow{font-family:var(--font-display);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.mast h1{font-size:clamp(30px,6vw,44px);font-weight:800;color:var(--ink)}
+.mast h1 span{color:var(--pen)}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:6px 14px;min-width:84px}
+.stat b{display:block;font-family:var(--font-display);font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat small{font-size:12px;color:var(--ink-soft)}
+.stat.streak b{color:var(--marigold)}
+
+/* week strip */
+.strip{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px}
+.day{appearance:none;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:4px 0;cursor:pointer;text-align:center;font-family:var(--font-display);line-height:1.15;min-width:0}
+.day .w{font-size:11px;color:var(--ink-soft);display:block}
+.day .d{font-size:15px;font-weight:700;display:block}
+.day .s{font-size:11px;display:block;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+.day.done{background:var(--good-soft);border-color:var(--good)}
+.day.done .s{color:var(--good);font-weight:700}
+.day.part{background:var(--pen-soft);border-color:var(--pen)}
+.day.cur{outline:2px solid var(--ink);outline-offset:1px}
+.day:disabled{opacity:.35;cursor:default}
+@media (max-width:560px){.strip{grid-template-columns:repeat(7,minmax(0,1fr))}.day.old{display:none}}
+
+.navrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{appearance:none;border:1.5px solid var(--ink);background:transparent;border-radius:999px;padding:6px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px}
+.btn:hover:not(:disabled){background:var(--pen-soft)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.primary{background:var(--pen);border-color:var(--pen);color:var(--paper)}
+.btn.primary:hover:not(:disabled){filter:brightness(1.08);background:var(--pen)}
+.btn.warn{background:var(--marigold);border-color:var(--marigold);color:#1c2652}
+.sync{font-size:13px;color:var(--ink-soft)}
+
+/* the sheet */
+.sheet{background:var(--paper);border-radius:4px 4px 0 0;box-shadow:0 1px 0 var(--line),0 12px 30px -18px rgba(20,30,70,.35);
+  background-image:linear-gradient(to right,transparent 46px,var(--margin) 46px,var(--margin) 48px,transparent 48px);
+  padding:28px 22px 30px 66px;position:relative}
+@media (max-width:560px){.sheet{padding:22px 14px 26px 34px;background-image:linear-gradient(to right,transparent 20px,var(--margin) 20px,var(--margin) 21px,transparent 21px)}}
+.sheet-head{text-align:center;border-bottom:2px solid var(--ink);padding-bottom:12px;display:flex;flex-direction:column;gap:2px}
+.sheet-head .school{font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:.02em}
+.sheet-head .meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:var(--ink-soft);margin-top:6px}
+.instr{font-size:14px;color:var(--ink-soft);margin:12px 0 0;padding-left:18px}
+.instr li{margin:2px 0}
+
+.jump{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.jump a{font-family:var(--font-display);font-weight:600;font-size:14px;color:var(--pen);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:2px 12px}
+.jump a:hover{background:var(--pen-soft)}
+
+section.sec{margin-top:30px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:14px}
+.sec-h h2{font-size:22px;font-weight:700}
+.sec-h h2 em{font-style:normal;color:var(--pen)}
+.sec-h .mk{font-family:var(--font-display);font-size:14px;color:var(--ink-soft);white-space:nowrap}
+
+.q{display:grid;grid-template-columns:38px minmax(0,1fr);gap:4px 6px;margin:0 0 18px}
+.qn{font-family:var(--font-display);font-weight:700;color:var(--ink-soft);padding-top:1px}
+.qbody{min-width:0}
+.qtag{font-family:var(--font-display);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.qtext{margin:0 0 8px}
+.qtext i{font-style:italic;color:var(--pen)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.opt label{display:inline-block;border:1.5px solid var(--line);border-radius:10px;padding:5px 14px;cursor:pointer;background:var(--paper);transition:border-color .12s,background .12s}
+.opt input:hover + label{border-color:var(--pen)}
+.opt input:checked + label{border-color:var(--pen);background:var(--pen-soft);font-weight:600}
+.opt input:focus-visible + label{outline:3px solid var(--pen);outline-offset:2px}
+.opt input:disabled{cursor:default}
+.opt.right label{border-color:var(--good);background:var(--good-soft);font-weight:600}
+.opt.wrong label{border-color:var(--bad);background:var(--bad-soft);text-decoration:line-through}
+.why{font-family:var(--font-hand);color:var(--margin);font-size:16px;margin-top:6px;line-height:1.4}
+.tick{font-family:var(--font-hand);font-weight:700;font-size:20px;margin-left:6px}
+.tick.ok{color:var(--good)} .tick.no{color:var(--bad)}
+
+.passage{border:1.5px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:18px;background:var(--paper)}
+.passage h3{font-size:19px;margin-bottom:2px}
+.passage .kind{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-family:var(--font-display)}
+.passage p{margin:10px 0 0;max-width:68ch}
+.passage.poem p{white-space:pre-line;font-style:italic}
+.passage.letter p{white-space:pre-line}
+
+.subhead{font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--ink-soft);margin:6px 0 10px}
+
+textarea.lined{width:100%;border:1.5px solid var(--line);border-radius:8px;resize:vertical;padding:4px 12px;
+  line-height:32px;font-family:var(--font-body);font-size:16px;color:var(--pen);
+  background-color:var(--paper);
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 31px,var(--rule) 31px,var(--rule) 32px);
+  background-attachment:local;background-position:0 4px}
+textarea.lined:focus{border-color:var(--pen);outline:none}
+textarea.lined:disabled{opacity:1;color:var(--pen)}
+.wc{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:13px;color:var(--ink-soft);margin-top:4px;font-variant-numeric:tabular-nums}
+.wc .ok{color:var(--good);font-weight:600}
+.wc .low{color:var(--marigold);font-weight:600}
+
+.topic{font-family:var(--font-display);font-size:21px;font-weight:700;margin:0 0 6px}
+.hints{margin:0 0 12px;padding-left:20px;font-size:15px;color:var(--ink-soft)}
+.hints li{margin:2px 0}
+.story-kind{display:inline-block;font-family:var(--font-display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--pen);color:var(--pen);border-radius:999px;padding:0 10px;margin-bottom:6px}
+.story-prompt{font-size:18px;margin:0 0 8px}
+
+.model{border-left:3px solid var(--good);background:var(--good-soft);padding:8px 12px;border-radius:0 8px 8px 0;margin-top:8px;font-size:15px}
+.model b{font-family:var(--font-display)}
+.markrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:14px;color:var(--ink-soft)}
+.markrow select{border:1.5px solid var(--line);border-radius:8px;padding:2px 8px;background:var(--paper)}
+.fb{margin-top:10px;border:1.5px dashed var(--margin);border-radius:10px;padding:10px 14px;font-family:var(--font-hand);color:var(--margin);font-size:17px;line-height:1.45}
+.fb ul{margin:4px 0;padding-left:20px}
+.fb .corr{font-family:var(--font-body);font-size:14px;color:var(--ink)}
+.fb .corr s{color:var(--bad)} .fb .corr ins{color:var(--good);text-decoration:none;font-weight:600}
+.rub{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px 14px;font-family:var(--font-body);font-size:13px;color:var(--ink);margin:6px 0}
+.rub div{display:flex;justify-content:space-between;border-bottom:1px dotted var(--line)}
+
+/* results */
+.result{border:2px solid var(--margin);border-radius:12px;padding:16px 18px;margin-top:20px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
+@media (max-width:560px){.result{grid-template-columns:1fr}}
+.stamp{width:120px;height:120px;border-radius:50%;border:3px solid var(--margin);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--margin);font-family:var(--font-hand);margin:0 auto}
+.stamp b{font-size:38px;line-height:1;font-variant-numeric:tabular-nums}
+.stamp small{font-size:14px}
+.remark{font-family:var(--font-hand);color:var(--margin);font-size:24px;line-height:1.25;margin:0 0 6px}
+.breakdown{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:8px 0}
+@media (max-width:420px){.breakdown{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bd{border:1px solid var(--line);border-radius:8px;padding:4px 8px;text-align:center}
+.bd small{display:block;font-size:12px;color:var(--ink-soft)}
+.bd b{font-family:var(--font-display);font-size:19px;font-variant-numeric:tabular-nums}
+.bd b.pend{color:var(--marigold);font-size:14px}
+.ai-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.ai-msg{font-size:14px;color:var(--ink-soft)}
+
+/* answer bar */
+.bar{position:sticky;bottom:0;background:var(--paper);border-top:2px solid var(--ink);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-inline:-16px;z-index:5}
+.bar .prog{font-family:var(--font-display);font-weight:600;font-variant-numeric:tabular-nums}
+.bar .prog small{font-weight:400;color:var(--ink-soft);margin-left:6px}
+.meter{height:6px;border-radius:3px;background:var(--rule);overflow:hidden;width:160px;max-width:40vw}
+.meter i{display:block;height:100%;background:var(--pen);width:0;transition:width .25s}
+.foot{font-size:13px;color:var(--ink-soft);text-align:center;padding:10px 0 16px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <div class="eyebrow">Class 5 · Daily practice</div>
+      <h1>Rishay’s <span>English</span> Paper</h1>
+    </div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <div class="strip" id="strip" aria-label="Last two weeks"></div>
+
+  <div class="navrow">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="prev" type="button">‹ Previous day</button>
+      <button class="btn" id="today" type="button">Today</button>
+      <button class="btn" id="next" type="button">Next day ›</button>
+    </div>
+    <span class="sync" id="sync">Saved on this device</span>
+  </div>
+
+  <main class="sheet" id="paper"></main>
+</div>
+
+<div class="bar" id="bar">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <span class="prog" id="prog">0 of 19 answered</span>
+    <span class="meter"><i id="meter"></i></span>
+  </div>
+  <button class="btn primary" id="submit" type="button">Submit paper</button>
+</div>
+<div class="foot">A new paper every day. The same paper stays for the whole day, so you can come back and finish it.</div>
+
+<script>
+/* ---------------- Question banks ---------------- */
+// Grammar: [topic, question (html), options, correct index, explanation]
+const G = [
+["Nouns","Which word is a <b>proper noun</b>? <i>We visited Jaipur last winter.</i>",["visited","Jaipur","winter","last"],1,"Jaipur is the name of a particular place, so it is a proper noun and begins with a capital letter."],
+["Nouns","Choose the collective noun: <i>A ___ of bees chased the bear.</i>",["swarm","herd","pack","flock"],0,"We say a swarm of bees, a herd of cattle, a pack of wolves and a flock of sheep."],
+["Nouns","Which of these is an <b>abstract noun</b>?",["kindness","table","river","teacher"],0,"An abstract noun names something you cannot see or touch, like a feeling or quality."],
+["Nouns","Choose the collective noun for ships.",["fleet","bunch","crowd","team"],0,"A group of ships is called a fleet."],
+["Nouns","Find the <b>common noun</b>: <i>Meera fed her puppy before school.</i>",["Meera","fed","puppy","before"],2,"‘Puppy’ is a general name for any young dog. ‘Meera’ is a proper noun."],
+["Nouns","The noun form of <i>brave</i> is:",["bravely","bravery","braver","braved"],1,"Bravery is the noun. Bravely is an adverb and braver is an adjective."],
+["Nouns","Choose the abstract noun formed from <i>child</i>.",["childish","childhood","children","childly"],1,"Childhood (the time of being a child) is the abstract noun."],
+["Nouns","Which word is a <b>countable</b> noun?",["water","sugar","pencil","milk"],2,"You can count pencils (one pencil, two pencils). Water, sugar and milk are uncountable."],
+
+["Pronouns","Choose the correct word: <i>Rohan and ___ went to the market.</i>",["I","me","mine","myself"],0,"Remove ‘Rohan and’: ‘I went to the market’ is correct, so ‘Rohan and I’ is correct."],
+["Pronouns","Choose the correct word: <i>The teacher gave the books to Asha and ___.</i>",["I","me","mine","myself"],1,"Remove ‘Asha and’: ‘gave the books to me’ is correct."],
+["Pronouns","Complete: <i>This bag is not yours; it is ___.</i>",["my","mine","me","I"],1,"‘Mine’ stands alone without a noun after it: it is mine."],
+["Pronouns","Complete: <i>The cat licked ___ paw.</i>",["it’s","its","his","their"],1,"‘Its’ means belonging to it. ‘It’s’ is short for ‘it is’."],
+["Pronouns","Complete: <i>___ of these pencils is yours?</i>",["Who","Which","Whom","Whose"],1,"We use ‘which’ to choose from a group of things."],
+["Pronouns","Complete: <i>We made the cake all by ___.</i>",["ourself","ourselves","us","ours"],1,"The reflexive pronoun for ‘we’ is ‘ourselves’."],
+["Pronouns","Complete: <i>The boy ___ won the race is my cousin.</i>",["who","which","whom","whose"],0,"We use ‘who’ for people when they are doing the action."],
+["Pronouns","Which sentence is correct?",["Him and me are friends.","He and I are friends.","He and me are friends.","Him and I are friends."],1,"Use subject pronouns (he, I) for the people doing the action."],
+
+["Tenses","Complete: <i>Yesterday, Neha ___ a letter to her grandmother.</i>",["write","writes","wrote","written"],2,"‘Yesterday’ tells us it is the past, so we use the simple past ‘wrote’."],
+["Tenses","Complete: <i>Look! The baby ___.</i>",["sleeps","is sleeping","slept","has sleep"],1,"‘Look!’ shows it is happening right now, so we use the present continuous."],
+["Tenses","Complete: <i>I ___ my homework already.</i>",["finished","have finished","finishing","finish"],1,"‘Already’ goes with the present perfect: have finished."],
+["Tenses","Complete: <i>By the time we reached the station, the train ___.</i>",["left","has left","had left","leaves"],2,"One past action happened before another past action, so we use the past perfect ‘had left’."],
+["Tenses","Complete: <i>Tomorrow we ___ the science museum.</i>",["visited","will visit","visit","are visited"],1,"‘Tomorrow’ shows the future: will visit."],
+["Tenses","The past tense of <i>catch</i> is:",["catched","caught","cought","catching"],1,"Catch is an irregular verb: catch – caught – caught."],
+["Tenses","Complete: <i>The sun ___ in the east.</i>",["rise","rises","rose","rising"],1,"Facts that are always true use the simple present: the sun rises."],
+["Tenses","Complete: <i>She ___ TV when the lights went out.</i>",["watched","was watching","is watching","watches"],1,"A longer action (was watching) was interrupted by a short one (went out)."],
+["Tenses","The past participle of <i>go</i> is:",["went","gone","goed","going"],1,"Go – went – gone. We say ‘has gone’, never ‘has went’."],
+
+["Adjectives & adverbs","Complete: <i>Mount Everest is the ___ mountain in the world.</i>",["high","higher","highest","most high"],2,"When comparing more than two things, use the superlative: highest."],
+["Adjectives & adverbs","Complete: <i>This box is ___ than that one.</i>",["heavy","heavier","heaviest","more heavy"],1,"Comparing two things uses the comparative. Heavy → heavier (y changes to i)."],
+["Adjectives & adverbs","Find the <b>adverb</b>: <i>The tortoise walked slowly to the finish line.</i>",["tortoise","walked","slowly","finish"],2,"‘Slowly’ tells us how the tortoise walked."],
+["Adjectives & adverbs","Find the <b>adjective</b>: <i>The playful kitten chased a ball.</i>",["playful","chased","ball","kitten"],0,"‘Playful’ describes the kitten."],
+["Adjectives & adverbs","Complete: <i>Riya sings ___.</i>",["beautiful","beautifully","beauty","more beautiful"],1,"We need an adverb to describe how she sings: beautifully."],
+["Adjectives & adverbs","Which set of degrees is correct?",["good, better, best","good, gooder, goodest","good, best, better","good, more good, most good"],0,"Good is irregular: good – better – best."],
+["Adjectives & adverbs","Find the <b>adverb of time</b>: <i>We will leave soon.</i>",["will","leave","soon","we"],2,"‘Soon’ tells us when we will leave."],
+["Adjectives & adverbs","Complete: <i>There is ___ milk left in the jug.</i>",["many","few","a little","a few"],2,"Milk cannot be counted, so we use ‘a little’, not ‘a few’ or ‘many’."],
+
+["Prepositions","Complete: <i>The cat is hiding ___ the bed.</i>",["under","at","of","since"],0,"‘Under’ tells us the position of the cat."],
+["Prepositions","Complete: <i>We have lived here ___ 2019.</i>",["for","since","from","by"],1,"Use ‘since’ with a starting point in time (since 2019, since Monday)."],
+["Prepositions","Complete: <i>She has been waiting ___ two hours.</i>",["since","for","from","at"],1,"Use ‘for’ with a length of time (for two hours, for a week)."],
+["Prepositions","Complete: <i>Ravi jumped ___ the swimming pool.</i>",["in","into","on","at"],1,"‘Into’ shows movement from outside to inside."],
+["Prepositions","Complete: <i>My birthday is ___ March.</i>",["on","at","in","by"],2,"Use ‘in’ with months and years, ‘on’ with days and dates, ‘at’ with times."],
+["Prepositions","Complete: <i>The match starts ___ 4 o’clock.</i>",["in","on","at","by"],2,"Use ‘at’ with clock times."],
+["Prepositions","Complete: <i>He divided the sweets ___ his three friends.</i>",["between","among","with","along"],1,"‘Between’ is for two; ‘among’ is for more than two."],
+["Prepositions","Complete: <i>School reopens ___ Monday.</i>",["in","on","at","since"],1,"Use ‘on’ with days of the week."],
+
+["Conjunctions","Complete: <i>I wanted to play, ___ it was raining.</i>",["and","but","so","or"],1,"‘But’ joins two ideas that contrast with each other."],
+["Conjunctions","Complete: <i>Would you like tea ___ coffee?</i>",["or","but","so","because"],0,"‘Or’ is used to give a choice."],
+["Conjunctions","Complete: <i>She was tired, ___ she went to bed early.</i>",["but","or","so","although"],2,"‘So’ shows the result of something."],
+["Conjunctions","Complete: <i>We stayed indoors ___ it was very hot.</i>",["because","but","or","so"],0,"‘Because’ gives the reason."],
+["Conjunctions","Complete: <i>___ he was ill, he came to school.</i>",["Because","Although","So","Or"],1,"‘Although’ shows something surprising happened despite the first idea."],
+["Conjunctions","Complete: <i>Neither Raj ___ Tina was late.</i>",["or","nor","and","but"],1,"‘Neither’ always pairs with ‘nor’."],
+["Conjunctions","Complete: <i>Both the dog ___ the cat sleep on the sofa.</i>",["or","nor","and","but"],2,"‘Both’ always pairs with ‘and’."],
+["Conjunctions","Complete: <i>Wait here ___ I come back.</i>",["until","but","or","so"],0,"‘Until’ means up to the time that something happens."],
+
+["Articles","Complete: <i>I saw ___ elephant at the zoo.</i>",["a","an","the","no article"],1,"Use ‘an’ before a vowel sound: an elephant."],
+["Articles","Complete: <i>She is ___ honest girl.</i>",["a","an","the","no article"],1,"The h in ‘honest’ is silent, so it starts with a vowel sound: an honest girl."],
+["Articles","Complete: <i>My sister studies at ___ university.</i>",["a","an","the","no article"],0,"‘University’ starts with a ‘you’ sound, which is a consonant sound, so we use ‘a’."],
+["Articles","Complete: <i>___ Ganga is a holy river.</i>",["A","An","The","No article"],2,"We use ‘the’ before the names of rivers, seas and oceans."],
+["Articles","Complete: <i>Please close ___ door.</i>",["a","an","the","no article"],2,"We mean one particular door, so we use ‘the’."],
+["Articles","Complete: <i>___ sun sets in the west.</i>",["A","An","The","No article"],2,"There is only one sun, so we use ‘the’."],
+["Articles","Complete: <i>We waited for ___ hour.</i>",["a","an","the","no article"],1,"The h in ‘hour’ is silent: an hour."],
+["Articles","Complete: <i>He bought ___ umbrella.</i>",["a","an","the","no article"],1,"‘Umbrella’ starts with a vowel sound: an umbrella."],
+
+["Subject–verb agreement","Complete: <i>Each of the boys ___ a prize.</i>",["get","gets","are getting","have got"],1,"‘Each’ is singular, so the verb is singular: gets."],
+["Subject–verb agreement","Complete: <i>The children ___ playing in the park.</i>",["is","are","was","has"],1,"‘Children’ is plural, so we use ‘are’."],
+["Subject–verb agreement","Complete: <i>My brother and I ___ cricket every evening.</i>",["plays","play","is playing","has played"],1,"Two people joined by ‘and’ make a plural subject: play."],
+["Subject–verb agreement","Complete: <i>One of my friends ___ in Pune.</i>",["live","lives","are living","have lived"],1,"The subject is ‘one’, which is singular: lives."],
+["Subject–verb agreement","Complete: <i>The news ___ good today.</i>",["are","is","were","have"],1,"‘News’ looks plural but is singular: the news is good."],
+["Subject–verb agreement","Complete: <i>Neither of them ___ ready.</i>",["are","were","is","have"],2,"‘Neither’ is singular: neither of them is ready."],
+["Subject–verb agreement","Complete: <i>A bunch of grapes ___ on the table.</i>",["are","is","were","have been"],1,"The subject is ‘a bunch’, which is singular."],
+["Subject–verb agreement","Complete: <i>Mathematics ___ my favourite subject.</i>",["are","is","were","have"],1,"Subjects like mathematics and physics are singular."],
+
+["Punctuation","Which sentence is punctuated correctly?",["what a lovely garden!","What a lovely garden!","What a lovely garden?","what a lovely garden."],1,"Start with a capital letter, and use an exclamation mark for strong feeling."],
+["Punctuation","Which sentence is correct?",["Its raining today.","It’s raining today.","Its’ raining today.","It is’ raining today."],1,"It’s = it is. The apostrophe shows the missing letter i."],
+["Punctuation","Where do the commas go?",["I bought apples, bananas and grapes.","I bought, apples bananas and grapes.","I bought apples bananas, and, grapes.","I, bought apples bananas and grapes."],0,"Use commas to separate items in a list."],
+["Punctuation","Which sentence needs a question mark?",["Please sit down","Where are my shoes","I love mangoes","Close the window"],1,"‘Where are my shoes’ asks something, so it needs a question mark."],
+["Punctuation","Which sentence is written correctly?",["Mr sharma lives in mumbai.","Mr Sharma lives in Mumbai.","mr Sharma lives in mumbai.","Mr Sharma Lives In Mumbai."],1,"Names of people and places always begin with capital letters."],
+["Punctuation","Complete: <i>The ___ tail is very long.</i> (one monkey)",["monkeys","monkey’s","monkeys’s","monkies"],1,"For one owner, add ’s: the monkey’s tail."],
+["Punctuation","Which sentence uses inverted commas correctly?",["“I am hungry,” said Arjun.","“I am hungry, said Arjun.”","I am “hungry,” said Arjun.","“I am hungry” said, Arjun."],0,"Only the exact words spoken go inside the inverted commas, with the comma inside too."],
+["Punctuation","The short form of <i>they are</i> is:",["there","their","they’re","theyr"],2,"They’re = they are. The apostrophe replaces the a."],
+
+["Vocabulary","A synonym (same meaning) of <i>huge</i> is:",["tiny","enormous","narrow","weak"],1,"Huge and enormous both mean very big."],
+["Vocabulary","An antonym (opposite) of <i>ancient</i> is:",["old","modern","broken","famous"],1,"Ancient means very old; modern means new or of today."],
+["Vocabulary","A synonym of <i>brave</i> is:",["fearful","courageous","lazy","polite"],1,"Brave and courageous both mean not afraid."],
+["Vocabulary","An antonym of <i>generous</i> is:",["kind","selfish","wealthy","gentle"],1,"A generous person shares; a selfish person keeps things for themselves."],
+["Vocabulary","A synonym of <i>begin</i> is:",["end","start","stop","finish"],1,"Begin and start mean the same."],
+["Vocabulary","An antonym of <i>arrive</i> is:",["reach","come","depart","enter"],2,"Arrive means to come; depart means to leave."],
+["Vocabulary","A synonym of <i>glad</i> is:",["happy","angry","sad","tired"],0,"Glad means happy."],
+["Vocabulary","An antonym of <i>victory</i> is:",["win","defeat","prize","success"],1,"The opposite of victory is defeat."],
+["Vocabulary","A synonym of <i>quickly</i> is:",["slowly","rapidly","quietly","lazily"],1,"Quickly and rapidly both mean fast."],
+
+["Plurals & gender","The plural of <i>child</i> is:",["childs","childrens","children","childes"],2,"Child is irregular: one child, many children."],
+["Plurals & gender","The plural of <i>knife</i> is:",["knifes","knives","knifs","knivess"],1,"Many words ending in -fe change to -ves: knife – knives, wife – wives."],
+["Plurals & gender","The plural of <i>mouse</i> is:",["mouses","mice","mices","mouse"],1,"One mouse, many mice."],
+["Plurals & gender","The plural of <i>baby</i> is:",["babys","babies","babyes","babeys"],1,"Consonant + y → change y to i and add -es: babies."],
+["Plurals & gender","The plural of <i>sheep</i> is:",["sheeps","sheep","sheepes","shoop"],1,"Sheep stays the same: one sheep, ten sheep."],
+["Plurals & gender","The feminine of <i>king</i> is:",["princess","queen","kingess","lady"],1,"King – queen."],
+["Plurals & gender","The feminine of <i>nephew</i> is:",["niece","aunt","cousin","nephewess"],0,"Nephew – niece."],
+["Plurals & gender","The plural of <i>tomato</i> is:",["tomatos","tomatoes","tomatoies","tomato"],1,"Tomato, potato and hero add -es: tomatoes."],
+["Plurals & gender","The masculine of <i>mare</i> is:",["stallion","bull","ram","gander"],0,"A mare is a female horse; a stallion is a male horse."],
+
+["Confusing words","Complete: <i>I can ___ the birds singing.</i>",["here","hear","hair","heer"],1,"Hear is what you do with your ears. Here means in this place."],
+["Confusing words","Complete: <i>___ going to the fair tomorrow.</i>",["Their","There","They’re","Thier"],2,"They’re = they are: They are going to the fair."],
+["Confusing words","Complete: <i>Please ___ your name at the top.</i>",["right","write","rite","wright"],1,"Write means to put words on paper. Right means correct or the opposite of left."],
+["Confusing words","Complete: <i>The wind ___ the leaves away.</i>",["blew","blue","blow","blewed"],0,"Blew is the past tense of blow. Blue is a colour."],
+["Confusing words","Complete: <i>We each ate a ___ of cake.</i>",["peace","piece","peice","pease"],1,"A piece is a part of something. Peace means calm, no fighting."],
+["Confusing words","Complete: <i>I have ___ brothers.</i>",["to","too","two","tow"],2,"Two is the number 2."],
+["Confusing words","Complete: <i>Our team ___ the match.</i>",["one","won","wan","own"],1,"Won is the past tense of win. One is the number 1."],
+["Confusing words","Complete: <i>Don’t ___ your money.</i>",["loose","lose","loss","lost"],1,"Lose means to misplace. Loose means not tight."],
+
+["Sentences","What kind of sentence is this? <i>Shut the door.</i>",["Statement","Question","Command","Exclamation"],2,"It tells someone to do something, so it is a command (imperative sentence)."],
+["Sentences","Change to passive voice: <i>Sita wrote a poem.</i>",["A poem was written by Sita.","A poem is written by Sita.","A poem wrote Sita.","Sita was written a poem."],0,"Past tense active ‘wrote’ becomes ‘was written’ in the passive."],
+["Sentences","Change to reported speech: <i>Ram said, “I am happy.”</i>",["Ram said that he was happy.","Ram said that I am happy.","Ram said that he is being happy.","Ram says he was happy."],0,"‘I’ becomes ‘he’ and ‘am’ becomes ‘was’."],
+["Sentences","Find the <b>subject</b>: <i>The old man in the blue shirt smiled at us.</i>",["The old man in the blue shirt","smiled","at us","blue shirt"],0,"The subject is who the sentence is about — the whole group of words naming him."],
+["Sentences","Find the <b>predicate</b>: <i>Birds build nests in spring.</i>",["Birds","build nests in spring","nests","spring"],1,"The predicate tells what the subject does."],
+["Sentences","Turn into a question: <i>She plays the piano.</i>",["Does she play the piano?","Do she plays the piano?","Does she plays the piano?","She does play the piano?"],0,"With ‘does’, the main verb goes back to its base form: play."],
+["Sentences","What kind of sentence is this? <i>What a beautiful rainbow!</i>",["Statement","Question","Command","Exclamation"],3,"It shows strong feeling and ends with !, so it is an exclamation."],
+["Sentences","Which is the negative of <i>He likes spinach.</i>",["He not likes spinach.","He does not like spinach.","He do not like spinach.","He does not likes spinach."],1,"Use ‘does not’ + base verb: does not like."],
+
+["Word building","Add a prefix to make the opposite of <i>happy</i>.",["unhappy","dishappy","imhappy","nonhappy"],0,"Un- means not: unhappy."],
+["Word building","The opposite of <i>possible</i> is:",["unpossible","impossible","dispossible","inpossible"],1,"Im- is used before many words starting with p: impossible, impolite."],
+["Word building","The opposite of <i>agree</i> is:",["unagree","disagree","imagree","misagree"],1,"Dis- makes the opposite: disagree, dislike."],
+["Word building","Which word means ‘without care’?",["careful","careless","caring","cared"],1,"The suffix -less means without: careless, helpless."],
+["Word building","Which word means ‘to read again’?",["preread","reread","misread","unread"],1,"The prefix re- means again."],
+["Word building","The opposite of <i>regular</i> is:",["unregular","irregular","disregular","inregular"],1,"Ir- is used before many words starting with r: irregular, irresponsible."],
+["Word building","<i>hope</i> + <i>ful</i> =",["hopful","hopeful","hopefull","hopefill"],1,"The suffix -ful has only one l: hopeful, careful."],
+["Word building","Which is a <b>compound word</b>?",["basketball","beautiful","quickly","running"],0,"Basketball is made of two words: basket + ball."]
+];
+
+// Reading passages
+const P = [
+{title:"Grandpa’s Kite",kind:"Story",text:`Every January, the sky above Ahmedabad fills with kites for Uttarayan. Ishaan had watched his grandfather make kites for years, but this year Grandpa said, “You will make your own.”
+
+They sat on the terrace with thin bamboo sticks, sheets of tissue paper and a pot of glue made from cooked rice. Ishaan’s first kite tore when he pulled the paper too tight. His second kite was so heavy that it would not leave the ground. He felt like giving up.
+
+“A kite is like a bird,” Grandpa said gently. “It must be light, and it must be balanced.” He showed Ishaan how to shave the bamboo until it was as thin as a pencil, and how to tie the string so that both sides pulled equally.
+
+On the morning of the festival, Ishaan’s third kite rose high above the rooftops. It was not the biggest kite in the sky, nor the most colourful, but it danced steadily in the wind. Ishaan looked at his sticky fingers and smiled. He had never been prouder of anything.`,
+mcq:[["Where did Ishaan and Grandpa make the kite?",["In the garden","On the terrace","At school","In a shop"],1],["Why did the second kite not fly?",["It was torn","It was too heavy","There was no wind","The string broke"],1],["What does the story mainly teach us?",["Kites are expensive","Keep trying and learn from mistakes","Festivals are noisy","Grandparents are strict"],1]],
+vocab:[["‘Steadily’ in the last paragraph means:",["in a shaky way","in a smooth, even way","very fast","sadly"],1],["The word ‘prouder’ is a/an:",["noun","verb","adjective","preposition"],2]],
+short:[["What two things did Grandpa say a kite must be? Why is this important?","Grandpa said a kite must be light and balanced. A light kite can rise in the wind, and a balanced kite flies steadily without spinning or falling."],["How did Ishaan feel at the start and at the end of the story? Give reasons.","At the start he felt frustrated and wanted to give up because his first two kites failed. At the end he felt proud because the kite he made himself flew high and steady."]]},
+
+{title:"The Busy Honeybee",kind:"Information",text:`A honeybee may look small, but it is one of the hardest workers in nature. A single hive can be home to more than fifty thousand bees, and each one has a job to do.
+
+The queen bee lays all the eggs, sometimes over a thousand in a day. Worker bees, which are all female, clean the hive, feed the young, guard the entrance and collect food. Drones are male bees, and they do not collect food at all.
+
+To make honey, worker bees visit flowers and suck up a sweet liquid called nectar. They store it in a special ‘honey stomach’ and carry it back to the hive. There, the nectar is passed from bee to bee and placed in wax cells. The bees fan it with their wings until most of the water dries up. What is left is thick, golden honey.
+
+Bees also do something even more important. As they move from flower to flower, they carry pollen, which helps plants make fruits and seeds. Without bees, we would have far fewer apples, mangoes and almonds.`,
+mcq:[["Who lays the eggs in a hive?",["Worker bees","Drones","The queen bee","All the bees"],2],["How do bees dry the nectar?",["By heating it in the sun","By fanning it with their wings","By mixing it with wax","By freezing it"],1],["Why are bees important for fruits like mangoes?",["They eat the pests","They carry pollen between flowers","They water the plants","They guard the trees"],1]],
+vocab:[["‘Nectar’ is:",["a type of wax","a sweet liquid in flowers","a bee’s sting","a kind of seed"],1],["The opposite of ‘female’ as used in the passage is:",["queen","male","worker","young"],1]],
+short:[["Name three jobs done by worker bees.","Worker bees clean the hive, feed the young bees, guard the entrance and collect food (any three)."],["What would happen if there were no bees? Answer in your own words.","Plants would not get pollen carried from flower to flower, so they could not make fruits and seeds. We would have far fewer fruits like apples, mangoes and almonds."]]},
+
+{title:"The Lost Wallet",kind:"Story",text:`Kabir was walking home from cricket practice when he spotted a brown wallet lying near the bus stop. He picked it up and opened it. Inside were five hundred-rupee notes, a library card and a small photograph of an old woman.
+
+Kabir’s heart beat fast. Five hundred rupees was enough to buy the new bat he had wanted for months. Nobody had seen him pick it up. For a moment he imagined himself hitting sixes with a shiny new bat.
+
+Then he looked at the photograph again. The woman had kind, tired eyes. Perhaps she needed the money for medicine or food. Kabir remembered how upset his mother had been when she once lost her purse at the market.
+
+He read the name on the library card: Mrs Kamala Iyer, Flat 4B, Lotus Apartments. That was only two streets away. Kabir walked there and rang the bell. When Mrs Iyer saw her wallet, her eyes filled with tears. “My pension money!” she cried. “Thank you, beta.”
+
+Kabir walked home without a new bat, but with a light and happy heart.`,
+mcq:[["What was NOT inside the wallet?",["Money","A library card","A photograph","A bus ticket"],3],["How did Kabir find out where the owner lived?",["He asked the bus driver","He read the library card","A neighbour told him","He called the police"],1],["Which word best describes Kabir?",["Greedy","Honest","Careless","Lazy"],1]],
+vocab:[["‘Pension’ means:",["money paid regularly to a person who has retired","a kind of library","a type of medicine","a school fee"],0],["‘With a light heart’ means:",["feeling hungry","feeling happy and free of worry","feeling weak","feeling sleepy"],1]],
+short:[["Why did Kabir feel tempted to keep the money?","He had wanted a new cricket bat for months, the money was enough to buy it, and nobody had seen him pick up the wallet."],["What made Kabir change his mind? Give two reasons.","He looked at the photograph and thought the old woman might need the money for food or medicine, and he remembered how upset his mother was when she lost her purse."]]},
+
+{title:"The Great Indian Hornbill",kind:"Information",text:`Deep in the forests of the Western Ghats and the north-east of India lives a bird with a bright yellow beak and a strange helmet on its head. This is the Great Indian Hornbill. The ‘helmet’, called a casque, is hollow and helps make its calls louder.
+
+Hornbills have a most unusual way of raising their chicks. When it is time to lay eggs, the female enters a hole in a tall tree. She then seals the entrance with mud, droppings and fruit pulp, leaving only a narrow slit. For about two months she stays inside, keeping the eggs warm and caring for the chicks.
+
+During this time the male works tirelessly. He flies back and forth, bringing figs and other fruits, and passes them through the slit to feed his family.
+
+Hornbills are called ‘farmers of the forest’ because they spread the seeds of the fruits they eat across large areas. Sadly, the cutting down of tall trees has made it hard for them to find nesting places. Today, many villagers in Nagaland and Arunachal Pradesh help to protect hornbill nests.`,
+mcq:[["What is the casque?",["The hornbill’s nest","A hollow helmet on its head","A type of fig","The slit in the tree"],1],["Who feeds the family while the female is inside the nest?",["The villagers","The chicks","The male hornbill","Other birds"],2],["Why are hornbills called ‘farmers of the forest’?",["They dig the soil","They spread the seeds of fruits","They grow figs in their nests","They eat insects"],1]],
+vocab:[["‘Tirelessly’ means:",["without getting tired; very hard","slowly","sadly","without wings"],0],["‘Seals’ in paragraph two means:",["a sea animal","closes tightly","opens wide","paints"],1]],
+short:[["Describe how the female hornbill prepares her nest.","She goes into a hole in a tall tree and closes the entrance with mud, droppings and fruit pulp, leaving only a narrow slit."],["Why is it becoming hard for hornbills to survive? What is being done to help?","Tall trees are being cut down, so hornbills cannot find places to nest. Villagers in Nagaland and Arunachal Pradesh are protecting their nests."]]},
+
+{title:"The Rain Comes Dancing",kind:"Poem",poem:true,text:`The clouds rolled in like elephants,
+All grey and slow and wide;
+The peacock spread its painted fan
+And danced with joy and pride.
+
+The first drops tapped upon the roof
+Like fingers on a drum;
+The thirsty earth looked up and sighed,
+“At last, at last you’ve come!”
+
+The paper boats went sailing down
+The river in our lane,
+And Mother laughed and let us play
+Barefoot in the rain.
+
+By evening every leaf was washed,
+The air was cool and sweet,
+And frogs began their evening song
+In one loud, croaking beat.`,
+mcq:[["The clouds are compared to:",["peacocks","elephants","drums","boats"],1],["Where did the paper boats sail?",["In the sea","In a pond","In the rainwater flowing down the lane","In the bathtub"],2],["How does the poet feel about the rain?",["Afraid","Bored","Joyful","Angry"],2]],
+vocab:[["‘Like fingers on a drum’ is a comparison called a:",["simile","question","rhyme","title"],0],["‘Thirsty earth’ means the ground was:",["wet","very dry","muddy","cold"],1]],
+short:[["Find two pairs of rhyming words from the poem.","wide – pride; drum – come; lane – rain; sweet – beat (any two)."],["How did the world look and feel by evening? Use words from the poem.","Every leaf was washed clean, the air was cool and sweet, and frogs were croaking loudly."]]},
+
+{title:"Kalpana Chawla",kind:"Biography",text:`Kalpana Chawla was born in Karnal, Haryana, in 1962. As a little girl, she loved to lie on the roof at night and look at the stars. She often drew pictures of aeroplanes while other children drew houses and flowers.
+
+In those days, few girls in her town studied engineering. Kalpana did not let that stop her. She studied aeronautical engineering in Chandigarh and then went to the United States for higher studies. She worked very hard and later became an astronaut with NASA, the American space agency.
+
+In 1997, Kalpana flew into space aboard the space shuttle Columbia. She became the first woman of Indian origin to go to space. During her mission she travelled millions of kilometres and circled the Earth hundreds of times.
+
+In 2003, she went on a second mission. Sadly, the shuttle broke apart as it returned to Earth, and all seven astronauts on board lost their lives. Kalpana is remembered as a brave pioneer who showed that dreams can take you beyond the sky. Many schools and hostels, and even an Indian satellite, have been named after her.`,
+mcq:[["Where was Kalpana Chawla born?",["Chandigarh","Karnal","Delhi","Texas"],1],["What did Kalpana like to draw as a child?",["Houses","Flowers","Aeroplanes","Animals"],2],["In which year did she first go to space?",["1962","1997","2003","1982"],1]],
+vocab:[["A ‘pioneer’ is someone who:",["is among the first to do something new","drives a shuttle","teaches at a school","is afraid of heights"],0],["‘Mission’ here means:",["a special journey with a task to do","a kind of school","a holiday","rocket fuel"],0]],
+short:[["What problem did Kalpana face when she wanted to study engineering? How did she deal with it?","Few girls in her town studied engineering, but she did not let that stop her. She worked hard, studied aeronautical engineering in Chandigarh and went to the USA for higher studies."],["How has India honoured Kalpana Chawla?","Many schools and hostels, and an Indian satellite, have been named after her."]]},
+
+{title:"The Banyan and the Bamboo",kind:"Fable",text:`At the edge of a village stood a mighty banyan tree. Its branches spread wide, and its roots hung down like ropes. Beside it grew a thin clump of bamboo.
+
+“Look at you,” the banyan boomed one day. “You bend whenever the smallest breeze blows. You have no strength at all. I never bow to anyone.”
+
+The bamboo said nothing. It simply swayed and rustled softly.
+
+One night, a terrible storm swept across the land. The wind howled and the rain lashed down. The banyan stood stiff and proud, refusing to bend. The bamboo bent low, almost touching the ground, and let the wind rush over it.
+
+By morning, the storm had passed. The villagers came out to see the damage. The great banyan lay on its side, its roots torn out of the earth. The bamboo stood tall again, shining in the sunlight, with hardly a leaf out of place.
+
+An old woman shook her head and said to the children, “Remember this. Sometimes the one who bends is stronger than the one who refuses to bend.”`,
+mcq:[["What did the banyan think of the bamboo at first?",["It was beautiful","It was weak","It was wise","It was tall"],1],["Why did the banyan fall in the storm?",["It was very old","It refused to bend","The villagers cut it","Lightning struck it"],1],["Who explains the lesson at the end?",["The bamboo","The banyan","An old woman","A farmer"],2]],
+vocab:[["‘Boomed’ means:",["whispered","spoke in a loud, deep voice","cried","laughed"],1],["‘Swayed’ means:",["moved gently from side to side","broke","grew","fell down"],0]],
+short:[["Compare how the banyan and the bamboo behaved during the storm.","The banyan stood stiff and refused to bend, while the bamboo bent low and let the wind pass over it."],["What does ‘the one who bends is stronger’ mean in real life? Give an example.","Being flexible and humble helps us get through problems better than being stubborn. For example, listening to a friend’s idea instead of insisting on your own can save a friendship (any sensible example)."]]},
+
+{title:"Plastic in Our Oceans",kind:"Information",text:`Every year, millions of tonnes of plastic end up in the world’s oceans. Much of it comes from things we use only once: bottles, straws, carry bags and food wrappers.
+
+Plastic does not rot like a banana peel or a leaf. Instead, sunlight and waves slowly break it into tiny pieces called microplastics. These pieces can stay in the water for hundreds of years.
+
+Sea animals suffer the most. Turtles often mistake floating bags for jellyfish, one of their favourite foods. Seabirds feed bottle caps to their chicks. Fish swallow microplastics, and when people eat those fish, the plastic can enter our bodies too.
+
+The good news is that each of us can help. We can carry cloth bags to the market, refuse plastic straws, and use steel bottles and lunch boxes. We can also take part in beach and river clean-ups. In 2015, volunteers led by a young lawyer named Afroz Shah began cleaning Versova Beach in Mumbai. Over the next few years they removed millions of kilograms of rubbish, and Olive Ridley turtles returned to hatch on the beach.`,
+mcq:[["What are microplastics?",["Plastic toys","Tiny pieces of broken plastic","A kind of jellyfish","Plastic bottles"],1],["Why do turtles eat plastic bags?",["They like the taste","They think the bags are jellyfish","They are very hungry","People feed them"],1],["What happened after Versova Beach was cleaned?",["It became a market","Olive Ridley turtles returned to hatch","More plastic came","The fish disappeared"],1]],
+vocab:[["‘Rot’ means:",["to break down naturally and decay","to shine","to float","to grow"],0],["‘Volunteers’ are people who:",["work without pay because they want to help","are paid workers","are sailors","are only scientists"],0]],
+short:[["Why is plastic harmful to sea animals? Give two examples.","Animals mistake plastic for food: turtles eat floating bags thinking they are jellyfish, seabirds feed bottle caps to their chicks, and fish swallow microplastics (any two)."],["Write two things YOU can do to reduce plastic waste.","Carry a cloth bag, refuse plastic straws, use a steel bottle and lunch box, or join a clean-up (any two, in your own words)."]]},
+
+{title:"The Mystery of the Missing Tiffin",kind:"Story",text:`On Monday, Aanya’s tiffin box disappeared from her desk during the morning break. On Tuesday, it happened again. By Wednesday, the whole of Class 5B was talking about the Tiffin Thief.
+
+“It must be someone from 5A,” said Dev. “They’re always hungry.”
+
+But Aanya was not so sure. She noticed that the box always went missing when the windows were open. She also noticed small muddy marks on her desk, shaped like tiny hands.
+
+On Thursday, Aanya and her friend Zoya hid behind the cupboard during break. Ten minutes later, they heard a soft thump. A small grey monkey climbed in through the window, grabbed Aanya’s tiffin and sat on the windowsill, happily eating her aloo parathas.
+
+The girls burst out laughing. The ‘thief’ looked at them, chattered angrily and leapt away into the neem tree.
+
+From then on, the class kept the windows closed at break time. And Aanya, feeling a little sorry for the monkey, left a banana on the wall outside every Friday.`,
+mcq:[["Why did Aanya think the thief was not from 5A?",["Dev told her","She saw muddy marks shaped like tiny hands","The teacher said so","5A was on holiday"],1],["Who was the real ‘thief’?",["Dev","Zoya","A monkey","A crow"],2],["What did the class do to stop the problem?",["Locked the tiffin boxes","Kept the windows closed at break","Told the principal","Moved to another room"],1]],
+vocab:[["‘Leapt’ is the past tense of:",["leap","lept","leaped up","lap"],0],["‘Chattered’ here means:",["made quick, high sounds","ate quickly","slept","climbed"],0]],
+short:[["What clues helped Aanya solve the mystery?","The box went missing only when the windows were open, and there were small muddy marks shaped like tiny hands on her desk."],["What does Aanya’s action at the end tell you about her?","She is kind and caring. Even though the monkey took her food, she felt sorry for it and left it a banana."]]},
+
+{title:"Why We Need Sleep",kind:"Information",text:`Have you ever felt grumpy or found it hard to focus in class after staying up late? That is because sleep is not just rest. It is when your body and brain do some of their most important work.
+
+While you sleep, your brain sorts out everything you learned during the day. It stores the useful memories and clears away what is not needed. This is why a good night’s sleep before a test often helps more than staying up late to study.
+
+Sleep also helps your body grow. Children’s bodies release a special growth hormone mostly while they are in deep sleep. Your muscles repair themselves, and your body builds up its defence against germs.
+
+Doctors say children aged six to twelve need nine to twelve hours of sleep every night. To sleep well, it helps to go to bed at the same time each day, keep screens away for an hour before bedtime, and sleep in a dark, quiet room.
+
+So the next time someone tells you to go to bed early, remember: you are not wasting time. You are helping your brain and body become stronger.`,
+mcq:[["What does the brain do with memories during sleep?",["Deletes all of them","Stores useful ones and clears away others","Turns them all into dreams","Nothing at all"],1],["How many hours of sleep do children aged 6–12 need?",["5–6","7–8","9–12","13–15"],2],["Which is NOT a tip for sleeping well?",["Sleep at the same time daily","Use screens just before bed","Sleep in a dark room","Keep the room quiet"],1]],
+vocab:[["‘Grumpy’ means:",["cheerful","bad-tempered","sleepy","hungry"],1],["‘Defence’ here means:",["protection","a wall","a sport","a fight"],0]],
+short:[["Give two ways sleep helps the body.","Growth hormone is released in deep sleep so the body grows, muscles repair themselves, and the body builds defence against germs (any two)."],["Why might sleeping well before a test be better than staying up late to study?","During sleep the brain stores what you learned as memories, so you remember better and can focus during the test."]]},
+
+{title:"The Forest Man of India",kind:"True story",text:`In 1979, a sixteen-year-old boy named Jadav Payeng saw something that made him very sad. After a flood on the Brahmaputra river in Assam, many snakes lay dead on a bare sandbank. There were no trees to give them shade, and the hot sun had killed them.
+
+Jadav decided to do something. He began planting bamboo saplings on the sandbank, one by one. Every day he watered them, carrying water from the river. People laughed at him. “Nothing will grow on sand,” they said.
+
+But Jadav did not give up. Year after year, he planted more trees. Slowly, the bare sandbank turned green. Today, the forest he planted covers about 550 hectares. It is called the Molai Forest, after his nickname.
+
+The forest is now home to deer, rhinos, tigers and hundreds of birds. Herds of elephants visit it every year. In 2015, the Government of India gave Jadav the Padma Shri award. People now call him the ‘Forest Man of India’.`,
+mcq:[["What made Jadav start planting trees?",["He wanted to sell wood","He saw snakes that died from the heat on a bare sandbank","His teacher asked him to","He wanted to win an award"],1],["What did people say at first?",["Nothing will grow on sand","Well done","Plant mango trees","Move to the city"],0],["What is Jadav called today?",["The River Man","The Forest Man of India","The Snake Man","The Bamboo King"],1]],
+vocab:[["‘Saplings’ are:",["young trees","old trees","seeds","flowers"],0],["‘Bare’ means:",["covered with plants","empty, with nothing on it","wet","crowded"],1]],
+short:[["Which quality of Jadav helped him succeed? Support your answer with a line from the passage.","He was determined and patient: ‘Jadav did not give up. Year after year, he planted more trees.’"],["How did the forest help animals?","It became a home for deer, rhinos, tigers and hundreds of birds, and herds of elephants visit it every year."]]},
+
+{title:"A Letter from Camp",kind:"Letter",letter:true,text:`Dear Ma and Papa,
+
+Greetings from the adventure camp in Manali! I have been here for four days, and I have so much to tell you.
+
+On the first day I was homesick, and I almost cried when the bus left. But my tent partner, Siddharth, shared his chocolates with me and told me funny jokes until I fell asleep. Now we are best friends.
+
+Every morning we wake up at six. It is so cold that my breath comes out like smoke! After a breakfast of porridge and parathas, we go trekking. Yesterday we climbed to a waterfall. The path was steep and slippery, and I fell twice, but our instructor, Captain Thapa, said I was the bravest in our group because I kept going.
+
+In the evenings, we sit around a campfire and sing songs. Last night I saw more stars than I have ever seen in Delhi. Captain Thapa showed us the Great Bear and the Pole Star.
+
+I miss your cooking, Ma, and our evening chess games, Papa. I will be home on Sunday.
+
+With lots of love,
+Arnav`,
+mcq:[["How did Arnav feel on the first day?",["Excited","Homesick","Angry","Bored"],1],["Who helped Arnav feel better?",["Captain Thapa","Siddharth","His parents","The cook"],1],["Why did Captain Thapa call Arnav brave?",["He climbed first","He kept going even after falling","He sang well","He woke up early"],1]],
+vocab:[["‘Steep’ means:",["rising sharply","flat","wide","dark"],0],["‘Homesick’ means:",["ill at home","sad because you miss home","happy to be home","tired of home"],1]],
+short:[["Write two things Arnav enjoyed at camp.","Trekking to the waterfall, singing around the campfire, seeing the stars, or making a new friend (any two)."],["Why do you think Arnav could see more stars in Manali than in Delhi?","Manali has clean air and few bright lights, while a big city like Delhi has lots of lights and pollution that hide the stars."]]}
+];
+
+// Essay topics: [title, hints separated by |]
+const E = [
+["My Favourite Festival","Which festival is it and when is it celebrated?|How does your family prepare for it?|What do you enjoy most: the food, the lights, the people?|Why is it special to you?"],
+["A Day Without Electricity","What happened when the power went off?|What could you not do?|How did your family pass the time?|What did you learn from the day?"],
+["My Best Friend","Who is your best friend and how did you meet?|What is your friend like?|What do you do together?|Why do you value this friendship?"],
+["If I Were the Principal of My School","What would you change first?|What new activities or rules would you bring?|How would you help students and teachers?|Why would these changes make school better?"],
+["The Importance of Trees","What do trees give us?|How do they help animals and birds?|What happens when we cut too many trees?|What can children do to save trees?"],
+["My Favourite Book","What is the book called and who wrote it?|What is it about (without giving away the ending)?|Which character do you like most and why?|Why would you recommend it?"],
+["A Visit to the Zoo","When did you go and with whom?|Which animals did you see?|Which animal did you like best and why?|How did you feel at the end of the day?"],
+["Why Sports Are Important","How do sports keep us healthy?|What do sports teach us, like teamwork and discipline?|Which sport do you play?|Why should every child play a sport?"],
+["My Dream Holiday","Where would you like to go?|Who would go with you?|What would you see and do there?|Why is this place your dream?"],
+["Saving Water","Why is water precious?|How is water wasted at home and at school?|Give three ways to save water.|What will happen if we do not save water?"],
+["My Grandparents","Who are they and where do they live?|What are they like?|What do you enjoy doing with them?|What have they taught you?"],
+["A Rainy Day","What did the sky and the air look like?|What were people and animals doing?|What did you do that day?|How did the rain make you feel?"],
+["The Best Gift I Ever Received","What was the gift and who gave it to you?|On what occasion did you get it?|Why is it special?|How do you take care of it?"],
+["Mobile Phones: Friend or Foe?","How are mobile phones useful?|What problems can they cause?|How much screen time is right for children?|What is your opinion?"],
+["My School Library","What does your library look like?|What kinds of books are there?|What rules does it have?|Why do you enjoy going there?"],
+["If I Could Fly","Where would you fly first?|What would the world look like from above?|How would you use this power to help others?|Would there be any problems?"],
+["Good Manners","What are good manners?|Give examples at home, at school and in public.|How do good manners make others feel?|Why should we practise them every day?"],
+["My Hobby","What is your hobby?|When and how did you start it?|What do you need for it?|How does it help you?"],
+["A Clean India","Why is cleanliness important?|What problems does dirt cause?|What is the Swachh Bharat Mission?|What can you do to keep your area clean?"],
+["The Animal I Like Most","Which animal is it?|What does it look like and where does it live?|What is special about it?|Why do you like it?"],
+["What I Want to Be When I Grow Up","What do you want to become?|Why did you choose this?|What will you need to learn?|How will you help others in this job?"],
+["My Most Embarrassing Moment","Where were you and what happened?|How did people react?|How did you feel?|What do you think about it now?"],
+["The Season I Love","Which season is it, and in which months?|What is the weather like?|What foods, clothes and activities go with it?|Why do you love it?"],
+["Healthy Food and Junk Food","What is healthy food? Give examples.|What is junk food and why is it tempting?|How does each affect our body?|How can you make healthy choices?"],
+["A Day in the Life of a Farmer","When does a farmer’s day start?|What work does a farmer do?|What difficulties does a farmer face?|Why should we respect farmers?"],
+["My Pet (or the Pet I Wish I Had)","What pet is it and what is its name?|What does it look like?|How do you take care of it?|Why is it special to you?"],
+["The Importance of Reading","Why should children read every day?|How does reading help in studies and in life?|What kinds of books do you enjoy?|How can we make reading a habit?"],
+["Online Classes or Classroom Learning?","What is good about online classes?|What do you miss when you are not in a classroom?|Which do you prefer and why?|Can both be used together?"],
+["A Person I Admire","Who is the person?|What have they done?|What qualities do you admire in them?|How do you want to be like them?"],
+["My Favourite Game","What game is it and how is it played?|Who do you play it with?|What skills does it need?|Why do you enjoy it?"],
+["Our National Flag","What does our flag look like?|What do the colours and the chakra stand for?|When do we hoist it?|How should we respect it?"],
+["A Walk in the Park","When did you go and with whom?|What did you see, hear and smell?|What were other people doing?|How did you feel after the walk?"],
+["Helping at Home","What jobs do you do at home?|Why should children help at home?|What have you learnt by helping?|How does it make your family feel?"],
+["The Wonders of Science","Name some inventions we use every day.|How has science made life easier?|Can science be harmful? How?|What would you like to invent?"],
+["Village Life and City Life","What is life like in a village?|What is life like in a city?|What are the good and bad points of each?|Where would you prefer to live, and why?"],
+["My First Day at School","How did you feel that morning?|Who took you to school?|What happened in class?|How do you feel about that day now?"],
+["Why We Should Be Kind to Animals","How do animals help us?|How are animals sometimes treated badly?|What can we do to help stray animals?|Why does kindness matter?"],
+["Television: Good or Bad?","What good programmes are there on TV?|What harm can too much TV do?|How much TV should children watch?|What is your opinion?"],
+["Sunday Morning at Home","What time do you wake up on Sunday?|What does your family do?|What special food is made?|Why do you look forward to Sundays?"],
+["The Value of Time","Why is time precious?|What happens when we waste time?|How do you plan your day?|What does ‘time and tide wait for none’ mean?"]
+];
+
+// Story prompts: [kind, prompt]
+const S = [
+["Begin with","“The moment I opened the old wooden box, it began to glow…”"],
+["Use the outline","A lion is sleeping — a mouse runs over him — the lion catches the mouse — the mouse begs and promises to help one day — the lion laughs and lets it go — later the lion is trapped in a hunter’s net — the mouse gnaws the net — the lion is free. Give the story a title and a moral."],
+["Use this title","The Robot Who Wanted to Be a Chef"],
+["What if…","What if you woke up one morning and could understand everything animals were saying?"],
+["Begin with","“Nobody believed me when I said something was living under the school stairs…”"],
+["Use the outline","A hot summer day — a thirsty crow — finds a pot with very little water — cannot reach it — has an idea — drops in pebbles one by one — the water rises — the crow drinks. Give the story a title and a moral."],
+["Use this title","The Day Our Teacher Turned Invisible"],
+["What if…","What if you found a small door in your house that you had never seen before?"],
+["Begin with","“The rain had not stopped for three days, and the river was rising fast…”"],
+["Use this title","My Shoes Ran Away"],
+["Use the outline","A boy comes last in a race on Sports Day — feels sad — his grandfather wakes him early every morning to practise — he wants to give up but doesn’t — next Sports Day arrives — what happens? Give a title and a lesson."],
+["What if…","What if your shadow started doing things on its own?"],
+["Begin with","“When the lights went out during the school play, I heard a strange whisper behind the curtain…”"],
+["Use this title","The Elephant Who Was Afraid of Mice"],
+["Use the outline","A dog finds a bone — crosses a bridge over a stream — sees his reflection in the water — thinks it is another dog with a bigger bone — barks to grab it — his own bone falls into the water. Give a title and a moral."],
+["What if…","What if you shrank to the size of an ant for one whole day?"],
+["Begin with","“The note had no name on it, only five words: ‘Look under the mango tree.’”"],
+["Use this title","Lost in the Mall"],
+["Use the outline","Two friends go camping with their school — one wanders off to follow a butterfly — gets lost in the forest — remembers what the guide taught — uses clues to find the way back — what do the friends learn?"],
+["What if…","What if your pet could talk to you for just one day?"],
+["Begin with","“I had always wanted a little brother, but I never expected him to be a dragon…”"],
+["Use this title","The Magic Paintbrush"],
+["Use the outline","A girl finds a bird with a hurt wing — takes it home — feeds and cares for it — the bird gets better — she must decide whether to keep it or set it free — how does she feel?"],
+["What if…","What if it rained chocolate instead of water for one day?"],
+["Begin with","“The new boy in our class never spoke a word, until the day of the science fair…”"],
+["Use this title","The Honest Woodcutter"],
+["Use the outline","An ant works hard all summer storing food — a grasshopper sings and plays and laughs at the ant — winter comes — the grasshopper is cold and hungry — goes to the ant for help — choose your own ending and moral."],
+["What if…","What if you could travel back in time to the age of dinosaurs?"],
+["Begin with","“As our train entered the dark tunnel, the old lady sitting opposite me vanished…”"],
+["Use this title","One Day as the Prime Minister"],
+["Use the outline","A village has no water in summer — the children make a plan to collect rainwater — the elders laugh at them — the children keep working — the monsoon comes — how is the village saved?"],
+["What if…","What if your school bag could take you anywhere you wished?"],
+["Begin with","“Grandma said the old banyan tree granted one wish every hundred years, and tonight was the night…”"],
+["Use this title","The Cricket Match We Almost Lost"],
+["Use the outline","A cruel lion eats one animal every day — it is the clever rabbit’s turn — the rabbit arrives late on purpose — tells the lion another lion lives in the well — the lion looks in and sees his reflection — jumps in to fight — the forest is free. Give a title and a moral."],
+["What if…","What if you became the teacher and your teacher became the student for a day?"],
+["Begin with","“The puppy followed me all the way home, and it had a tiny golden key tied to its collar…”"],
+["Use this title","The Kite That Flew to the Moon"],
+["Use the outline","A boy breaks his neighbour’s window with a cricket ball — runs away and hides — cannot sleep because he feels guilty — goes to say sorry — what does the neighbour say? Give a title and a lesson."],
+["What if…","What if every computer and phone in the world stopped working for a week?"]
+];
+
+/* ---------------- Paper building ---------------- */
+const MAX = {g:10, b:10, e:10, s:10};
+const ESSAY_RANGE = [120,180], STORY_RANGE = [150,220];
+const mod = (a,n) => ((a % n) + n) % n;
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuffle(arr,r){for(let i=arr.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+const CATS = [...new Set(G.map(q => q[0]))];
+
+function fmt(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function parse(s){const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
+function addDays(s,k){const d=parse(s);d.setDate(d.getDate()+k);return fmt(d)}
+function todayStr(){return fmt(new Date())}
+function dayNum(s){const [y,m,d]=s.split("-").map(Number);return Math.round((Date.UTC(y,m-1,d)-Date.UTC(2026,0,1))/864e5)}
+function pretty(s){return parse(s).toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}
+
+function buildPaper(ds){
+  const n = dayNum(ds), r = rng(n*9301+49297);
+  const cats = shuffle(CATS.slice(), r).slice(0,10);
+  const grammar = cats.map(c => {
+    const list = G.filter(q => q[0] === c);
+    const q = list[mod(n + CATS.indexOf(c)*3, list.length)];
+    const order = shuffle(q[2].map((_,k) => k), r);
+    return {cat:c, q:q[1], opts:order.map(k => q[2][k]), ans:order.indexOf(q[3]), why:q[4]};
+  });
+  const essay = E[mod(n*17, E.length)];
+  return {n, grammar, passage:P[mod(n, P.length)], essay:{title:essay[0], hints:essay[1].split("|")}, story:S[mod(n*23+5, S.length)]};
+}
+
+/* ---------------- State and saving ---------------- */
+const LS_KEY = "rishay-english-papers-v1";
+let papers = {};
+try { papers = JSON.parse(localStorage.getItem(LS_KEY) || "{}") || {}; } catch(e) { papers = {}; }
+let db = null, sample = null;
+let current = todayStr();
+
+function blank(){return {g:Array(10).fill(null), m:[null,null,null], v:[null,null], s:["",""], essay:"", story:"",
+  marks:{s:[null,null], essay:null, story:null}, feedback:null, submitted:false, startedAt:null, submittedAt:null, minutes:null, updatedAt:0}}
+function norm(x){const b=blank(); if(!x||typeof x!=="object") return b; const o={...b,...x}; o.marks={...b.marks,...(x.marks||{})};
+  if(!Array.isArray(o.g)||o.g.length!==10) o.g=b.g; if(!Array.isArray(o.m)) o.m=b.m; if(!Array.isArray(o.v)) o.v=b.v; if(!Array.isArray(o.s)) o.s=b.s;
+  if(!Array.isArray(o.marks.s)) o.marks.s=[null,null]; return o}
+function rec(ds=current){ if(!papers[ds]) papers[ds]=blank(); papers[ds]=norm(papers[ds]); return papers[ds]; }
+
+let saveTimer=null, chain=Promise.resolve(), dirty=new Set();
+function touch(ds=current){ const r=rec(ds); r.updatedAt=Date.now(); if(!r.startedAt) r.startedAt=Date.now(); dirty.add(ds); clearTimeout(saveTimer); saveTimer=setTimeout(flush,1200); }
+function flush(){
+  try { localStorage.setItem(LS_KEY, JSON.stringify(papers)); } catch(e) {}
+  if(!db){ setSync(); return; }
+  const list=[...dirty]; dirty.clear();
+  list.forEach(ds => {
+    const body = JSON.parse(JSON.stringify(papers[ds]));
+    chain = chain.then(() => db.doc("papers/"+ds).set(body)).then(() => setSync("Saved to your Claude account"))
+      .catch(e => { setSync(e && e.code==="quota_exceeded" ? "Storage is full. Saved on this device only." : "Could not save online. Saved on this device."); });
+  });
+}
+function setSync(msg){ document.getElementById("sync").textContent = msg || (db ? "Saved to your Claude account" : "Saved on this device"); }
+
+/* ---------------- Scoring ---------------- */
+function score(paper, r){
+  const g = paper.grammar.reduce((a,q,i) => a + (r.g[i]===q.ans ? 1 : 0), 0);
+  const m = paper.passage.mcq.reduce((a,q,i) => a + (r.m[i]===q[2] ? 1 : 0), 0);
+  const v = paper.passage.vocab.reduce((a,q,i) => a + (r.v[i]===q[2] ? 1 : 0), 0);
+  const sm = r.marks.s, sPend = sm.some(x => x===null);
+  const sSum = sm.reduce((a,x) => a + (x||0), 0);
+  const b = m + v + sSum;
+  const e = r.marks.essay, st = r.marks.story;
+  const pending = sPend || e===null || st===null;
+  const total = g + b + (e||0) + (st||0);
+  // grammar and the reading MCQs are always marked; written parts count once marked
+  const markedMax = 10 + 5 + sm.filter(x=>x!==null).length*2.5 + (e!==null?10:0) + (st!==null?10:0);
+  return {g, b, bAuto:m+v, sPend, e, st, total, pending, markedMax, pct: markedMax ? total/markedMax : 0};
+}
+const fmtN = x => (Math.round(x*2)/2).toString();
+
+function answeredCount(r){
+  let c = r.g.filter(x => x!==null).length + r.m.filter(x => x!==null).length + r.v.filter(x => x!==null).length;
+  c += r.s.filter(x => x.trim().length > 0).length;
+  if (r.essay.trim()) c++; if (r.story.trim()) c++;
+  return c;
+}
+const TOTAL_ITEMS = 10 + 3 + 2 + 2 + 2;
+const words = t => (t.trim().match(/[A-Za-z0-9’']+/g) || []).length;
+
+/* ---------------- Rendering ---------------- */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function optsHTML(name, opts, chosen, ans, locked){
+  return `<div class="opts" role="radiogroup">` + opts.map((o,k) => {
+    let cls = "opt";
+    if (locked) { if (k===ans) cls += " right"; else if (k===chosen) cls += " wrong"; }
+    const id = name + "o" + k;
+    return `<span class="${cls}"><input type="radio" id="${id}" name="${name}" value="${k}" ${chosen===k?"checked":""} ${locked?"disabled":""}><label for="${id}">${esc(o)}</label></span>`;
+  }).join("") + `</div>`;
+}
+function tick(ok){ return `<span class="tick ${ok?"ok":"no"}" aria-label="${ok?"correct":"incorrect"}">${ok?"✓":"✗"}</span>`; }
+function markSelect(id, max, step, val, label){
+  let o = `<option value="">–</option>`;
+  for (let x=0; x<=max+1e-9; x+=step) o += `<option value="${x}" ${val!==null && Math.abs(val-x)<1e-9 ? "selected":""}>${fmtN(x)}</option>`;
+  return `<div class="markrow"><label for="${id}">${label}</label><select id="${id}">${o}</select><span>/ ${max}</span></div>`;
+}
+function feedbackHTML(f, kind){
+  if (!f) return "";
+  const rubricNames = kind==="essay" ? {content:"Ideas",organisation:"Organisation",vocabulary:"Vocabulary",grammar:"Grammar"} : {plot:"Plot",characters:"Characters",language:"Language",grammar:"Grammar"};
+  const maxes = kind==="essay" ? {content:4,organisation:2,vocabulary:2,grammar:2} : {plot:4,characters:2,language:2,grammar:2};
+  const rub = f.rubric ? `<div class="rub">` + Object.keys(rubricNames).map(k => `<div><span>${rubricNames[k]}</span><b>${esc(f.rubric[k] ?? "–")}/${maxes[k]}</b></div>`).join("") + `</div>` : "";
+  const tips = Array.isArray(f.tips) && f.tips.length ? `<ul>${f.tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : "";
+  const corr = Array.isArray(f.corrections) && f.corrections.length ? `<div class="corr">${f.corrections.map(c => `<div><s>${esc(c.wrong)}</s> → <ins>${esc(c.right)}</ins></div>`).join("")}</div>` : "";
+  return `<div class="fb">${f.praise ? esc(f.praise) : ""}${rub}${tips}${corr}</div>`;
+}
+
+function render(){
+  const paper = buildPaper(current), r = rec(), locked = r.submitted, p = paper.passage;
+  const sc = score(paper, r);
+  let h = `<div class="sheet-head">
+    <div class="school">Daily English Practice Paper · Class 5</div>
+    <div>Name: <b>Rishay</b></div>
+    <div class="meta"><span>${esc(pretty(current))}</span><span>Paper no. ${paper.n+1}</span><span>Time: 45 minutes</span><span>Maximum marks: 40</span></div>
+  </div>
+  <ol class="instr">
+    <li>Read every question carefully and answer all of them.</li>
+    <li>Write the essay in about ${ESSAY_RANGE[0]}–${ESSAY_RANGE[1]} words and the story in about ${STORY_RANGE[0]}–${STORY_RANGE[1]} words.</li>
+    <li>Check your spelling and punctuation before you submit.</li>
+  </ol>
+  <nav class="jump" aria-label="Sections"><a href="#secA">A · Grammar</a><a href="#secB">B · Reading</a><a href="#secC">C · Essay</a><a href="#secD">D · Story</a></nav>`;
+
+  if (locked) {
+    const pctTxt = sc.pending ? "" : Math.round(sc.total/40*100) + "%";
+    const pct = sc.total/40;
+    const remark = sc.pending ? "Grammar and reading marked. Writing still to be marked." :
+      pct>=0.9 ? "Excellent work, Rishay!" : pct>=0.75 ? "Very good, Rishay. Keep it up!" : pct>=0.6 ? "Good effort. Read the corrections below." : "Keep practising. Look at each correction carefully.";
+    h += `<div class="result" id="result">
+      <div class="stamp"><b>${fmtN(sc.total)}</b><small>out of 40</small><small>${pctTxt}</small></div>
+      <div>
+        <p class="remark">${esc(remark)}</p>
+        ${r.feedback && r.feedback.overall ? `<p style="margin:0 0 6px">${esc(r.feedback.overall)}</p>` : ""}
+        <div class="breakdown">
+          <div class="bd"><small>A · Grammar</small><b>${sc.g}/10</b></div>
+          <div class="bd"><small>B · Reading</small>${sc.sPend ? `<b class="pend">${sc.bAuto}/5 + to mark</b>` : `<b>${fmtN(sc.b)}/10</b>`}</div>
+          <div class="bd"><small>C · Essay</small>${sc.e===null ? `<b class="pend">to mark</b>` : `<b>${fmtN(sc.e)}/10</b>`}</div>
+          <div class="bd"><small>D · Story</small>${sc.st===null ? `<b class="pend">to mark</b>` : `<b>${fmtN(sc.st)}/10</b>`}</div>
+        </div>
+        ${r.minutes ? `<div class="ai-msg">Finished in ${r.minutes} minute${r.minutes===1?"":"s"}.</div>` : ""}
+        <div class="ai-row" id="aiRow" ${sample ? "" : "hidden"}>
+          <button class="btn primary" type="button" id="askClaude">${r.feedback ? "Mark the writing again" : "Ask Claude to mark the writing"}</button>
+          <span class="ai-msg" id="aiMsg">${r.feedback ? "Marked by Claude. A parent can change any mark below." : "Claude marks the short answers, essay and story, and explains how to improve."}</span>
+        </div>
+        ${sample ? "" : `<div class="ai-msg">A parent can mark the short answers, essay and story using the mark boxes below.</div>`}
+      </div>
+    </div>`;
+  }
+
+  // Section A
+  h += `<section class="sec" id="secA"><div class="sec-h"><h2>Section A · <em>Grammar</em></h2><span class="mk">10 × 1 = 10 marks</span></div>`;
+  paper.grammar.forEach((q,i) => {
+    const ok = r.g[i]===q.ans;
+    h += `<div class="q"><div class="qn">${i+1}.</div><div class="qbody"><div class="qtag">${esc(q.cat)}</div>
+      <p class="qtext">${q.q}${locked ? tick(ok) : ""}</p>${optsHTML("g"+i, q.opts, r.g[i], q.ans, locked)}
+      ${locked && !ok ? `<div class="why">${esc(q.why)}</div>` : ""}</div></div>`;
+  });
+  h += `</section>`;
+
+  // Section B
+  const paras = p.text.split(/\n\s*\n/).map(t => `<p>${esc(t)}</p>`).join("");
+  h += `<section class="sec" id="secB"><div class="sec-h"><h2>Section B · <em>Reading</em></h2><span class="mk">10 marks</span></div>
+    <p class="subhead">Read the ${p.poem ? "poem" : p.letter ? "letter" : "passage"} carefully and answer the questions that follow.</p>
+    <article class="passage ${p.poem?"poem":""} ${p.letter?"letter":""}"><div class="kind">${esc(p.kind)}</div><h3>${esc(p.title)}</h3>${paras}</article>
+    <p class="subhead">Choose the correct answer. (3 × 1 = 3)</p>`;
+  let qn = 11;
+  p.mcq.forEach((q,i) => {
+    const ok = r.m[i]===q[2];
+    h += `<div class="q"><div class="qn">${qn++}.</div><div class="qbody"><p class="qtext">${esc(q[0])}${locked?tick(ok):""}</p>${optsHTML("m"+i, q[1], r.m[i], q[2], locked)}</div></div>`;
+  });
+  h += `<p class="subhead">Word meanings. (2 × 1 = 2)</p>`;
+  p.vocab.forEach((q,i) => {
+    const ok = r.v[i]===q[2];
+    h += `<div class="q"><div class="qn">${qn++}.</div><div class="qbody"><p class="qtext">${esc(q[0])}${locked?tick(ok):""}</p>${optsHTML("v"+i, q[1], r.v[i], q[2], locked)}</div></div>`;
+  });
+  h += `<p class="subhead">Answer in two or three complete sentences. (2 × 2½ = 5)</p>`;
+  p.short.forEach((q,i) => {
+    const fb = r.feedback && r.feedback.short && r.feedback.short[i];
+    h += `<div class="q"><div class="qn">${qn++}.</div><div class="qbody"><p class="qtext">${esc(q[0])}</p>
+      <textarea class="lined" id="s${i}" rows="3" ${locked?"disabled":""} aria-label="Answer to question ${qn-1}">${esc(r.s[i])}</textarea>
+      ${locked ? `<div class="model"><b>Model answer:</b> ${esc(q[1])}</div>
+        ${fb && fb.comment ? `<div class="why">${esc(fb.comment)}</div>` : ""}
+        ${markSelect("mk-s"+i, 2.5, 0.5, r.marks.s[i], "Marks")}` : ""}
+    </div></div>`;
+  });
+  h += `</section>`;
+
+  // Section C
+  const ew = words(r.essay);
+  h += `<section class="sec" id="secC"><div class="sec-h"><h2>Section C · <em>Essay</em></h2><span class="mk">10 marks</span></div>
+    <div class="q"><div class="qn">${qn++}.</div><div class="qbody">
+    <p class="subhead">Write an essay of about ${ESSAY_RANGE[0]}–${ESSAY_RANGE[1]} words on the topic below. Use the points to help you plan.</p>
+    <p class="topic">${esc(paper.essay.title)}</p>
+    <ul class="hints">${paper.essay.hints.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+    <textarea class="lined" id="essay" rows="12" ${locked?"disabled":""} aria-label="Essay">${esc(r.essay)}</textarea>
+    <div class="wc"><span id="essayWc">${wcText(ew, ESSAY_RANGE)}</span><span>Start with an introduction, write 2–3 paragraphs, and finish with a conclusion.</span></div>
+    ${locked ? feedbackHTML(r.feedback && r.feedback.essay, "essay") + markSelect("mk-essay", 10, 1, r.marks.essay, "Marks") : ""}
+    </div></div></section>`;
+
+  // Section D
+  const sw = words(r.story);
+  h += `<section class="sec" id="secD"><div class="sec-h"><h2>Section D · <em>Story writing</em></h2><span class="mk">10 marks</span></div>
+    <div class="q"><div class="qn">${qn++}.</div><div class="qbody">
+    <span class="story-kind">${esc(paper.story[0])}</span>
+    <p class="story-prompt">${esc(paper.story[1])}</p>
+    <ul class="hints"><li>Give your story a title.</li><li>Name your characters and say where the story happens.</li><li>Build up a problem, then show how it is solved.</li><li>Use some dialogue (“…,” said …) and describing words.</li></ul>
+    <textarea class="lined" id="story" rows="14" ${locked?"disabled":""} aria-label="Story">${esc(r.story)}</textarea>
+    <div class="wc"><span id="storyWc">${wcText(sw, STORY_RANGE)}</span><span>Write in the past tense and check your full stops and capital letters.</span></div>
+    ${locked ? feedbackHTML(r.feedback && r.feedback.story, "story") + markSelect("mk-story", 10, 1, r.marks.story, "Marks") : ""}
+    </div></div></section>`;
+
+  document.getElementById("paper").innerHTML = h;
+  renderChrome();
+}
+function wcText(n, [lo,hi]){ const cls = n>=lo ? "ok" : n>0 ? "low" : ""; return `<span class="${cls}">${n} words</span> · aim for ${lo}–${hi}`; }
+
+function renderChrome(){
+  const r = rec(), t = todayStr();
+  const n = answeredCount(r);
+  document.getElementById("prog").innerHTML = r.submitted ? `Paper submitted<small>${esc(pretty(current))}</small>` : `${n} of ${TOTAL_ITEMS} answered<small>${n===TOTAL_ITEMS ? "Ready to submit" : ""}</small>`;
+  document.getElementById("meter").style.width = (r.submitted ? 100 : n/TOTAL_ITEMS*100) + "%";
+  const sub = document.getElementById("submit");
+  sub.hidden = r.submitted; sub.textContent = "Submit paper"; sub.classList.remove("warn"); sub.classList.add("primary");
+  document.getElementById("next").disabled = current >= t;
+
+  // stats
+  const done = Object.keys(papers).filter(k => papers[k] && papers[k].submitted).sort();
+  let streak = 0, d = rec(t).submitted ? t : addDays(t,-1);
+  while (papers[d] && papers[d].submitted) { streak++; d = addDays(d,-1); }
+  const pcts = done.map(k => score(buildPaper(k), norm(papers[k]))).filter(s => s.markedMax>0).map(s => s.pct);
+  const avg = pcts.length ? Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length*100) + "%" : "–";
+  document.getElementById("stats").innerHTML =
+    `<div class="stat streak"><b>${streak}</b><small>day streak</small></div><div class="stat"><b>${done.length}</b><small>papers done</small></div><div class="stat"><b>${avg}</b><small>average score</small></div>`;
+
+  // strip
+  let s = "";
+  for (let i=13; i>=0; i--) {
+    const ds = addDays(t,-i), x = papers[ds] ? norm(papers[ds]) : null, dt = parse(ds);
+    let cls = "day" + (i>=7 ? " old" : "") + (ds===current ? " cur" : "");
+    let sTxt = "–";
+    if (x && x.submitted) { const sc = score(buildPaper(ds), x); cls += sc.pending ? " part" : " done"; sTxt = sc.pending ? "to mark" : fmtN(sc.total); }
+    else if (x && answeredCount(x)>0) { cls += " part"; sTxt = "started"; }
+    s += `<button type="button" class="${cls}" data-d="${ds}" aria-label="${esc(pretty(ds))}"><span class="w">${dt.toLocaleDateString("en-IN",{weekday:"short"})}</span><span class="d">${dt.getDate()}</span><span class="s">${sTxt}</span></button>`;
+  }
+  document.getElementById("strip").innerHTML = s;
+}
+
+/* ---------------- Events ---------------- */
+const paperEl = document.getElementById("paper");
+paperEl.addEventListener("change", e => {
+  const el = e.target, r = rec();
+  if (el.type === "radio" && !r.submitted) {
+    const key = el.name[0], i = Number(el.name.slice(1)), val = Number(el.value);
+    r[key][i] = val; touch(); renderChrome(); return;
+  }
+  if (el.tagName === "SELECT" && el.id.startsWith("mk-")) {
+    const v = el.value === "" ? null : Number(el.value);
+    if (el.id === "mk-essay") r.marks.essay = v;
+    else if (el.id === "mk-story") r.marks.story = v;
+    else r.marks.s[Number(el.id.slice(4))] = v;
+    touch(); const y = window.scrollY; render(); window.scrollTo(0,y);
+  }
+});
+paperEl.addEventListener("input", e => {
+  const el = e.target, r = rec();
+  if (el.tagName !== "TEXTAREA" || r.submitted) return;
+  if (el.id === "essay") { r.essay = el.value; document.getElementById("essayWc").innerHTML = wcText(words(el.value), ESSAY_RANGE); }
+  else if (el.id === "story") { r.story = el.value; document.getElementById("storyWc").innerHTML = wcText(words(el.value), STORY_RANGE); }
+  else if (/^s\d$/.test(el.id)) r.s[Number(el.id[1])] = el.value;
+  touch(); renderChrome();
+});
+paperEl.addEventListener("click", e => { if (e.target.id === "askClaude") askClaude(); });
+
+let armTimer = null;
+document.getElementById("submit").addEventListener("click", e => {
+  const btn = e.currentTarget, r = rec();
+  if (!btn.classList.contains("warn")) {
+    const left = TOTAL_ITEMS - answeredCount(r);
+    btn.classList.remove("primary"); btn.classList.add("warn");
+    btn.textContent = left > 0 ? `${left} left blank. Tap again to submit` : "Tap again to submit";
+    clearTimeout(armTimer); armTimer = setTimeout(() => renderChrome(), 5000);
+    return;
+  }
+  clearTimeout(armTimer);
+  r.submitted = true; r.submittedAt = Date.now();
+  r.minutes = r.startedAt ? Math.max(1, Math.round((r.submittedAt - r.startedAt)/60000)) : null;
+  touch(); flush(); render(); window.scrollTo({top: document.getElementById("paper").offsetTop - 10, behavior: "smooth"});
+});
+function go(ds){ flush(); current = ds; render(); window.scrollTo({top:0}); }
+document.getElementById("prev").onclick = () => go(addDays(current,-1));
+document.getElementById("next").onclick = () => { if (current < todayStr()) go(addDays(current,1)); };
+document.getElementById("today").onclick = () => go(todayStr());
+document.getElementById("strip").addEventListener("click", e => { const b = e.target.closest(".day"); if (b) go(b.dataset.d); });
+window.addEventListener("pagehide", flush);
+
+/* ---------------- Claude marking ---------------- */
+let marking = false;
+async function askClaude(){
+  if (!sample || marking) return;
+  const paper = buildPaper(current), r = rec(), p = paper.passage;
+  const btn = document.getElementById("askClaude"), msg = document.getElementById("aiMsg");
+  marking = true; btn.disabled = true; msg.textContent = "Claude is reading Rishay’s answers. This can take up to a minute…";
+  const prompt = `You are a warm, encouraging English teacher marking a daily practice paper for Rishay, a Class 5 student (about 10 years old) in India. Be fair, use Class 5 standards, and write every comment directly to Rishay in simple, friendly words.
+
+READING PASSAGE: ${p.title}
+${p.text}
+
+SHORT ANSWER 1 (out of 2.5)
+Question: ${p.short[0][0]}
+Model answer: ${p.short[0][1]}
+Rishay's answer: ${r.s[0].trim() || "(blank)"}
+
+SHORT ANSWER 2 (out of 2.5)
+Question: ${p.short[1][0]}
+Model answer: ${p.short[1][1]}
+Rishay's answer: ${r.s[1].trim() || "(blank)"}
+
+ESSAY (out of 10). Topic: ${paper.essay.title}. Target length ${ESSAY_RANGE[0]}-${ESSAY_RANGE[1]} words.
+Rubric: content and ideas 4, organisation (introduction, paragraphs, conclusion) 2, vocabulary 2, grammar and spelling 2.
+Rishay's essay:
+"""
+${r.essay.trim() || "(blank)"}
+"""
+
+STORY (out of 10). Task: ${paper.story[0]}: ${paper.story[1]}. Target length ${STORY_RANGE[0]}-${STORY_RANGE[1]} words.
+Rubric: plot and creativity 4, characters and setting 2, language (describing words, dialogue) 2, grammar and spelling 2.
+Rishay's story:
+"""
+${r.story.trim() || "(blank)"}
+"""
+
+Rules: short-answer marks go in steps of 0.5. Essay and story marks are whole numbers equal to the sum of their rubric scores. A blank piece gets 0 with a kind note. Corrections must quote Rishay's own words exactly in "wrong" and give the corrected version in "right"; give at most 5 per piece, the most useful ones.
+
+Reply with only JSON in this shape:
+{"short":[{"marks":2,"comment":"one sentence"},{"marks":1.5,"comment":"one sentence"}],
+"essay":{"rubric":{"content":3,"organisation":2,"vocabulary":1,"grammar":1},"marks":7,"praise":"one sentence about what was good","tips":["tip","tip"],"corrections":[{"wrong":"...","right":"..."}]},
+"story":{"rubric":{"plot":3,"characters":2,"language":1,"grammar":1},"marks":7,"praise":"...","tips":["tip","tip"],"corrections":[{"wrong":"...","right":"..."}]},
+"overall":"two encouraging sentences for Rishay"}`;
+  try {
+    const res = await sample.json(prompt, {modelTier:"default", cache:false});
+    const clamp = (x,max,step) => { const n = Number(x); if (!isFinite(n)) return null; return Math.min(max, Math.max(0, Math.round(n/step)*step)); };
+    const sh = Array.isArray(res && res.short) ? res.short : [];
+    r.marks.s = [0,1].map(i => clamp(sh[i] && sh[i].marks, 2.5, 0.5));
+    r.marks.essay = clamp(res && res.essay && res.essay.marks, 10, 1);
+    r.marks.story = clamp(res && res.story && res.story.marks, 10, 1);
+    r.feedback = {short: sh.slice(0,2).map(x => ({comment: String((x && x.comment) || "")})),
+      essay: res.essay || null, story: res.story || null, overall: String(res.overall || ""), at: Date.now()};
+    touch(); flush(); render();
+  } catch (e) {
+    const code = e && e.code;
+    const copy = code==="not_granted" || code==="sampling_disabled" ? "Claude marking is turned off here. A parent can use the mark boxes below." :
+      code==="rate_limited" ? "Claude is busy right now. Try again in a few minutes." :
+      code==="session_expired" ? "Please sign in to Claude again, then try." :
+      code==="invalid_json" ? "Claude’s reply could not be read. Tap the button to try again." :
+      "Something went wrong while marking. Tap the button to try again.";
+    if (code==="not_granted" || code==="sampling_disabled") { sample = null; }
+    const m = document.getElementById("aiMsg"), b = document.getElementById("askClaude");
+    if (m) m.textContent = copy; if (b) { b.disabled = false; if (!sample) b.hidden = true; }
+  } finally { marking = false; }
+}
+
+/* ---------------- Boot ---------------- */
+rec(); render();
+(async () => {
+  if (!window.claude || !window.claude.use) return;
+  claude.use("sample").then(s => { if (s) { sample = s; if (rec().submitted) render(); } }).catch(() => {});
+  try { db = await claude.use("db"); } catch (e) { db = null; }
+  if (!db) return;
+  try {
+    const snap = await db.collection("papers").get();
+    let changed = false;
+    snap.docs.forEach(d => {
+      const x = d.data(); if (!x) return;
+      const local = papers[d.id];
+      if (!local || (x.updatedAt||0) >= (local.updatedAt||0)) { papers[d.id] = norm(JSON.parse(JSON.stringify(x))); changed = true; }
+      else dirty.add(d.id);
+    });
+    Object.keys(papers).forEach(k => { if (!snap.docs.some(d => d.id===k) && answeredCount(norm(papers[k]))>0) dirty.add(k); });
+    setSync("Saved to your Claude account");
+    if (dirty.size) flush();
+    const a = document.activeElement;
+    if (changed && !(a && a.tagName === "TEXTAREA")) render(); else renderChrome();
+  } catch (e) { db = null; setSync(); }
+})();
+</script>
+</body></html>
