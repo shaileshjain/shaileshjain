@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Science 8 Unit Tests</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: exam-paper column. Unit index as a ruled list; each test runs one question at a time with instant "why" feedback. */
+:root {
+  --bg: #f2f4f3;
+  --paper: #ffffff;
+  --ink: #17202a;
+  --muted: #5b6670;
+  --rule: #d9dfdd;
+  --accent: #23408e;
+  --bio: #2c7a4b;
+  --chem: #a33b67;
+  --phys: #2a5fb3;
+  --good: #1f7a45;
+  --good-bg: #e3f3e9;
+  --bad: #b3261e;
+  --bad-bg: #fbe7e5;
+  --warn: #8a5a00;
+  --warn-bg: #fbf0d9;
+  --shadow: 0 1px 2px rgba(23,32,42,.06), 0 4px 16px rgba(23,32,42,.05);
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161b; --paper: #19212a; --ink: #e6ebef; --muted: #9aa6b1; --rule: #2b3540;
+    --accent: #8fa8ff; --bio: #5fc58a; --chem: #e57fab; --phys: #7aa8f5;
+    --good: #6fd39a; --good-bg: #173226; --bad: #ff8a80; --bad-bg: #3a1c1b; --warn: #f2c464; --warn-bg: #352b14;
+    --shadow: 0 1px 2px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161b; --paper: #19212a; --ink: #e6ebef; --muted: #9aa6b1; --rule: #2b3540;
+  --accent: #8fa8ff; --bio: #5fc58a; --chem: #e57fab; --phys: #7aa8f5;
+  --good: #6fd39a; --good-bg: #173226; --bad: #ff8a80; --bad-bg: #3a1c1b; --warn: #f2c464; --warn-bg: #352b14;
+  --shadow: 0 1px 2px rgba(0,0,0,.3);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.55; }
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(2rem, 6vw, 2.9rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.45rem; font-weight: 700; }
+.eyebrow { font-family: var(--f-mono); font-size: .74rem; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+p { margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Header */
+header.top { display: grid; gap: 10px; margin-bottom: 28px; }
+header.top .lede { color: var(--muted); max-width: 60ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 4px; font-size: .9rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c, var(--accent)); display: inline-block; }
+
+/* Unit index */
+.units { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
+.unit-row { border-bottom: 1px solid var(--rule); }
+.unit-btn { width: 100%; background: none; border: 0; text-align: left; display: grid; grid-template-columns: 3.2rem 1fr auto; gap: 14px; align-items: start; padding: 16px 4px; }
+.unit-btn:hover { background: color-mix(in srgb, var(--c) 6%, transparent); }
+.unit-no { font-family: var(--f-display); font-weight: 800; font-size: 1.9rem; line-height: 1; color: var(--c); font-variant-numeric: tabular-nums; }
+.unit-main { min-width: 0; display: grid; gap: 4px; }
+.unit-title { font-family: var(--f-display); font-weight: 700; font-size: 1.2rem; }
+.unit-topics { color: var(--muted); font-size: .92rem; }
+.unit-meta { display: grid; justify-items: end; gap: 6px; font-family: var(--f-mono); font-size: .78rem; color: var(--muted); white-space: nowrap; }
+.strand { font-family: var(--f-mono); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--c); border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; }
+.best { font-variant-numeric: tabular-nums; }
+.best.secure { color: var(--good); }
+.best.developing { color: var(--warn); }
+.best.revisit { color: var(--bad); }
+.mixed { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; }
+.mixed p { color: var(--muted); font-size: .95rem; min-width: 0; flex: 1 1 260px; }
+
+/* Buttons */
+.btn { border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper); border-radius: 8px; padding: 10px 18px; font-weight: 700; }
+.btn:hover { opacity: .9; }
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+.link { background: none; border: 0; padding: 4px 0; color: var(--muted); font-size: .92rem; }
+.link:hover { color: var(--ink); text-decoration: underline; }
+
+/* Quiz */
+.qbar { display: grid; gap: 10px; margin-bottom: 20px; }
+.qbar-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline; }
+.progress { height: 6px; background: var(--rule); border-radius: 999px; overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--c); width: 0; transition: width .3s ease; }
+.tally { font-family: var(--f-mono); font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow); padding: clamp(18px, 4vw, 28px); display: grid; gap: 18px; }
+.qhead { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.qtext { font-size: 1.15rem; font-weight: 700; line-height: 1.45; }
+.options { display: grid; gap: 10px; }
+.opt { display: grid; grid-template-columns: 2rem 1fr; gap: 10px; align-items: start; text-align: left; background: transparent; border: 1.5px solid var(--rule); border-radius: 9px; padding: 11px 12px; }
+.opt:hover:not(:disabled) { border-color: var(--c); }
+.opt:disabled { cursor: default; }
+.opt .key { font-family: var(--f-mono); font-weight: 500; width: 1.7rem; height: 1.7rem; border-radius: 6px; display: grid; place-items: center; border: 1px solid var(--rule); font-size: .85rem; }
+.opt span:last-child { min-width: 0; }
+.opt.correct { border-color: var(--good); background: var(--good-bg); }
+.opt.correct .key { background: var(--good); color: var(--paper); border-color: var(--good); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.opt.wrong .key { background: var(--bad); color: var(--paper); border-color: var(--bad); }
+.opt.dim { opacity: .55; }
+.why { border-left: 4px solid var(--fb); background: color-mix(in srgb, var(--fb) 8%, transparent); padding: 12px 14px; border-radius: 0 8px 8px 0; display: grid; gap: 4px; }
+.why strong { color: var(--fb); font-family: var(--f-display); }
+.qfoot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.hint { font-size: .82rem; color: var(--muted); }
+
+/* Results */
+.result-head { display: grid; gap: 6px; }
+.score { font-family: var(--f-display); font-weight: 800; font-size: clamp(3rem, 12vw, 4.5rem); line-height: 1; font-variant-numeric: tabular-nums; }
+.score small { font-size: .35em; color: var(--muted); font-weight: 500; }
+.band { justify-self: start; font-family: var(--f-mono); font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; }
+.band.secure { color: var(--good); background: var(--good-bg); }
+.band.developing { color: var(--warn); background: var(--warn-bg); }
+.band.revisit { color: var(--bad); background: var(--bad-bg); }
+.review { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.review li { border-top: 1px solid var(--rule); padding-top: 12px; display: grid; gap: 4px; }
+.review .ans { font-size: .93rem; }
+.review .ans b { color: var(--good); }
+.review .ans s { color: var(--bad); }
+.review .exp { color: var(--muted); font-size: .93rem; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.note { margin-top: 28px; font-size: .85rem; color: var(--muted); max-width: 62ch; }
+@media (max-width: 520px) {
+  .unit-btn { grid-template-columns: 2.4rem 1fr; }
+  .unit-meta { grid-column: 2; justify-items: start; grid-auto-flow: column; justify-content: start; gap: 10px; }
+  .unit-no { font-size: 1.5rem; }
+}
+@media (prefers-reduced-motion: reduce) { .progress i { transition: none; } }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app"></div>
+
+<script>
+const STRANDS = { Biology: "var(--bio)", Chemistry: "var(--chem)", Physics: "var(--phys)" };
+
+/* Each question: c = concept, q = question, o = options (correct answer first; shuffled on screen), e = explanation */
+const UNITS = [
+{ n: 1, title: "Plants", strand: "Biology", topics: "Photosynthesis, testing leaves for starch, leaf structure, water and minerals, roots",
+  qs: [
+  { c: "Where plant mass comes from", q: "A seedling with a mass of 1 g grows into a plant with a mass of 500 g. Where did most of the extra mass come from?",
+    o: ["Carbon dioxide from the air and water, turned into glucose by photosynthesis", "Soil taken in through the roots", "Energy from sunlight that has been turned into matter", "Minerals such as nitrates absorbed from the soil"],
+    e: "Photosynthesis builds glucose from carbon dioxide and water, and glucose is used to make the rest of the plant. The soil supplies only small amounts of minerals. Light provides energy, not mass." },
+  { c: "Photosynthesis equation", q: "Which word equation correctly describes photosynthesis?",
+    o: ["carbon dioxide + water → glucose + oxygen (using light and chlorophyll)", "glucose + oxygen → carbon dioxide + water (using light)", "oxygen + water → glucose + carbon dioxide (using chlorophyll)", "carbon dioxide + oxygen → glucose + water (using light)"],
+    e: "The reactants are carbon dioxide and water. Light energy is absorbed by chlorophyll, and the products are glucose and oxygen. The reverse equation is respiration." },
+  { c: "Why test for starch", q: "When we want to know whether a leaf has been photosynthesising, why do we test it for starch rather than for glucose?",
+    o: ["Glucose made in the leaf is quickly turned into starch for storage", "Leaves never contain any glucose", "Starch is the gas given off during photosynthesis", "Iodine solution only works on living cells"],
+    e: "Glucose is soluble and is quickly converted into insoluble starch to be stored. Starch builds up in the leaf, so it is a reliable sign that photosynthesis has happened." },
+  { c: "Destarching (controls)", q: "Before an experiment, a plant is kept in the dark for 48 hours. What is the purpose of this?",
+    o: ["To use up the starch already in its leaves, so any starch found later was made during the experiment", "To make the plant photosynthesise faster when it is put back in the light", "To kill the leaf cells so that iodine can get in", "To make the leaves produce more chlorophyll"],
+    e: "In the dark the plant cannot photosynthesise, so it uses up its stored starch. Any starch found at the end must have been made during the experiment. This makes the test fair." },
+  { c: "Chlorophyll is needed", q: "A variegated leaf has green parts and white parts. After a day in bright light it is tested with iodine. What result do you expect?",
+    o: ["Only the green parts turn blue-black", "The whole leaf turns blue-black", "Only the white parts turn blue-black", "No part turns blue-black, because variegated leaves cannot make starch"],
+    e: "Only the green parts contain chlorophyll, which absorbs the light energy needed for photosynthesis. The white parts have no chlorophyll, so they make no starch and stay orange-brown." },
+  { c: "Starch test method", q: "In the starch test, why is the leaf placed in hot ethanol before iodine is added?",
+    o: ["To remove the green chlorophyll so the colour change can be seen clearly", "To turn the glucose in the leaf into starch", "To add the energy needed for the iodine to react", "To keep the leaf cells alive during the test"],
+    e: "Ethanol dissolves chlorophyll and makes the leaf pale. Without this step, the green colour would hide the blue-black colour of iodine reacting with starch." },
+  { c: "Light intensity and rate", q: "A student counts oxygen bubbles from pondweed with a lamp at different distances. Moving the lamp closer increases the number of bubbles per minute. Which conclusion is best?",
+    o: ["The rate of photosynthesis increases as light intensity increases", "Pondweed only photosynthesises when a lamp is very close", "The bubbles are carbon dioxide, which increases with light", "The pondweed respires faster when the lamp is closer"],
+    e: "The bubbles are oxygen, a product of photosynthesis. A closer lamp means brighter light, so more bubbles means a faster rate. Light intensity is the independent variable in this investigation." },
+  { c: "Leaf shape and function", q: "Most leaves are broad and thin. How does this help photosynthesis?",
+    o: ["A large surface area absorbs plenty of light, and gases only have a short distance to diffuse", "It makes the leaf lighter so the plant does not fall over", "It stops water from reaching the leaf cells", "It lets the leaf store more starch in its cells"],
+    e: "A broad leaf traps more light. A thin leaf means carbon dioxide can diffuse quickly from the air spaces to every cell that has chloroplasts." },
+  { c: "Stomata", q: "Why are most stomata found on the lower surface of a leaf?",
+    o: ["They let gases in and out while losing less water, because the lower surface is cooler and shaded", "Light can only enter the leaf through the lower surface", "Roots push water up through the lower surface", "Chlorophyll is only found in the lower surface"],
+    e: "Stomata let carbon dioxide in and oxygen out, but water vapour also escapes through them. The lower surface is cooler and out of direct sun, so less water is lost there." },
+  { c: "Palisade cells", q: "Palisade cells are packed just below the upper surface of a leaf and contain many chloroplasts. Why is this a good arrangement?",
+    o: ["They are in the position that receives the most light", "They are closest to the stomata for taking in water", "They protect the leaf from insects", "They store all the minerals the leaf needs"],
+    e: "Light falls on the upper surface, so cells placed there with many chloroplasts can absorb the most light for photosynthesis." },
+  { c: "Root hair cells", q: "Root hair cells have a long, thin extension. What is the main advantage of this shape?",
+    o: ["It gives a large surface area for absorbing water and minerals from the soil", "It lets the root make glucose in the dark", "It anchors the plant by growing into rocks", "It allows the root to take in carbon dioxide for photosynthesis"],
+    e: "A larger surface area in contact with the soil means water and dissolved minerals can be absorbed faster. Root hair cells have no chloroplasts because they are underground." },
+  { c: "Minerals", q: "A plant has yellow leaves even though it has plenty of light and water. A lack of which mineral is most likely?",
+    o: ["Magnesium, because it is needed to make chlorophyll", "Glucose, because it is needed to make leaves", "Oxygen, because it is needed for photosynthesis", "Carbon, because it is needed to make roots"],
+    e: "Chlorophyll molecules contain magnesium. Without enough magnesium the plant makes less chlorophyll and its leaves turn yellow. Nitrates are needed to make proteins for growth." },
+  { c: "Plants also respire", q: "What is happening in a plant's leaves at night?",
+    o: ["Respiration continues, using oxygen and releasing carbon dioxide", "Nothing, because plants only respire during the day", "Photosynthesis continues, using stored light", "The leaves take in oxygen and release glucose"],
+    e: "All living cells respire all the time. In daylight, photosynthesis is usually faster than respiration so a plant gives out oxygen overall. At night only respiration happens, so the plant gives out carbon dioxide." }
+  ]},
+{ n: 2, title: "Food and digestion", strand: "Biology", topics: "Nutrients, a balanced diet, deficiency diseases, the digestive system, enzymes, absorption",
+  qs: [
+  { c: "Why digest food", q: "Why must large food molecules such as starch and protein be digested?",
+    o: ["They are too large to pass through the wall of the small intestine into the blood", "They contain no energy until they are broken down", "They would dissolve the wall of the intestine", "The body can only use molecules that contain water"],
+    e: "Digestion breaks large, insoluble molecules into small, soluble molecules. Only small molecules can be absorbed through the gut wall into the blood." },
+  { c: "Mechanical digestion", q: "How does chewing food help digestion?",
+    o: ["It breaks food into smaller pieces, giving enzymes a larger surface area to work on", "It turns starch into sugar", "It breaks proteins into amino acids", "It absorbs nutrients into the blood through the teeth"],
+    e: "Chewing is mechanical digestion. It does not change the molecules, but smaller pieces have more surface for enzymes to act on, so chemical digestion is faster." },
+  { c: "Enzyme products", q: "What are proteins broken down into during digestion?",
+    o: ["Amino acids", "Glucose", "Fatty acids and glycerol", "Vitamins"],
+    e: "Protease enzymes break proteins into amino acids. Carbohydrase enzymes such as amylase break starch into sugars. Lipase breaks fats into fatty acids and glycerol." },
+  { c: "Enzymes and temperature", q: "Amylase is mixed with starch at 5 °C, 37 °C and 90 °C. In which tube is starch digested fastest?",
+    o: ["37 °C, because human enzymes work best at about body temperature", "90 °C, because higher temperatures always make reactions faster", "5 °C, because enzymes are protected from damage", "All three, because temperature does not affect enzymes"],
+    e: "Enzymes work fastest near their optimum temperature, which is about 37 °C for human enzymes. At 5 °C they work slowly. At 90 °C their shape is permanently changed (denatured), so they stop working." },
+  { c: "Villi", q: "The small intestine is lined with millions of villi. How do they help?",
+    o: ["They give a very large surface area, with thin walls and a good blood supply, for absorption", "They grind food into smaller pieces", "They produce stomach acid to kill bacteria", "They push food along by beating like hairs"],
+    e: "Villi make the inner surface of the small intestine very large. Each one has a thin wall and many capillaries, so digested food can diffuse into the blood quickly." },
+  { c: "Fibre", q: "Fibre is not digested and does not enter the blood. Why is it still an important part of a balanced diet?",
+    o: ["It adds bulk that helps food move through the gut and prevents constipation", "It is the body's main source of energy", "It is needed to build new muscle", "It is changed into vitamins in the large intestine"],
+    e: "Fibre gives the muscles of the intestine something to push against, which keeps food moving and prevents constipation." },
+  { c: "Balanced diet depends on need", q: "Which person most needs a diet with more energy-rich food?",
+    o: ["A teenage athlete who trains for two hours each day", "An adult who works at a desk all day", "An elderly person who rarely exercises", "Everyone needs exactly the same amount of energy"],
+    e: "A balanced diet depends on age, sex and how active a person is. Active, growing people use more energy and need more carbohydrate and fat." },
+  { c: "Rickets", q: "A child has soft, weak leg bones that bend. Which deficiency is the most likely cause?",
+    o: ["Too little vitamin D or calcium", "Too little vitamin C", "Too little iron", "Too little fibre"],
+    e: "Calcium is needed to build strong bones, and vitamin D helps the body absorb calcium. A lack of either causes rickets. Lack of vitamin C causes scurvy; lack of iron causes anaemia." },
+  { c: "Anaemia", q: "Why does a person with iron-deficiency anaemia feel tired?",
+    o: ["Iron is needed to make haemoglobin, so less oxygen is carried to cells for respiration", "Iron is the main source of energy in the diet", "Iron is needed to digest carbohydrates", "Iron keeps the bones strong for movement"],
+    e: "Haemoglobin in red blood cells carries oxygen and contains iron. With less haemoglobin, cells get less oxygen and release less energy by respiration." },
+  { c: "Scurvy", q: "Sailors on long voyages long ago often got scurvy, with bleeding gums. Eating limes or oranges cured it. What does this show?",
+    o: ["Scurvy is caused by a lack of vitamin C, which citrus fruits contain", "Scurvy is caused by bacteria that citrus fruits kill", "Sailors were short of protein, which citrus fruits contain", "Sailors were eating too much fat"],
+    e: "Citrus fruits are rich in vitamin C. Scurvy is a deficiency disease, so it is cured by supplying the missing nutrient." },
+  { c: "Stomach acid", q: "What is one job of the hydrochloric acid in the stomach?",
+    o: ["It kills most bacteria in food", "It digests starch into glucose", "It absorbs water from food", "It turns fats into protein"],
+    e: "Stomach acid kills many microorganisms in food. It also gives the right acidic conditions for the stomach's protease enzyme to work." },
+  { c: "Large intestine", q: "What is the main job of the large intestine?",
+    o: ["Absorbing water from undigested food", "Digesting protein with enzymes", "Absorbing most of the glucose into the blood", "Storing food before it is digested"],
+    e: "Most digested food is absorbed in the small intestine. The large intestine absorbs water from what is left. If food passes through too quickly, too little water is absorbed and diarrhoea results." },
+  { c: "Energy in nutrients", q: "Why do people who need to lose weight often reduce the amount of fat they eat?",
+    o: ["One gram of fat contains about twice as much energy as one gram of carbohydrate", "Fat cannot be digested and stays in the body", "Fat contains no useful nutrients at all", "Fat is turned directly into muscle"],
+    e: "Fat is the most energy-dense nutrient. If energy taken in is more than energy used, the extra is stored as body fat. Some fat is still needed in a balanced diet." }
+  ]},
+{ n: 3, title: "The circulatory system", strand: "Biology", topics: "The heart, double circulation, arteries, veins and capillaries, blood",
+  qs: [
+  { c: "Artery structure", q: "Why do arteries have thick walls containing muscle and elastic tissue?",
+    o: ["They carry blood at high pressure, pumped directly from the heart", "They carry blood at very low pressure back to the heart", "They need to let substances diffuse through their walls", "They store blood when the body is resting"],
+    e: "Each heartbeat pushes blood into the arteries at high pressure. Thick, stretchy walls withstand this pressure and help smooth out the flow." },
+  { c: "Valves in veins", q: "Veins contain valves but arteries (apart from where they leave the heart) do not. Why?",
+    o: ["Blood in veins is at low pressure, so valves stop it flowing backwards", "Valves make blood in veins move faster than in arteries", "Valves let oxygen into the blood in veins", "Veins carry blood away from the heart and need valves to push it"],
+    e: "By the time blood reaches the veins, its pressure is low. Valves make sure it only flows towards the heart, especially in the legs." },
+  { c: "Capillaries", q: "Capillary walls are only one cell thick. Why is this important?",
+    o: ["Substances such as oxygen and glucose can diffuse quickly between blood and cells", "Blood can flow through them at very high pressure", "They can contract to pump blood around the body", "It stops white blood cells from leaving the blood"],
+    e: "Capillaries are where exchange happens. A very thin wall means only a short distance for diffusion between the blood and the body's cells." },
+  { c: "Ventricle walls", q: "The wall of the left ventricle is much thicker than the wall of the right ventricle. Why?",
+    o: ["The left ventricle pumps blood all around the body, but the right only pumps to the lungs", "The left ventricle holds deoxygenated blood, which is heavier", "The right ventricle does not need to pump blood at all", "The left ventricle receives blood from the lungs at high pressure"],
+    e: "Pushing blood around the whole body needs a much higher pressure than pushing it to the nearby lungs, so the left ventricle has more muscle." },
+  { c: "Arteries defined by direction", q: "The pulmonary artery carries deoxygenated blood. Why is it still called an artery?",
+    o: ["Arteries are vessels that carry blood away from the heart", "Arteries are vessels that carry deoxygenated blood", "All vessels connected to the lungs are arteries", "It has valves along its length"],
+    e: "Arteries carry blood away from the heart and veins carry it back. The pulmonary artery takes deoxygenated blood from the heart to the lungs. The pulmonary vein brings oxygenated blood back." },
+  { c: "Double circulation", q: "Which route does blood take in the human double circulation, starting from the body?",
+    o: ["Body → right side of heart → lungs → left side of heart → body", "Body → left side of heart → lungs → right side of heart → body", "Body → lungs → right side of heart → left side of heart → body", "Body → right side of heart → left side of heart → lungs → body"],
+    e: "Blood passes through the heart twice in one full circuit. The right side sends it to the lungs to collect oxygen. It returns to the left side, which pumps it around the body." },
+  { c: "Red blood cells", q: "Red blood cells have no nucleus. How does this help them do their job?",
+    o: ["There is more space for haemoglobin, so each cell can carry more oxygen", "It lets them destroy bacteria more easily", "It allows them to divide quickly to make new cells", "It helps them form blood clots"],
+    e: "Red blood cells are packed with haemoglobin, which carries oxygen. Their biconcave disc shape also gives a large surface area for oxygen to diffuse in and out." },
+  { c: "Plasma", q: "Which list shows substances carried dissolved in the plasma?",
+    o: ["Glucose, carbon dioxide, urea and hormones", "Oxygen, haemoglobin and platelets", "Red blood cells and white blood cells", "Starch, protein and fat molecules"],
+    e: "Plasma is the liquid part of blood. It carries digested food such as glucose, waste such as carbon dioxide and urea, and hormones. Most oxygen is carried by haemoglobin in red cells." },
+  { c: "Platelets", q: "You cut your finger. Which part of the blood helps stop the bleeding?",
+    o: ["Platelets, which help form a clot", "Red blood cells, which carry oxygen to the cut", "Plasma, which washes the cut clean", "White blood cells, which seal the skin"],
+    e: "Platelets are cell fragments that help blood clot. The clot seals the wound and stops blood loss and microorganisms entering." },
+  { c: "White blood cells", q: "What is the main job of white blood cells?",
+    o: ["Defending the body against pathogens such as bacteria and viruses", "Carrying oxygen from the lungs", "Carrying digested food to cells", "Making the heart beat"],
+    e: "Some white blood cells engulf pathogens. Others make antibodies that help destroy them." },
+  { c: "Heart rate and exercise", q: "Why does your heart rate increase when you exercise?",
+    o: ["Muscles need oxygen and glucose delivered faster, and carbon dioxide removed faster", "The heart needs to cool the body down", "Blood becomes thicker during exercise", "The lungs stop working during exercise"],
+    e: "Working muscles respire faster. A faster heartbeat delivers more oxygen and glucose to them and removes carbon dioxide more quickly." },
+  { c: "Coronary arteries", q: "A fatty blockage forms in a coronary artery. Why can this cause a heart attack?",
+    o: ["Part of the heart muscle does not get enough oxygen and glucose, so it stops working", "Blood can no longer reach the lungs", "The heart chambers fill with fat", "The valves in the heart can no longer close"],
+    e: "Heart muscle has its own blood supply through the coronary arteries. If this is blocked, the muscle cannot respire and that part of the heart can die." },
+  { c: "Pulmonary vein", q: "Where does the pulmonary vein carry blood, and what kind of blood is it?",
+    o: ["From the lungs to the heart; oxygenated blood", "From the heart to the lungs; deoxygenated blood", "From the body to the heart; deoxygenated blood", "From the heart to the body; oxygenated blood"],
+    e: "Veins carry blood towards the heart. The pulmonary vein brings blood that has just collected oxygen in the lungs back to the left atrium." }
+  ]},
+{ n: 4, title: "Respiration", strand: "Biology", topics: "Aerobic respiration, gas exchange, breathing, smoking and health",
+  qs: [
+  { c: "Respiration vs breathing", q: "Which statement correctly describes the difference between respiration and breathing?",
+    o: ["Respiration is a chemical reaction in cells that releases energy; breathing moves air in and out of the lungs", "They are two words for the same process", "Breathing happens in all cells; respiration happens only in the lungs", "Respiration is breathing out; breathing is breathing in"],
+    e: "Respiration happens in every living cell and releases energy from glucose. Breathing is the movement of air that supplies oxygen and removes carbon dioxide." },
+  { c: "Respiration equation", q: "Which word equation shows aerobic respiration?",
+    o: ["glucose + oxygen → carbon dioxide + water", "carbon dioxide + water → glucose + oxygen", "glucose + carbon dioxide → oxygen + water", "oxygen + water → glucose + carbon dioxide"],
+    e: "Aerobic respiration uses glucose and oxygen and releases energy, with carbon dioxide and water as waste products. Photosynthesis is the reverse reaction." },
+  { c: "Where respiration happens", q: "Which cells carry out respiration?",
+    o: ["All living cells, including plant cells and microorganisms", "Only cells in the lungs", "Only animal cells", "Only muscle cells during exercise"],
+    e: "Every living cell needs energy, so every living cell respires, all the time. In plant and animal cells it happens in the mitochondria." },
+  { c: "Alveoli", q: "Which set of features makes the alveoli good at gas exchange?",
+    o: ["Very large total surface area, thin walls and a rich blood supply", "Thick walls, few capillaries and a dry surface", "Muscular walls that pump air into the blood", "A small surface area so gases do not escape"],
+    e: "Millions of alveoli give a huge surface area. Their walls and the capillary walls are one cell thick, and the blood flow keeps the concentration difference high." },
+  { c: "Composition of breath", q: "Compared with inhaled air, exhaled air contains:",
+    o: ["less oxygen and more carbon dioxide, but still quite a lot of oxygen", "no oxygen at all and only carbon dioxide", "more oxygen and less carbon dioxide", "the same amounts of oxygen and carbon dioxide"],
+    e: "Inhaled air has about 21% oxygen and exhaled air about 16%. Carbon dioxide rises from about 0.04% to about 4%. This leftover oxygen is why rescue breathing works." },
+  { c: "Breathing mechanism", q: "What happens when you breathe in?",
+    o: ["The diaphragm contracts and flattens, the ribs move up and out, chest volume increases and air flows in", "The lungs expand by themselves and suck air in", "The diaphragm relaxes and moves up, pushing air into the lungs", "The ribs move down and in, squeezing air into the lungs"],
+    e: "Muscles make the chest cavity bigger. This lowers the pressure inside the lungs, so air from outside, at higher pressure, flows in. The lungs have no muscle of their own." },
+  { c: "Testing breath", q: "Air is breathed out through limewater in one tube and room air is bubbled through limewater in another. The first tube turns milky much faster. What does this show?",
+    o: ["Exhaled air contains more carbon dioxide than room air", "Exhaled air contains more oxygen than room air", "Exhaled air contains no water vapour", "Room air contains no carbon dioxide"],
+    e: "Limewater turns milky with carbon dioxide. Room air has a little carbon dioxide, so it changes slowly. Exhaled air has much more, so it changes quickly." },
+  { c: "Smoking and cilia", q: "Smokers often have a cough and get chest infections. Which explanation is correct?",
+    o: ["Tar damages the cilia, so mucus and trapped bacteria are not swept away from the lungs", "Nicotine makes the lungs produce oxygen too quickly", "Smoke makes the alveoli bigger", "Carbon monoxide kills bacteria in the lungs"],
+    e: "Cilia normally sweep mucus, dust and microorganisms up out of the airways. When they are damaged, mucus builds up, causing coughing and infections." },
+  { c: "Carbon monoxide", q: "Cigarette smoke contains carbon monoxide. Why does this make it harder to exercise?",
+    o: ["It combines with haemoglobin, so red blood cells carry less oxygen", "It blocks the stomata in the lungs", "It makes the heart beat more slowly", "It is a source of extra energy for muscles"],
+    e: "Carbon monoxide binds to haemoglobin more strongly than oxygen does. Less oxygen reaches the muscles, so less energy is released by respiration." },
+  { c: "Emphysema", q: "In emphysema, the walls of many alveoli break down. Why does the person become breathless?",
+    o: ["The surface area for gas exchange is reduced, so less oxygen gets into the blood", "The diaphragm stops working", "Their blood stops carrying carbon dioxide", "Their airways become too wide"],
+    e: "Fewer, larger air sacs have much less total surface area. Less oxygen can diffuse into the blood, even when the person breathes hard." },
+  { c: "Exercise and breathing", q: "Why do you breathe faster and more deeply during exercise?",
+    o: ["To take in more oxygen for respiration in muscles and remove the extra carbon dioxide", "To cool the lungs down", "Because the muscles need extra air inside them", "To get rid of the extra glucose being made"],
+    e: "Muscles respire faster during exercise. They need more oxygen and produce more carbon dioxide, so breathing rate and depth increase." },
+  { c: "Respiration releases heat", q: "Germinating seeds are placed in a sealed vacuum flask with a thermometer. After two days the temperature has risen. Why?",
+    o: ["The seeds are respiring, and some of the energy released is lost as heat", "The seeds are photosynthesising inside the flask", "The vacuum flask creates heat", "The seeds are absorbing heat from the thermometer"],
+    e: "Respiration releases energy from glucose. Some of this energy is transferred to the surroundings as heat. A control flask with boiled (dead) seeds would show no rise." },
+  { c: "Diffusion in gas exchange", q: "Why does oxygen move from the alveoli into the blood?",
+    o: ["The oxygen concentration is higher in the alveoli than in the blood, so it diffuses", "The heart sucks oxygen out of the alveoli", "Muscles in the alveoli push oxygen into the blood", "Blood always contains more oxygen than air"],
+    e: "Diffusion is the net movement of particles from a high concentration to a low concentration. Blood arriving at the lungs is low in oxygen, so oxygen diffuses into it." }
+  ]},
+{ n: 5, title: "Reproduction and development", strand: "Biology", topics: "Gametes, fertilisation, the menstrual cycle, pregnancy, growth and adolescence",
+  qs: [
+  { c: "Sperm cell adaptations", q: "Sperm cells have a tail and contain many mitochondria. How do these help?",
+    o: ["The tail lets the sperm swim, and the mitochondria release the energy it needs", "The tail anchors the sperm to the egg, and mitochondria store food", "The mitochondria carry the genetic information", "They help the sperm divide into many cells"],
+    e: "A sperm must swim a long way to reach the egg. Mitochondria are where respiration happens, so many mitochondria provide plenty of energy for swimming." },
+  { c: "Egg cell adaptations", q: "Why is an egg cell much larger than a sperm cell?",
+    o: ["It contains a store of food for the early embryo", "It needs to swim further than a sperm", "It contains more chromosomes than a sperm", "It needs a larger nucleus to fuse with the sperm"],
+    e: "The egg's large cytoplasm contains nutrients that supply energy until the embryo implants and gets food from the mother." },
+  { c: "Fertilisation", q: "What exactly happens at fertilisation?",
+    o: ["The nucleus of a sperm fuses with the nucleus of an egg", "A sperm enters the uterus", "An egg is released from the ovary", "The embryo attaches to the wall of the uterus"],
+    e: "Fertilisation is the joining of the two nuclei. It usually happens in the oviduct. Release of the egg is ovulation; attaching to the uterus wall is implantation." },
+  { c: "Half the chromosomes", q: "Why do gametes contain only half the number of chromosomes of a normal body cell?",
+    o: ["So that when two gametes fuse, the zygote has the full number of chromosomes", "So that gametes are small enough to swim", "Because chromosomes are only needed in body cells", "So that the baby has only the mother's features"],
+    e: "Each gamete brings half. When egg and sperm nuclei fuse, the zygote has a complete set, half from each parent." },
+  { c: "Placenta", q: "What does the placenta do?",
+    o: ["It lets oxygen and nutrients pass from mother to fetus, and wastes pass back, without the two bloods mixing", "It pumps the mother's blood directly into the fetus", "It protects the fetus from bumps", "It produces eggs during pregnancy"],
+    e: "The mother's blood and the fetus's blood come very close in the placenta, so substances diffuse across. They do not mix, which protects the fetus." },
+  { c: "Lifestyle in pregnancy", q: "Why are pregnant women advised not to smoke?",
+    o: ["Harmful substances cross the placenta and the fetus may get less oxygen, leading to low birth weight", "Smoke enters the uterus through the mother's lungs", "Smoking makes the amniotic fluid evaporate", "Smoking only harms the mother, not the fetus"],
+    e: "Carbon monoxide and nicotine can cross the placenta. Carbon monoxide reduces the oxygen carried in the blood, so the baby may grow more slowly." },
+  { c: "Amniotic fluid", q: "What is the main function of the amniotic fluid?",
+    o: ["It cushions and protects the fetus from knocks", "It supplies the fetus with food", "It carries oxygen to the fetus", "It removes carbon dioxide from the fetus"],
+    e: "The fetus floats in amniotic fluid inside the amnion. The fluid absorbs bumps. Food and oxygen arrive through the placenta and umbilical cord." },
+  { c: "Menstrual cycle", q: "Why does the lining of the uterus thicken during each menstrual cycle?",
+    o: ["To prepare for a fertilised egg to implant", "To push the egg out of the ovary", "To make sperm cells", "To store food for the mother"],
+    e: "A thick lining with a good blood supply is ready to receive an embryo. If no egg is fertilised, the lining breaks down and is lost during menstruation." },
+  { c: "Ovulation timing", q: "In a typical 28-day cycle, starting on the first day of menstruation, roughly when is an egg released?",
+    o: ["Around day 14", "Around day 1", "Around day 5", "Around day 28"],
+    e: "Ovulation usually happens about halfway through the cycle. Days 1 to 5 are menstruation. This is a typical pattern; real cycles vary." },
+  { c: "Puberty and hormones", q: "What causes the body changes at puberty?",
+    o: ["Sex hormones such as testosterone and oestrogen", "A sudden increase in the amount of food eaten", "Growth of new organs that were not there before", "Changes in the number of chromosomes in body cells"],
+    e: "At puberty the testes start producing testosterone and the ovaries produce oestrogen. These hormones cause secondary sexual characteristics to develop." },
+  { c: "Twins", q: "How are identical twins formed?",
+    o: ["One fertilised egg splits into two embryos", "Two eggs are fertilised by two different sperm", "One egg is fertilised by two sperm", "Two eggs are fertilised by one sperm"],
+    e: "Identical twins come from one zygote, so they have the same genetic information. Non-identical twins come from two eggs fertilised by two sperm." },
+  { c: "Growth vs development", q: "Which statement shows the difference between growth and development?",
+    o: ["Growth is an increase in size; development is becoming more complex, with new features", "Growth only happens before birth; development only after", "Growth means getting older; development means getting taller", "They mean exactly the same thing"],
+    e: "A baby grows by getting bigger. It develops when it gains new abilities and features, such as walking, or body changes at puberty." },
+  { c: "Many sperm", q: "Millions of sperm are released, but only one fertilises an egg. Why are so many produced?",
+    o: ["Most sperm die or never reach the egg, so large numbers increase the chance that one will", "Each sperm carries only one chromosome", "Many sperm must join together to fertilise the egg", "The extra sperm become food for the embryo"],
+    e: "The journey to the oviduct is long and most sperm do not survive it. Producing huge numbers makes fertilisation more likely." }
+  ]},
+{ n: 6, title: "States of matter", strand: "Chemistry", topics: "Particle theory, changes of state, diffusion, gas pressure, expansion",
+  qs: [
+  { c: "Melting at particle level", q: "What happens to the particles in ice when it melts?",
+    o: ["They gain energy, vibrate more and break free of their fixed positions, but stay close together", "The particles themselves melt and become liquid", "The particles get bigger and push each other apart", "The particles stop moving"],
+    e: "Particles do not change in size or melt. In a liquid they are still close together but can move past each other." },
+  { c: "Compressing gases", q: "Why can a gas be squashed into a smaller volume, but a liquid cannot?",
+    o: ["There are large spaces between gas particles; liquid particles are already touching", "Gas particles are smaller than liquid particles", "Gas particles are soft and can be squeezed", "Liquid particles do not move at all"],
+    e: "In a gas the particles are far apart, so pushing them closer is easy. In a liquid the particles are already close together, so there is almost no space to remove." },
+  { c: "Spaces between particles", q: "What is in the space between the particles of a gas?",
+    o: ["Nothing; it is empty space", "Air", "Water vapour", "Smaller particles of the same gas"],
+    e: "Air is itself made of particles. Between gas particles there is simply empty space." },
+  { c: "Diffusion", q: "Someone opens a bottle of perfume at the front of a classroom. A few minutes later students at the back can smell it. Which explanation is best?",
+    o: ["Perfume particles move randomly and spread from where they are concentrated to where there are fewer of them", "Perfume particles are attracted to people's noses", "The perfume particles grow until they fill the room", "Air particles push the perfume particles in a straight line to the back"],
+    e: "This is diffusion. Particles move randomly and collide, which causes a net movement from a high concentration to a low concentration." },
+  { c: "Diffusion and temperature", q: "A drop of food colouring spreads faster in hot water than in cold water. Why?",
+    o: ["Particles in hot water have more energy and move faster", "Hot water has more spaces between particles because the particles shrink", "Food colouring dissolves only in hot water", "Cold water particles do not move at all"],
+    e: "Higher temperature means particles have more kinetic energy. They move and collide faster, so the dye spreads more quickly." },
+  { c: "Diffusion in gases vs liquids", q: "Why does diffusion happen faster in gases than in liquids?",
+    o: ["Gas particles move faster and have more space between them", "Gas particles are heavier than liquid particles", "Liquid particles are not able to move", "Gases are always hotter than liquids"],
+    e: "Gas particles move quickly and travel further before hitting another particle, so they spread out faster than particles in a liquid." },
+  { c: "Gas pressure", q: "What causes the pressure of a gas inside a container?",
+    o: ["Gas particles colliding with the walls of the container", "Gas particles sticking to the walls", "The weight of the container", "Gas particles getting bigger"],
+    e: "Each collision pushes on the wall. Millions of collisions every second produce a steady force on the walls, which we measure as pressure." },
+  { c: "Heating a sealed gas", q: "A sealed can of gas is heated. Why does the pressure inside increase?",
+    o: ["The particles move faster, so they hit the walls more often and harder", "More gas particles are made when the gas is heated", "The particles expand and press on the walls", "Heat particles enter the can"],
+    e: "The number of particles stays the same. Faster particles collide with the walls more often and with more force, so pressure rises. That is why aerosol cans warn against heating." },
+  { c: "Expansion", q: "Gaps are left between sections of some bridges. Why?",
+    o: ["In hot weather the particles vibrate more and take up more space, so the bridge expands", "The particles of metal get larger when they are heated", "Gaps let rain drain away so the bridge does not rust", "Metal shrinks in summer and needs room"],
+    e: "When a solid is heated its particles vibrate more and move slightly further apart. The particles do not grow. The gaps stop the bridge from buckling when it expands." },
+  { c: "Constant temperature while boiling", q: "Water keeps boiling on a cooker but its temperature stays at 100 °C. Where is the energy going?",
+    o: ["Into separating the particles as liquid turns into gas", "Into the saucepan only", "It is destroyed by the boiling water", "Into making the water particles bigger"],
+    e: "During a change of state, energy is used to overcome the attraction between particles rather than to raise the temperature." },
+  { c: "Evaporation vs boiling", q: "Which statement about evaporation is correct?",
+    o: ["It can happen at any temperature, but only from the surface of a liquid", "It only happens at the boiling point", "It happens throughout the whole liquid, forming bubbles", "It only happens when a liquid is heated"],
+    e: "Some surface particles always have enough energy to escape. Boiling happens only at the boiling point and throughout the liquid." },
+  { c: "Cooling by evaporation", q: "Why does sweating cool you down?",
+    o: ["The particles with the most energy escape as vapour, leaving the remaining liquid with less energy", "Sweat is colder than the body", "Sweat reflects heat away from the skin", "Sweat stops the body making heat"],
+    e: "Evaporating particles take energy with them. The average energy of the particles left on the skin falls, so the skin cools." },
+  { c: "Using melting and boiling points", q: "A substance melts at −39 °C and boils at 357 °C. What state is it in at 25 °C?",
+    o: ["Liquid", "Solid", "Gas", "It cannot be in any state at 25 °C"],
+    e: "25 °C is above the melting point, so it is not a solid, and below the boiling point, so it is not a gas. This substance is mercury." },
+  { c: "Cooling a gas", q: "A balloon is taken from a warm room into a freezer and shrinks. Why?",
+    o: ["The gas particles slow down, hitting the inside of the balloon less often and less hard", "Some gas particles are destroyed by the cold", "The particles shrink in the cold", "Cold air particles enter the balloon"],
+    e: "Slower particles produce less pressure. The higher pressure outside squashes the balloon until the pressures balance." }
+  ]},
+{ n: 7, title: "Elements and compounds", strand: "Chemistry", topics: "Atoms, elements and symbols, the Periodic Table, metals and non-metals, compounds and formulae",
+  qs: [
+  { c: "What an element is", q: "Which is the best definition of an element?",
+    o: ["A substance made of only one type of atom", "A substance made of two or more types of atom joined together", "Any substance found in the Periodic Table or in nature", "A substance that is always a metal"],
+    e: "An element cannot be broken down into simpler substances by chemical reactions, because all its atoms are the same type." },
+  { c: "Molecules of an element", q: "Oxygen gas is made of O₂ molecules. Is oxygen an element or a compound?",
+    o: ["An element, because both atoms in the molecule are oxygen atoms", "A compound, because its atoms are joined together", "A mixture, because it contains two atoms", "A compound, because it is a molecule"],
+    e: "A molecule is any group of atoms joined together. It is only a compound if the atoms are of different elements." },
+  { c: "Compound properties differ", q: "Sodium is a soft, very reactive metal. Chlorine is a poisonous green gas. They react to form sodium chloride, which is table salt. What does this show?",
+    o: ["A compound can have completely different properties from the elements it is made from", "Sodium chloride is a mixture of sodium and chlorine", "Sodium chloride is still poisonous", "Elements keep their properties when they form compounds"],
+    e: "When elements react, their atoms join to make a new substance. The new substance has its own properties, which can be very different from those of the elements." },
+  { c: "Reading a formula", q: "What does the formula H₂O tell you?",
+    o: ["Each molecule contains two hydrogen atoms joined to one oxygen atom", "Water contains two oxygen atoms and one hydrogen atom", "Water is a mixture of hydrogen and oxygen gases", "There are two water molecules"],
+    e: "The small number after a symbol tells you how many atoms of that element there are. No number means one atom." },
+  { c: "Counting atoms", q: "Calcium carbonate has the formula CaCO₃. How many different elements and how many atoms in total does one unit contain?",
+    o: ["3 elements, 5 atoms", "3 elements, 3 atoms", "2 elements, 5 atoms", "4 elements, 6 atoms"],
+    e: "The elements are calcium (Ca), carbon (C) and oxygen (O). There is 1 Ca, 1 C and 3 O, which makes 5 atoms." },
+  { c: "Naming compounds", q: "What is the name of the compound formed when iron reacts with sulfur?",
+    o: ["Iron sulfide", "Iron sulfate", "Sulfur iron", "Iron sulfur oxide"],
+    e: "The metal is named first. A compound of just two elements ends in -ide. Names ending in -ate, like sulfate, mean oxygen is also present." },
+  { c: "-ate compounds", q: "Which elements are present in copper sulfate?",
+    o: ["Copper, sulfur and oxygen", "Copper and sulfur only", "Copper, sulfur and hydrogen", "Copper and oxygen only"],
+    e: "The ending -ate tells you the compound contains oxygen as well as the other elements named. Copper sulfate is CuSO₄." },
+  { c: "Metal or non-metal", q: "An unknown solid element is dull, breaks when hammered and does not conduct electricity. What is it most likely to be?",
+    o: ["A non-metal", "A metal", "A compound", "An alloy"],
+    e: "Metals are usually shiny, malleable and good conductors of electricity and heat. Dull, brittle and non-conducting are typical non-metal properties." },
+  { c: "Groups in the Periodic Table", q: "Lithium, sodium and potassium are in the same column (group) of the Periodic Table. What would you expect?",
+    o: ["They have similar chemical properties", "They have the same mass", "They are all gases", "They are all compounds"],
+    e: "Elements in the same group react in similar ways. These three are all soft metals that react strongly with water." },
+  { c: "Where metals are", q: "Where are most metals found in the Periodic Table?",
+    o: ["On the left and in the middle", "On the right-hand side", "Only in the top row", "Only in the bottom row"],
+    e: "Most elements are metals, and they are found on the left and in the centre. Non-metals are mainly on the right." },
+  { c: "Chemical symbols", q: "Which pair of element and symbol is correct?",
+    o: ["Iron, Fe", "Sodium, S", "Potassium, P", "Copper, Co"],
+    e: "Some symbols come from Latin names: Fe (ferrum) is iron, Na (natrium) is sodium, K (kalium) is potassium and Cu (cuprum) is copper. S is sulfur, P is phosphorus and Co is cobalt." },
+  { c: "Compounds only", q: "Which list contains only compounds?",
+    o: ["H₂O, CO₂, NaCl", "O₂, H₂O, CO₂", "Fe, Cu, NaCl", "N₂, O₂, Cl₂"],
+    e: "A compound has at least two different elements chemically joined. O₂, N₂, Cl₂, Fe and Cu each contain only one element." },
+  { c: "Separating a compound", q: "How can the elements in a compound be separated?",
+    o: ["Only by a chemical reaction", "By filtering", "With a magnet", "By evaporating the compound"],
+    e: "The atoms in a compound are chemically joined. Physical methods like filtering or using a magnet can separate mixtures, but not compounds." }
+  ]},
+{ n: 8, title: "Mixtures", strand: "Chemistry", topics: "Mixtures vs compounds, solutions and solubility, filtration, evaporation, distillation, chromatography, purity",
+  qs: [
+  { c: "Conservation of mass in dissolving", q: "10 g of salt is dissolved completely in 100 g of water. What is the mass of the solution?",
+    o: ["110 g, because the salt particles are still there, spread among the water particles", "100 g, because the salt has disappeared", "Less than 100 g, because some water is used up", "More than 110 g, because a new substance is made"],
+    e: "Dissolving is a physical change. No particles are lost, so total mass stays the same even though you cannot see the salt." },
+  { c: "Solute and solvent", q: "In a sugar solution, which is the solute and which is the solvent?",
+    o: ["Sugar is the solute; water is the solvent", "Water is the solute; sugar is the solvent", "Both are solutes", "The solution is the solvent"],
+    e: "The solute is the substance that dissolves. The solvent is the liquid it dissolves in. Together they make a solution." },
+  { c: "Saturated solutions", q: "What is a saturated solution?",
+    o: ["A solution in which no more solute will dissolve at that temperature", "A solution that is very hot", "A solution that contains a lot of solvent", "Any solution that has a colour"],
+    e: "When a solution is saturated, extra solute stays undissolved. Changing the temperature can change how much will dissolve." },
+  { c: "Solubility and temperature", q: "A hot saturated solution of copper sulfate is left to cool. Crystals appear. Why?",
+    o: ["Solubility decreases as the solution cools, so less solid can stay dissolved", "Cooling turns the water into copper sulfate", "The solvent freezes into crystals", "New copper sulfate is made by a chemical reaction"],
+    e: "Most solids are more soluble in hot water. As the solution cools, the extra solute comes out of solution as crystals." },
+  { c: "Rate vs amount", q: "Stirring helps sugar dissolve faster in tea. Does stirring increase the total amount of sugar that can dissolve?",
+    o: ["No, it only speeds up dissolving; the maximum amount depends on temperature", "Yes, stirring always increases solubility", "Yes, because stirring adds energy that makes room for more sugar", "No, because stirring stops sugar dissolving"],
+    e: "Stirring brings fresh solvent to the solid, so it dissolves sooner. Solubility, the maximum that can dissolve, depends on the solvent and the temperature." },
+  { c: "Filtration and evaporation", q: "How would you get dry salt from a mixture of sand, salt and water?",
+    o: ["Filter to remove the sand, then evaporate the water from the filtrate", "Evaporate the water, then filter out the salt", "Use a magnet to remove the salt", "Filter the mixture; the salt stays on the filter paper"],
+    e: "Salt is dissolved, so it passes through the filter paper with the water. Sand is insoluble and stays as the residue. Evaporating the filtrate leaves the salt." },
+  { c: "Distillation", q: "Which method gives pure water from sea water?",
+    o: ["Distillation: the water evaporates and is then condensed and collected", "Filtration, because filter paper traps the salt", "Chromatography, because the water travels up the paper", "Evaporation, because the water is left behind"],
+    e: "Salt is dissolved, so filtering does not remove it. In distillation the water turns to vapour and is cooled back to liquid, leaving the salt behind." },
+  { c: "Reading a chromatogram", q: "A spot of black ink separates into three coloured spots on chromatography paper. What does this show?",
+    o: ["The ink is a mixture of at least three dyes", "The ink is a pure substance", "The ink reacted with the solvent to make three new substances", "The ink contains three different solvents"],
+    e: "Each dye travels a different distance depending on how soluble it is in the solvent and how strongly it sticks to the paper. Three spots means at least three dyes." },
+  { c: "Chromatography method", q: "Why is the start line in chromatography drawn in pencil and placed above the level of the solvent?",
+    o: ["Pencil does not dissolve in the solvent, and the spots must not dissolve straight into the solvent in the beaker", "Pencil lines help the solvent move faster", "Pen ink is too dark to see the spots", "The spots need to be below the solvent to dissolve"],
+    e: "Ink from a pen would separate too and spoil the result. If the spots are under the solvent, they wash off into the beaker instead of moving up the paper." },
+  { c: "Purity and boiling point", q: "Pure water boils at 100 °C. A sample of water boils at 102 °C. What does this suggest?",
+    o: ["The water is not pure; it contains dissolved substances", "The thermometer must be broken", "The water is extra pure", "The water is turning into a different element"],
+    e: "Pure substances have fixed melting and boiling points. Dissolved impurities change them; salt water, for example, boils above 100 °C." },
+  { c: "Air is a mixture", q: "Why is air described as a mixture and not a compound?",
+    o: ["Its gases are not chemically joined and their proportions can vary", "It contains only one element", "It has a chemical formula", "Its gases cannot be separated"],
+    e: "Nitrogen, oxygen and the other gases in air keep their own properties. They can be separated by physical methods, such as fractional distillation of liquid air." },
+  { c: "Mixture vs compound", q: "Iron filings and sulfur powder are mixed. Then some of the mixture is heated to make iron sulfide. What happens if a magnet is held near each?",
+    o: ["The magnet removes iron from the mixture, but not from iron sulfide", "The magnet removes iron from both", "The magnet removes iron from iron sulfide only", "The magnet attracts the sulfur in both"],
+    e: "In the mixture, iron keeps its magnetic property. In the compound, iron atoms are chemically joined to sulfur atoms and the new substance has different properties." },
+  { c: "Other solvents", q: "Nail varnish does not dissolve in water but does dissolve in acetone (propanone). What does this show?",
+    o: ["Whether something dissolves depends on the solvent as well as the solute", "Nail varnish is a soluble substance in all liquids", "Acetone is a type of water", "Water cannot dissolve anything"],
+    e: "Insoluble in water does not mean insoluble in everything. Different solvents dissolve different substances." }
+  ]},
+{ n: 9, title: "Material changes", strand: "Chemistry", topics: "Physical and chemical changes, word equations, conservation of mass, burning, rusting, energy changes",
+  qs: [
+  { c: "Physical vs chemical change", q: "Which of these is a chemical change?",
+    o: ["Frying an egg", "Melting chocolate", "Dissolving sugar in water", "Freezing water"],
+    e: "In a chemical change, new substances are made and the change is usually hard to reverse. Melting, dissolving and freezing make no new substance." },
+  { c: "Candle burning", q: "A candle is lit. Which part involves a chemical change?",
+    o: ["The wax vapour burning in the flame", "The wax melting near the wick", "The liquid wax rising up the wick", "The melted wax going solid again"],
+    e: "Melting and solidifying are physical changes. Burning makes new substances: carbon dioxide and water vapour." },
+  { c: "Mass increases on burning", q: "Magnesium ribbon is heated in a crucible and burns to form a white powder. The powder has a greater mass than the magnesium. Why?",
+    o: ["Magnesium has combined with oxygen from the air to form magnesium oxide", "Heat has mass and has been added", "The crucible has broken into the powder", "The magnesium atoms have grown bigger"],
+    e: "magnesium + oxygen → magnesium oxide. The extra mass is the oxygen atoms that have joined on. No mass is created." },
+  { c: "Mass seems to decrease", q: "A piece of wood burns and the ash weighs much less than the wood. Has mass been destroyed?",
+    o: ["No; gases such as carbon dioxide and water vapour escaped into the air", "Yes; burning destroys mass", "Yes; the energy given out took the mass with it", "No; the ash weighs the same, but feels lighter"],
+    e: "If you collected all the products, including the gases, their total mass would equal the mass of the wood plus the oxygen that reacted." },
+  { c: "Conservation of mass", q: "Two solutions react in a sealed flask on a balance and a solid forms. What happens to the reading on the balance?",
+    o: ["It stays the same, because atoms are rearranged, not created or destroyed", "It increases, because a solid is heavier than a liquid", "It decreases, because some particles are used up", "It goes to zero, because the reactants are gone"],
+    e: "In a closed system nothing can enter or leave. The same atoms are present before and after; they are just joined in new ways." },
+  { c: "Conditions for rusting", q: "Three iron nails are set up: A in air and water, B in boiled water with oil on top, C in dry air with a drying agent. Which nail rusts?",
+    o: ["Only A", "Only B", "Only C", "A and B"],
+    e: "Rusting needs both oxygen and water. Boiling removes dissolved oxygen and the oil stops more getting in (B). The drying agent removes water (C)." },
+  { c: "Preventing rust", q: "How does painting a steel gate stop it rusting?",
+    o: ["It stops oxygen and water reaching the surface of the iron", "It makes the iron into a different element", "It adds oxygen to the iron", "Paint reacts with rust and turns it back into iron"],
+    e: "Rust prevention methods such as paint, oil and plastic coatings work by keeping air and water away from the metal." },
+  { c: "Combustion products", q: "Methane (natural gas) burns in plenty of air. What are the products?",
+    o: ["Carbon dioxide and water", "Carbon and hydrogen", "Oxygen and water", "Methane oxide only"],
+    e: "Methane contains carbon and hydrogen. When it burns, carbon combines with oxygen to make carbon dioxide, and hydrogen combines with oxygen to make water." },
+  { c: "Putting out fires", q: "Why does a fire blanket put out a small fire in a pan?",
+    o: ["It cuts off the supply of oxygen", "It cools the fuel to below freezing", "It removes the fuel", "It absorbs the flames"],
+    e: "A fire needs fuel, heat and oxygen. Remove any one and the fire goes out. A blanket stops oxygen reaching the fuel." },
+  { c: "Thermal decomposition", q: "Copper carbonate is heated and forms copper oxide and carbon dioxide. What type of reaction is this?",
+    o: ["Thermal decomposition: one substance breaks down into simpler substances when heated", "Combustion, because oxygen from the air is used", "A physical change, because it can be reversed easily", "Neutralisation, because a gas is given off"],
+    e: "Only one reactant is involved and it splits up when heated. No oxygen from the air is needed." },
+  { c: "Reactants and products", q: "magnesium + hydrochloric acid → magnesium chloride + hydrogen. How could you test for the gas produced?",
+    o: ["Hold a lighted splint near it; hydrogen burns with a squeaky pop", "Bubble it through limewater; it turns milky", "Use a glowing splint; it relights", "Hold damp blue litmus near it; it turns red"],
+    e: "The squeaky pop test identifies hydrogen. Limewater tests for carbon dioxide and a relighting glowing splint tests for oxygen." },
+  { c: "Exothermic reactions", q: "A reaction makes the test tube feel hot. What does this tell you?",
+    o: ["The reaction is exothermic: it transfers energy to the surroundings", "The reaction is endothermic: it takes energy in", "No reaction has happened, only a physical change", "The reactants are being destroyed"],
+    e: "Exothermic reactions give out energy, so the temperature of the surroundings rises. Endothermic reactions take in energy, so the surroundings get colder." },
+  { c: "Energy change ≠ chemical change", q: "Ice takes in energy when it melts. Is melting a chemical change?",
+    o: ["No; no new substance is made, it is still water", "Yes; any change involving energy is chemical", "Yes; because it cannot be reversed", "No; because melting gives out energy"],
+    e: "Physical changes also involve energy. The test for a chemical change is whether a new substance is formed." }
+  ]},
+{ n: 10, title: "Measuring motion", strand: "Physics", topics: "Speed, average speed, distance–time graphs, measuring speed accurately",
+  qs: [
+  { c: "Calculating speed", q: "A car travels 150 km in 3 hours. What is its average speed?",
+    o: ["50 km/h", "450 km/h", "0.02 km/h", "153 km/h"],
+    e: "speed = distance ÷ time = 150 km ÷ 3 h = 50 km/h." },
+  { c: "Calculating speed (m/s)", q: "A runner finishes a 100 m race in 12.5 s. What is the runner's average speed?",
+    o: ["8 m/s", "1250 m/s", "0.125 m/s", "12.5 m/s"],
+    e: "speed = 100 m ÷ 12.5 s = 8 m/s." },
+  { c: "Rearranging the equation", q: "A cyclist moves at a steady 15 m/s. How long does it take to travel 300 m?",
+    o: ["20 s", "4500 s", "0.05 s", "285 s"],
+    e: "time = distance ÷ speed = 300 m ÷ 15 m/s = 20 s." },
+  { c: "Average speed", q: "A bus has an average speed of 40 km/h on a journey. What does this tell you?",
+    o: ["The total distance divided by the total time is 40 km/h; it may have gone faster and slower at times", "The bus travelled at exactly 40 km/h the whole time", "The bus's top speed was 40 km/h", "The bus never stopped"],
+    e: "Average speed ignores changes along the way. A bus that stops at traffic lights and then speeds up can still have an average of 40 km/h." },
+  { c: "Average speed trap", q: "A car drives 60 km at 60 km/h, then another 60 km at 120 km/h. What is its average speed for the whole journey?",
+    o: ["80 km/h", "90 km/h", "60 km/h", "180 km/h"],
+    e: "The first part takes 1 h and the second part takes 0.5 h. Total: 120 km in 1.5 h = 80 km/h. You cannot just average the two speeds, because the car spent more time at the slower speed." },
+  { c: "Flat line on a distance–time graph", q: "On a distance–time graph, a section of the line is horizontal. What is the object doing?",
+    o: ["Standing still", "Moving at a constant speed", "Speeding up", "Moving backwards"],
+    e: "A horizontal line means time is passing but the distance is not changing, so the object is stationary." },
+  { c: "Gradient = speed", q: "Two straight lines on a distance–time graph both start at the origin. Line A is steeper than line B. What does this show?",
+    o: ["A is moving faster than B", "A is moving slower than B", "A has travelled for longer than B", "A is speeding up and B is slowing down"],
+    e: "The gradient (steepness) of a distance–time graph is the speed. A steeper line means more distance covered in each second." },
+  { c: "Curved line", q: "A line on a distance–time graph curves upwards, getting steeper and steeper. What is happening?",
+    o: ["The object is speeding up (accelerating)", "The object is slowing down", "The object is moving at a steady speed", "The object is stationary"],
+    e: "The gradient is increasing, so the speed is increasing. A line that gets less steep shows the object slowing down." },
+  { c: "Units", q: "A speed of 36 km/h is the same as:",
+    o: ["10 m/s", "36 m/s", "3.6 m/s", "100 m/s"],
+    e: "36 km = 36 000 m, and 1 h = 3600 s. 36 000 m ÷ 3600 s = 10 m/s." },
+  { c: "Comparing speeds", q: "Cyclist A rides 100 m in 20 s. Cyclist B rides 120 m in 30 s. Who is faster?",
+    o: ["A, at 5 m/s compared with 4 m/s", "B, because B travelled further", "B, because B rode for longer", "They have the same speed"],
+    e: "Speed depends on both distance and time. A: 100 ÷ 20 = 5 m/s. B: 120 ÷ 30 = 4 m/s." },
+  { c: "Measurement accuracy", q: "Why do light gates connected to a timer give a more accurate speed than a person using a stopwatch?",
+    o: ["They remove the error caused by human reaction time", "They make the object move at a steady speed", "They measure distance as well as time", "Stopwatches always run slow"],
+    e: "A person takes a fraction of a second to react when starting and stopping a stopwatch. For short times this is a large error." },
+  { c: "Repeat readings", q: "Why should you repeat a speed measurement several times and calculate a mean?",
+    o: ["To reduce the effect of random errors and spot anomalous results", "To make the object go faster", "Because the first reading is always wrong", "To change the independent variable"],
+    e: "Each reading may be slightly off in a random way. Averaging several readings gives a more reliable value, and repeats help you spot a result that does not fit." },
+  { c: "Going back to the start", q: "A distance-from-home–time graph rises, stays flat, then slopes back down to zero. What does the downward part show?",
+    o: ["The person is travelling back towards home", "The person is falling down", "The person is slowing down but still moving away", "The person is stationary"],
+    e: "On a graph of distance from a starting point, a falling line means that distance is getting smaller, so the person is returning." }
+  ]},
+{ n: 11, title: "Sound", strand: "Physics", topics: "Vibrations, how sound travels, loudness and amplitude, pitch and frequency, the ear, echoes",
+  qs: [
+  { c: "Sound needs a medium", q: "An electric bell rings inside a glass jar. As the air is pumped out, the sound fades, but you can still see the hammer moving. What does this show?",
+    o: ["Sound needs particles (a medium) to travel through, but light does not", "The bell stops vibrating when there is no air", "Light needs air to travel through", "Glass absorbs all sound"],
+    e: "Sound is passed on by particles vibrating and bumping into each other. In a vacuum there are no particles, so sound cannot travel. Light can travel through a vacuum." },
+  { c: "Sound in space", q: "Two astronauts are on a spacewalk with their radios switched off. Can they talk to each other?",
+    o: ["Only if their helmets touch, so sound travels through the solid helmets", "Yes, if they shout loudly enough", "Yes, sound travels faster in space", "No, sound cannot travel through any material"],
+    e: "Space is a vacuum, so sound cannot travel through it. Touching helmets gives a solid path for the vibrations." },
+  { c: "Speed in different media", q: "In which of these does sound travel fastest?",
+    o: ["Steel", "Water", "Air", "A vacuum"],
+    e: "Sound travels fastest in solids, slower in liquids and slowest in gases, because particles in solids are close together and strongly linked. It cannot travel in a vacuum." },
+  { c: "What travels", q: "When you hear someone speak across a room, what has travelled from them to you?",
+    o: ["Energy, passed on by air particles vibrating back and forth", "Air particles from their mouth that have moved across the room", "Light given off by their voice", "Sound particles"],
+    e: "Air particles vibrate around fixed positions and pass the vibration on. They do not travel across the room with the sound." },
+  { c: "Amplitude and loudness", q: "Two sounds are shown on an oscilloscope. Trace X has taller waves than trace Y, with the same spacing. What can you say?",
+    o: ["X is louder than Y; they have the same pitch", "X is higher pitched than Y; they are equally loud", "X is quieter than Y", "X is both louder and higher pitched than Y"],
+    e: "The height of the wave (amplitude) shows loudness. The number of waves on the screen shows frequency, which is pitch." },
+  { c: "Frequency and pitch", q: "A trace on an oscilloscope changes so that more waves fit across the screen, with the same height. What has changed?",
+    o: ["The pitch is higher", "The sound is louder", "The sound is quieter", "The sound is travelling faster"],
+    e: "More waves across the same time means more vibrations per second, a higher frequency, and so a higher pitch." },
+  { c: "Changing pitch", q: "How can you make a guitar string produce a higher note?",
+    o: ["Make the vibrating part of the string shorter or tighter", "Pluck the string harder", "Use a longer, looser string", "Play the guitar in a bigger room"],
+    e: "Shorter, tighter or thinner strings vibrate more times per second, giving a higher frequency. Plucking harder makes the sound louder, not higher." },
+  { c: "Frequency definition", q: "A sound has a frequency of 500 Hz. What does this mean?",
+    o: ["The source vibrates 500 times each second", "The sound travels 500 m every second", "The sound is 500 times louder than silence", "The sound lasts 500 seconds"],
+    e: "Frequency is the number of vibrations per second, measured in hertz (Hz)." },
+  { c: "Light vs sound speed", q: "In a storm you see lightning before you hear the thunder. Why?",
+    o: ["Light travels much faster than sound", "The thunder is made after the lightning", "Sound has to travel further than light", "Your eyes work faster than your ears"],
+    e: "Both are made at the same moment. Light travels at about 300 000 km/s, while sound in air travels at only about 340 m/s." },
+  { c: "Calculating distance", q: "You hear thunder 3 seconds after you see the lightning. The speed of sound in air is about 340 m/s. Roughly how far away is the storm?",
+    o: ["About 1 km", "About 113 m", "About 340 m", "About 3 km"],
+    e: "distance = speed × time = 340 m/s × 3 s = 1020 m, which is about 1 km. The light arrives almost instantly." },
+  { c: "Echoes", q: "You stand 170 m from a large wall and clap. The speed of sound is 340 m/s. When do you hear the echo?",
+    o: ["After 1 second", "After 0.5 seconds", "After 2 seconds", "Straight away"],
+    e: "The sound must travel to the wall and back: 340 m in total. 340 m ÷ 340 m/s = 1 s." },
+  { c: "Range of hearing", q: "A dog whistle has a frequency of 25 000 Hz. Why can a dog hear it but a person cannot?",
+    o: ["It is above the human range of hearing, about 20 Hz to 20 000 Hz", "It is too quiet for humans", "Sound at that frequency cannot travel in air", "Human ears only detect low-pitched sound below 2000 Hz"],
+    e: "Sound above about 20 000 Hz is called ultrasound. Humans cannot hear it, but many animals, including dogs and bats, can." },
+  { c: "The ear", q: "Which part of the ear changes vibrations into electrical signals that go to the brain?",
+    o: ["The cochlea", "The eardrum", "The ear canal", "The small bones (ossicles)"],
+    e: "The eardrum vibrates and the ossicles pass and amplify the vibrations. Hair cells in the cochlea turn them into nerve signals sent along the auditory nerve." }
+  ]},
+{ n: 12, title: "Light", strand: "Physics", topics: "How we see, straight-line travel, reflection, refraction, dispersion, colour and filters",
+  qs: [
+  { c: "How we see objects", q: "How are you able to see this page?",
+    o: ["Light from a source reflects off the page and enters your eyes", "Light leaves your eyes and lands on the page", "The page gives out its own light", "Your eyes send out signals that bounce back"],
+    e: "Non-luminous objects are seen because they reflect light from a luminous source, such as the Sun or a lamp, into our eyes. Eyes detect light; they do not send it out." },
+  { c: "Luminous objects", q: "Which of these is a non-luminous object?",
+    o: ["The Moon", "The Sun", "A candle flame", "A lit torch bulb"],
+    e: "The Moon does not make its own light. We see it because it reflects sunlight." },
+  { c: "Shadows", q: "Why do shadows form?",
+    o: ["Light travels in straight lines and cannot bend around an opaque object", "Opaque objects give out darkness", "Light slows down behind objects", "Light is reflected back by the shadow"],
+    e: "Light travels in straight lines. An opaque object blocks the light, leaving an area behind it that light cannot reach." },
+  { c: "Law of reflection", q: "A ray hits a plane mirror with an angle of incidence of 35°. What is the angle of reflection?",
+    o: ["35°", "55°", "70°", "145°"],
+    e: "The angle of incidence equals the angle of reflection. Both are measured from the normal, the line at 90° to the mirror." },
+  { c: "Measure from the normal", q: "A ray makes an angle of 30° with the surface of a mirror. What is the angle of reflection?",
+    o: ["60°", "30°", "90°", "120°"],
+    e: "Angles are measured from the normal, not the mirror. If the ray is 30° from the surface, it is 90° − 30° = 60° from the normal. So both angles are 60°." },
+  { c: "Mirror images", q: "You stand 2 m in front of a plane mirror. How far are you from your image?",
+    o: ["4 m", "2 m", "1 m", "0 m"],
+    e: "The image appears as far behind the mirror as you are in front of it: 2 m + 2 m = 4 m. The image is also the same size and laterally inverted." },
+  { c: "Diffuse reflection", q: "Paper reflects most of the light that hits it. Why can't you see your reflection in it?",
+    o: ["Its surface is rough, so it scatters reflected light in many directions", "Paper absorbs all the light", "Paper only reflects white light", "The law of reflection does not apply to paper"],
+    e: "Every tiny part of the paper still obeys the law of reflection, but the surface is uneven, so the rays leave in many directions. A smooth mirror reflects them all in an orderly way." },
+  { c: "Refraction into glass", q: "A ray of light passes at an angle from air into a glass block. What happens?",
+    o: ["It slows down and bends towards the normal", "It speeds up and bends away from the normal", "It slows down and bends away from the normal", "It travels straight on without changing"],
+    e: "Light travels more slowly in glass than in air. When it enters at an angle, the change in speed makes it bend towards the normal." },
+  { c: "Ray along the normal", q: "A ray of light enters a glass block along the normal (at 90° to the surface). What happens?",
+    o: ["It slows down but does not change direction", "It bends towards the normal", "It is totally reflected", "It speeds up and bends"],
+    e: "The ray still changes speed, but because it hits the surface straight on, it does not bend." },
+  { c: "Apparent depth", q: "A swimming pool looks shallower than it really is. Why?",
+    o: ["Light from the bottom bends away from the normal as it leaves the water, so it seems to come from a shallower point", "Water magnifies the bottom of the pool", "Light reflects off the water surface", "Light travels faster in water than in air"],
+    e: "Your brain assumes light travels in straight lines. The refracted rays seem to come from a point higher than the real bottom." },
+  { c: "Dispersion", q: "White light passes through a prism and a spectrum appears. Why?",
+    o: ["White light is a mixture of colours, and each colour is refracted by a different amount", "The prism adds colour to the white light", "The prism reflects each colour from a different face", "Only red light is refracted, and the rest is absorbed"],
+    e: "Violet is refracted the most and red the least, so the colours spread out. The prism does not create the colours; it separates them." },
+  { c: "Coloured objects", q: "A red shirt is lit only by blue light. What colour does it appear?",
+    o: ["Black", "Red", "Blue", "Purple"],
+    e: "A red object reflects red light and absorbs other colours. With no red light falling on it, it reflects nothing, so it looks black." },
+  { c: "Filters", q: "White light passes through a red filter and then a green filter. What comes out?",
+    o: ["No light", "Red light", "Green light", "Yellow light"],
+    e: "A filter only lets through its own colour and absorbs the rest. Only red light leaves the red filter, and the green filter absorbs red. Filters remove colours; they do not add them." },
+  { c: "White objects", q: "A white sheet of paper is lit only by green light. What colour does it appear?",
+    o: ["Green", "White", "Black", "Magenta"],
+    e: "A white object reflects all colours that fall on it. If only green light falls on it, it reflects green." }
+  ]},
+{ n: 13, title: "Magnetism", strand: "Physics", topics: "Magnetic materials, poles, magnetic fields, the Earth's field, electromagnets",
+  qs: [
+  { c: "Magnetic materials", q: "Which of these metals is attracted to a magnet?",
+    o: ["Nickel", "Aluminium", "Copper", "Gold"],
+    e: "Only a few metals are magnetic: iron, nickel and cobalt, and alloys such as steel. Most metals, including aluminium, copper and gold, are not." },
+  { c: "Testing for a magnet", q: "You have two identical-looking metal bars. One is a magnet and the other is plain iron. How can you be sure which is the magnet?",
+    o: ["Find a bar that repels one end of a known magnet", "Find a bar that attracts a known magnet", "Find a bar that attracts paper clips with both ends", "See which bar is heavier"],
+    e: "A magnet attracts unmagnetised iron, so attraction does not prove anything. Only a magnet can repel another magnet." },
+  { c: "Poles", q: "The north pole of one magnet is brought near the north pole of another. What happens?",
+    o: ["They repel", "They attract", "Nothing happens", "They attract, then join permanently"],
+    e: "Like poles repel; unlike poles attract." },
+  { c: "Field lines", q: "Which statement about magnetic field lines around a bar magnet is correct?",
+    o: ["They go from the north pole to the south pole, and are closest together where the field is strongest", "They go from the south pole to the north pole outside the magnet", "They are evenly spaced all around the magnet", "They cross each other near the poles"],
+    e: "Field lines show the direction a compass's north end would point. They are most crowded at the poles, where the field is strongest, and never cross." },
+  { c: "Breaking a magnet", q: "A bar magnet is snapped in half. What do you get?",
+    o: ["Two smaller magnets, each with a north and a south pole", "One north pole and one south pole on separate pieces", "Two pieces of unmagnetised metal", "One magnet and one piece of plain iron"],
+    e: "Every magnet has two poles. A new pair of poles forms at the break, so each half is a complete magnet." },
+  { c: "Earth's magnetic field", q: "The north pole of a compass needle points towards the Arctic. What does this tell you about the Earth's magnetism?",
+    o: ["There is a magnetic south pole near the geographic North Pole", "There is a magnetic north pole near the geographic North Pole", "The compass is attracted by the cold", "The Earth's magnetism only works in the northern hemisphere"],
+    e: "Unlike poles attract. Since the compass's north pole is pulled towards the Arctic, the Earth's magnetic pole there must behave as a south pole." },
+  { c: "Magnetism passes through materials", q: "A magnet under a wooden table can move a paper clip on top of it. What does this show?",
+    o: ["Magnetic fields can pass through non-magnetic materials", "Wood is a magnetic material", "The paper clip is a magnet", "Magnets only work through wood"],
+    e: "Non-magnetic materials such as wood, paper, plastic and glass do not block a magnetic field." },
+  { c: "Current makes a field", q: "A plotting compass is placed beside a wire. When a current is switched on, the needle moves. Why?",
+    o: ["An electric current produces a magnetic field around the wire", "The wire has become hot", "The wire is made of iron", "Current pushes air onto the compass"],
+    e: "Any wire carrying a current has a magnetic field around it in circles. This is the basis of an electromagnet." },
+  { c: "Electromagnet strength", q: "Which change would make an electromagnet stronger?",
+    o: ["Increasing the number of turns in the coil", "Reversing the direction of the current", "Using a plastic core instead of an iron core", "Using a longer wire with the same number of turns"],
+    e: "An electromagnet is stronger with more turns, a larger current and an iron core. Reversing the current swaps the poles but does not change strength." },
+  { c: "Reversing the current", q: "The battery in an electromagnet circuit is turned round. What happens?",
+    o: ["The north and south poles of the electromagnet swap", "The electromagnet stops working", "The electromagnet becomes twice as strong", "Nothing changes at all"],
+    e: "The direction of the magnetic field depends on the direction of the current. Reverse the current and the poles reverse." },
+  { c: "Choice of core", q: "Why does a scrapyard crane electromagnet use an iron core rather than a steel core?",
+    o: ["Iron loses its magnetism when the current is switched off, so the crane can drop the scrap", "Iron is not a magnetic material", "Steel cannot be magnetised at all", "Iron makes the current flow faster"],
+    e: "Iron (soft iron) is easy to magnetise and demagnetise. Steel keeps its magnetism, so the scrap would not drop when the current is switched off." },
+  { c: "Why electromagnets are useful", q: "What is the main advantage of an electromagnet over a permanent magnet?",
+    o: ["It can be switched on and off, and its strength can be changed", "It never needs electricity", "It is always stronger than any permanent magnet", "It attracts all metals, including copper"],
+    e: "Controlling the current lets you control the magnetism. This is why electromagnets are used in cranes, door locks, relays and electric bells." },
+  { c: "Fair testing", q: "A student tests how the number of turns on a coil affects how many paper clips an electromagnet picks up. Which variable must be kept the same?",
+    o: ["The current in the coil", "The number of turns", "The number of paper clips picked up", "None; all can change"],
+    e: "Number of turns is the independent variable and paper clips picked up is the dependent variable. Current also affects strength, so it must be controlled." }
+  ]}
+];
+
+/* ---------- state ---------- */
+const KEY = "sci8-best-v1";
+function loadBest() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+function saveBest(b) { try { localStorage.setItem(KEY, JSON.stringify(b)); } catch (e) {} }
+let best = loadBest();
+let run = null; // { unitKey, title, color, items:[{q,opts,correctIdx,chosen}], i, score }
+
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const band = pct => pct >= 80 ? ["secure", "Secure"] : pct >= 50 ? ["developing", "Developing"] : ["revisit", "Revisit"];
+const total = UNITS.reduce((s, u) => s + u.qs.length, 0);
+
+function prepare(q, unit) {
+  const order = shuffle([0, 1, 2, 3]);
+  return { q, unit, opts: order.map(k => q.o[k]), correctIdx: order.indexOf(0), chosen: null };
+}
+
+/* ---------- views ---------- */
+function home() {
+  run = null;
+  const rows = UNITS.map(u => {
+    const b = best["u" + u.n];
+    let bestHtml = "Not tried";
+    if (b) { const [cls] = band(Math.round(b.score / b.of * 100)); bestHtml = `<span class="best ${cls}">Best ${b.score}/${b.of}</span>`; }
+    return `<li class="unit-row" style="--c:${STRANDS[u.strand]}">
+      <button class="unit-btn" data-unit="${u.n}" aria-label="Start Unit ${u.n} test: ${esc(u.title)}">
+        <span class="unit-no">${String(u.n).padStart(2, "0")}</span>
+        <span class="unit-main"><span class="unit-title">${esc(u.title)}</span><span class="unit-topics">${esc(u.topics)}</span></span>
+        <span class="unit-meta"><span class="strand">${u.strand}</span><span>${u.qs.length} questions</span>${bestHtml}</span>
+      </button></li>`;
+  }).join("");
+  const mb = best.mixed;
+  app.innerHTML = `
+    <header class="top">
+      <span class="eyebrow">Cambridge Checkpoint Science · Coursebook 8</span>
+      <h1>Science 8 Unit Tests</h1>
+      <p class="lede">One test per unit, ${total} questions in all. Each question checks an idea, not a definition to recite. Many wrong options are common misconceptions. You get an explanation after every answer.</p>
+      <div class="legend">
+        <span><i class="dot" style="--c:var(--bio)"></i>Biology</span>
+        <span><i class="dot" style="--c:var(--chem)"></i>Chemistry</span>
+        <span><i class="dot" style="--c:var(--phys)"></i>Physics</span>
+        <span>Score bands: Secure ≥ 80% · Developing 50–79% · Revisit &lt; 50%</span>
+      </div>
+    </header>
+    <ol class="units">${rows}</ol>
+    <section class="mixed">
+      <p><strong>Mixed review.</strong> Two random questions from every unit (26 questions). Good for checking that earlier units have stuck.${mb ? ` Best so far: ${mb.score}/${mb.of}.` : ""}</p>
+      <button class="btn" id="mixed">Start mixed review</button>
+    </section>
+    <p class="note">Unit order and titles follow the first edition of the Coursebook 8. Best scores are saved only in this browser.</p>`;
+  app.querySelectorAll("[data-unit]").forEach(b => b.addEventListener("click", () => startUnit(+b.dataset.unit)));
+  document.getElementById("mixed").addEventListener("click", startMixed);
+  window.scrollTo(0, 0);
+}
+
+function startUnit(n) {
+  const u = UNITS.find(x => x.n === n);
+  run = { key: "u" + n, label: `Unit ${n}`, title: u.title, color: STRANDS[u.strand], n,
+          items: shuffle(u.qs).map(q => prepare(q, u)), i: 0, score: 0 };
+  question();
+}
+function startMixed() {
+  const items = shuffle(UNITS.flatMap(u => shuffle(u.qs).slice(0, 2).map(q => prepare(q, u))));
+  run = { key: "mixed", label: "All units", title: "Mixed review", color: "var(--accent)", items, i: 0, score: 0 };
+  question();
+}
+
+function question() {
+  const it = run.items[run.i], N = run.items.length;
+  const answered = it.chosen !== null;
+  const opts = it.opts.map((t, k) => {
+    let cls = "opt";
+    if (answered) { if (k === it.correctIdx) cls += " correct"; else if (k === it.chosen) cls += " wrong"; else cls += " dim"; }
+    return `<button class="${cls}" data-k="${k}" ${answered ? "disabled" : ""}><span class="key">${"ABCD"[k]}</span><span>${esc(t)}</span></button>`;
+  }).join("");
+  const right = answered && it.chosen === it.correctIdx;
+  const fb = answered ? `<div class="why" style="--fb:${right ? "var(--good)" : "var(--bad)"}" role="status">
+      <strong>${right ? "Correct" : "Not quite. The answer is " + "ABCD"[it.correctIdx] + "."}</strong><p>${esc(it.q.e)}</p></div>` : "";
+  const unitTag = run.key === "mixed" ? `Unit ${it.unit.n} · ` : "";
+  app.innerHTML = `
+    <div class="qbar" style="--c:${run.color}">
+      <div class="qbar-row"><button class="link" id="quit">← All units</button><span class="tally">Score ${run.score} · Q ${run.i + 1} of ${N}</span></div>
+      <div class="qbar-row"><h2>${esc(run.label)}: ${esc(run.title)}</h2></div>
+      <div class="progress" aria-hidden="true"><i style="width:${(run.i + (answered ? 1 : 0)) / N * 100}%"></i></div>
+    </div>
+    <article class="card" style="--c:${run.color}">
+      <div class="qhead"><span class="eyebrow">${unitTag}${esc(it.q.c)}</span></div>
+      <p class="qtext">${esc(it.q.q)}</p>
+      <div class="options">${opts}</div>
+      ${fb}
+      <div class="qfoot">
+        <span class="hint">Keys: 1–4 or A–D to answer${answered ? ", Enter for next" : ""}</span>
+        <button class="btn" id="next" ${answered ? "" : "disabled"}>${run.i + 1 === N ? "See results" : "Next question"}</button>
+      </div>
+    </article>`;
+  document.getElementById("quit").addEventListener("click", home);
+  app.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => answer(+b.dataset.k)));
+  const next = document.getElementById("next");
+  next.addEventListener("click", advance);
+  if (answered) next.focus();
+}
+
+function answer(k) {
+  const it = run.items[run.i];
+  if (it.chosen !== null) return;
+  it.chosen = k;
+  if (k === it.correctIdx) run.score++;
+  question();
+}
+function advance() {
+  if (run.items[run.i].chosen === null) return;
+  if (run.i + 1 < run.items.length) { run.i++; question(); window.scrollTo(0, 0); } else results();
+}
+
+function results() {
+  const N = run.items.length, pct = Math.round(run.score / N * 100), [cls, label] = band(pct);
+  const prev = best[run.key];
+  if (!prev || run.score / N > prev.score / prev.of) { best[run.key] = { score: run.score, of: N }; saveBest(best); }
+  const missed = run.items.filter(it => it.chosen !== it.correctIdx);
+  const reviewHtml = missed.length ? `<h3>Ideas to revisit</h3><ul class="review">${missed.map(it => `
+      <li><span class="eyebrow">${run.key === "mixed" ? "Unit " + it.unit.n + " · " : ""}${esc(it.q.c)}</span>
+      <p>${esc(it.q.q)}</p>
+      <p class="ans">You chose <s>${esc(it.opts[it.chosen])}</s>. Correct: <b>${esc(it.opts[it.correctIdx])}</b></p>
+      <p class="exp">${esc(it.q.e)}</p></li>`).join("")}</ul>` : `<p>Every answer correct. Try the mixed review, or move on to the next unit.</p>`;
+  const nextUnit = run.n && run.n < UNITS.length ? `<button class="btn ghost" id="nextunit">Unit ${run.n + 1} test</button>` : "";
+  app.innerHTML = `
+    <div class="qbar" style="--c:${run.color}">
+      <div class="qbar-row"><button class="link" id="quit">← All units</button></div>
+    </div>
+    <article class="card" style="--c:${run.color}">
+      <div class="result-head">
+        <span class="eyebrow">${esc(run.label)}: ${esc(run.title)}</span>
+        <div class="score">${run.score}<small> / ${N}</small></div>
+        <span class="band ${cls}">${label} · ${pct}%</span>
+      </div>
+      ${reviewHtml}
+      <div class="actions"><button class="btn" id="retry">Retake this test</button>${nextUnit}</div>
+    </article>`;
+  document.getElementById("quit").addEventListener("click", home);
+  document.getElementById("retry").addEventListener("click", () => run.key === "mixed" ? startMixed() : startUnit(run.n));
+  const nu = document.getElementById("nextunit");
+  if (nu) nu.addEventListener("click", () => startUnit(run.n + 1));
+  window.scrollTo(0, 0);
+}
+
+document.addEventListener("keydown", e => {
+  if (!run || e.metaKey || e.ctrlKey || e.altKey) return;
+  const it = run.items[run.i];
+  if (!it || !document.querySelector(".opt")) return;
+  const map = { "1": 0, "2": 1, "3": 2, "4": 3, a: 0, b: 1, c: 2, d: 3 };
+  const k = map[e.key.toLowerCase()];
+  if (k !== undefined && it.chosen === null) { e.preventDefault(); answer(k); }
+  else if (e.key === "Enter" && it.chosen !== null && document.activeElement?.id !== "next") { e.preventDefault(); advance(); }
+});
+
+home();
+</script>
+</body>
+</html>
