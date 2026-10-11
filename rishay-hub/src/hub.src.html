@@ -1,0 +1,1168 @@
+<title>Rishay's Learning Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: graph-paper ground, one sticky top bar with subject tabs, a single centred column of
+   cards. Subjects keep fixed identity colours (Maths blue, English coral, UOI green); status
+   chips always carry an icon and a word, never colour alone. */
+:root{
+  --bg:#f3f5f7;
+  --grid:#e4e9ee;
+  --card:#ffffff;
+  --ink:#152030;
+  --muted:#596577;
+  --line:#dce2e9;
+  --soft:#eef2f6;
+  --math:#2d6cdf;
+  --eng:#d4572e;
+  --uoi:#1f9b6b;
+  --sun:#e0a21b;
+  --bad:#c62828;
+  --warn:#a86a00;
+  --ok:#2d5fa8;
+  --chart:#3b4b63;
+  --font-display:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f141b; --grid:#18202a; --card:#18202b; --ink:#e8edf3; --muted:#9aa6b5; --line:#2a3442; --soft:#202a37;
+    --math:#5a8cf0; --eng:#d8653c; --uoi:#21996a; --sun:#f2c14e; --bad:#ef7070; --warn:#e3a740; --ok:#8db6ff; --chart:#9fb1c8;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f141b; --grid:#18202a; --card:#18202b; --ink:#e8edf3; --muted:#9aa6b5; --line:#2a3442; --soft:#202a37;
+  --math:#5a8cf0; --eng:#d8653c; --uoi:#21996a; --sun:#f2c14e; --bad:#ef7070; --warn:#e3a740; --ok:#8db6ff; --chart:#9fb1c8;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background-color:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px}
+h1,h2,h3,h4{font-family:var(--font-display);line-height:1.15;margin:0;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--math);outline-offset:2px;border-radius:6px}
+.wrap{max-width:980px;margin:0 auto;padding-inline:16px;padding-block:18px 60px;display:flex;flex-direction:column;gap:18px}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--card);border-bottom:1px solid var(--line)}
+.top-in{max-width:980px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap}
+.brand{font-family:var(--font-display);font-weight:800;font-size:20px;letter-spacing:-.01em;cursor:pointer;background:none;border:0;padding:0}
+.brand span{color:var(--sun)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+.tab{appearance:none;border:0;background:transparent;border-radius:999px;padding:6px 14px;cursor:pointer;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:7px}
+.tab:hover{background:var(--soft);color:var(--ink)}
+.tab[aria-current="page"]{background:var(--ink);color:var(--card)}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+.d-math{background:var(--math)} .d-eng{background:var(--eng)} .d-uoi{background:var(--uoi)}
+
+/* generic */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.eyebrow{font-family:var(--font-display);font-weight:700;font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.btn{appearance:none;border:1.5px solid var(--ink);background:transparent;border-radius:10px;padding:7px 14px;cursor:pointer;font-weight:700;white-space:nowrap}
+.btn:hover:not(:disabled){background:var(--soft)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.solid{background:var(--ink);color:var(--card)}
+.btn.solid:hover:not(:disabled){background:var(--ink);opacity:.9}
+.btn.sm{padding:4px 10px;font-size:14px;border-width:1px}
+.btn.math{border-color:var(--math);color:var(--math)} .btn.eng{border-color:var(--eng);color:var(--eng)} .btn.uoi{border-color:var(--uoi);color:var(--uoi)}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.grid3,.grid2{grid-template-columns:1fr}}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:620px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.tile b{display:block;font-family:var(--font-display);font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile small{color:var(--muted);font-size:13px}
+
+/* meters + chips */
+.meter{display:flex;align-items:center;gap:8px;min-width:0}
+.bar{flex:1;height:8px;border-radius:4px;background:var(--soft);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;border-radius:4px}
+.bar.math i{background:var(--math)} .bar.eng i{background:var(--eng)} .bar.uoi i{background:var(--uoi)}
+.pct{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;min-width:38px;text-align:right}
+.chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:13px;font-weight:700;white-space:nowrap}
+.chip.new{color:var(--muted)}
+.chip.needs{color:var(--bad);border-color:var(--bad)}
+.chip.learning{color:var(--warn);border-color:var(--warn)}
+.chip.secure{color:var(--ok);border-color:var(--ok)}
+.chip.mastered{color:var(--sun);border-color:var(--sun)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--muted)}
+
+/* home */
+.hello h1{font-size:clamp(28px,5vw,40px);font-weight:800}
+.mix{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;border:2px solid var(--ink)}
+@media (max-width:620px){.mix{grid-template-columns:1fr}}
+.mix h2{font-size:24px}
+.mix .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.subj h3{font-size:21px;display:flex;align-items:center;gap:8px}
+.subj .big{font-family:var(--font-display);font-weight:800;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
+.subj ul{margin:6px 0 0;padding-left:18px;font-size:14px}
+.subj{display:flex;flex-direction:column;gap:10px}
+.subj .row:last-child{margin-top:auto}
+
+/* activity chart */
+.chart{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:2px;align-items:end;height:120px;border-bottom:1px solid var(--line);padding-top:16px}
+.col{position:relative;height:100%;display:flex;align-items:flex-end;justify-content:center;outline:none}
+.col i{display:block;width:70%;max-width:26px;background:var(--chart);border-radius:4px 4px 0 0;min-height:0}
+.col.today i{background:var(--sun)}
+.col[data-tip]:hover::after,.col[data-tip]:focus::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--card);font-size:12px;padding:4px 8px;border-radius:6px;white-space:nowrap;z-index:3}
+.col:first-child[data-tip]:hover::after,.col:first-child[data-tip]:focus::after{left:0;transform:none}
+.col:last-child[data-tip]:hover::after,.col:last-child[data-tip]:focus::after{left:auto;right:0;transform:none}
+.xlab{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:2px;font-size:11px;color:var(--muted);text-align:center;margin-top:4px}
+
+/* lists */
+.list{display:flex;flex-direction:column}
+.li{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,200px) auto auto;gap:6px 14px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.li:first-child{border-top:0}
+.li .nm{font-weight:700}
+.li .ds{font-size:14px;color:var(--muted)}
+@media (max-width:620px){.li{grid-template-columns:minmax(0,1fr) auto}.li>div:first-child{grid-column:1;grid-row:1}.li>.chip{grid-column:2;grid-row:1;justify-self:end}.li>.meter{grid-column:1;grid-row:2}.li>.btn{grid-column:2;grid-row:2;justify-self:end}}
+.strand{display:flex;flex-direction:column;gap:4px}
+.strand-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.strand-h h3{font-size:19px}
+.sess{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.sess:first-child{border-top:0}
+.sess .sc{font-weight:700;font-variant-numeric:tabular-nums}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td.wrap{white-space:normal;min-width:200px}
+th{font-family:var(--font-display);font-size:13px;color:var(--muted)}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+
+/* subject header */
+.shead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.shead h1{font-size:clamp(28px,5vw,38px);display:flex;align-items:center;gap:10px}
+.shead .dot{width:14px;height:14px}
+
+/* UOI */
+.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.unit{appearance:none;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.unit[aria-pressed="true"]{border-color:var(--uoi);box-shadow:0 0 0 2px var(--uoi) inset}
+.unit .th{font-size:12px;color:var(--uoi);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.unit b{font-family:var(--font-display);font-size:17px}
+.central{font-family:var(--font-display);font-size:clamp(20px,3.4vw,26px);font-weight:700;line-height:1.25;margin:6px 0 4px;max-width:36ch}
+.vocab{display:flex;flex-wrap:wrap;gap:6px}
+.vocab span{background:var(--soft);border-radius:6px;padding:1px 8px;font-size:14px}
+.concepts{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px 18px}
+.concept .q{font-size:13px;color:var(--muted)}
+
+/* quiz */
+.quiz{max-width:760px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:14px}
+.qtop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.qprog{height:6px;border-radius:3px;background:var(--soft);overflow:hidden}
+.qprog i{display:block;height:100%;background:var(--ink);transition:width .25s}
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+.qmeta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.lvl{display:inline-flex;gap:3px;align-items:center;font-size:12px;color:var(--muted)}
+.lvl i{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--muted)}
+.lvl i.on{background:var(--muted)}
+.prompt{font-size:21px;line-height:1.45;margin:4px 0 16px}
+.prompt .bignum{font-family:var(--font-display);font-size:30px;font-weight:700;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.prompt mark{background:transparent;color:var(--math);text-decoration:underline 3px;text-underline-offset:5px;font-weight:800}
+.prompt i{color:var(--eng)}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;margin:0 2px;font-variant-numeric:tabular-nums}
+.fr sup{border-bottom:2px solid currentColor;padding:0 3px;font-size:.85em;vertical-align:baseline}
+.fr sub{font-size:.85em;padding:0 3px;vertical-align:baseline}
+.fr .sl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.passage{border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:14px;background:var(--soft)}
+.passage summary{cursor:pointer;font-weight:700;font-family:var(--font-display)}
+.passage p{margin:8px 0 0;max-width:68ch;font-size:16px}
+.passage.poem p,.passage.letter p{white-space:pre-line}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.choices{grid-template-columns:1fr}}
+.choice{appearance:none;text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;font-size:17px}
+.choice .k{font-family:var(--font-display);font-weight:700;color:var(--muted);min-width:18px}
+.choice:hover:not(:disabled){border-color:var(--ink)}
+.choice[aria-pressed="true"]{border-color:var(--ink);background:var(--soft);font-weight:700}
+.choice.right{border-color:var(--uoi);background:color-mix(in srgb,var(--uoi) 14%,var(--card))}
+.choice.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--card))}
+.choice:disabled{cursor:default}
+.ans{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ans input{border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;font-size:20px;width:min(280px,100%);background:var(--card);font-variant-numeric:tabular-nums}
+.ans input:focus{border-color:var(--ink);outline:none}
+.ans .unitlbl{font-size:18px;color:var(--muted)}
+.ans textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:17px;background:var(--card);min-height:130px;resize:vertical}
+.hint{font-size:14px;color:var(--muted);margin-top:6px}
+.fb{margin-top:16px;border-radius:12px;padding:12px 16px;border:1.5px solid var(--line)}
+.fb.good{border-color:var(--uoi)} .fb.badf{border-color:var(--bad)} .fb.part{border-color:var(--warn)}
+.fb h4{font-size:18px;display:flex;align-items:center;gap:8px}
+.fb .ex{margin-top:6px}
+.fb .model{margin-top:8px;background:var(--soft);border-radius:8px;padding:8px 12px}
+.qactions{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
+
+/* results */
+.score{font-family:var(--font-display);font-size:64px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.review{display:flex;flex-direction:column;gap:10px}
+.rv{border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.rv .p{font-weight:700}
+.rv .a{font-size:14px;margin-top:4px}
+
+/* forms */
+.form{display:grid;gap:12px}
+.form label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:14px}
+.form input,.form select,.form textarea{border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--card);font-weight:400;font-size:16px}
+.form textarea{min-height:80px;resize:vertical}
+.checks{display:flex;flex-wrap:wrap;gap:6px 14px;font-weight:400}
+.checks label{flex-direction:row;align-items:center;gap:6px;font-weight:400}
+.note{font-size:14px;color:var(--muted);background:var(--soft);border-radius:8px;padding:8px 12px}
+.status{font-size:14px;color:var(--muted)}
+.qlist{display:flex;flex-direction:column;gap:6px;max-height:420px;overflow:auto}
+.qi{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:start;border-top:1px solid var(--line);padding-top:6px;font-size:14px}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--card)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <button class="brand" type="button" data-go="home">Rishay’s Learning Hub<span>.</span></button>
+    <nav class="tabs" aria-label="Sections">
+      <button class="tab" type="button" data-go="home">Home</button>
+      <button class="tab" type="button" data-go="math"><span class="dot d-math"></span>Maths</button>
+      <button class="tab" type="button" data-go="eng"><span class="dot d-eng"></span>English</button>
+      <button class="tab" type="button" data-go="uoi"><span class="dot d-uoi"></span>Unit of Inquiry</button>
+      <button class="tab" type="button" data-go="parent">Parent</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap" id="app"></main>
+
+<script>
+/* =========================================================
+   Utilities
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ri = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
+const gcd = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b]} return a; };
+const lcm = (a,b) => a/gcd(a,b)*b;
+const fmt = n => Number(n).toLocaleString("en-US", {maximumFractionDigits: 6});
+const round6 = x => Math.round(x*1e6)/1e6;
+const frac = (n,d) => `<span class="fr"><sup>${n}</sup><span class="sl">/</span><sub>${d}</sub></span>`;
+const mixed = (w,n,d) => w ? (n ? `${w}${frac(n,d)}` : `${w}`) : frac(n,d);
+function simp(n,d){ const g=gcd(n,d)||1; return [n/g, d/g]; }
+function fracText(n,d){ if (d===1) return String(n); if (n>d){ const w=Math.floor(n/d), r=n%d; return r ? `${frac(n,d)} = ${mixed(w,r,d)}` : String(w); } return frac(n,d); }
+const todayKey = () => { const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const dayKey = t => { const d=new Date(t); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const addDays = (k,n) => { const [y,m,d]=k.split("-").map(Number); return dayKey(new Date(y,m-1,d+n)); };
+const PLACES = ["ones","tens","hundreds","thousands","ten thousands","hundred thousands","millions","ten millions"];
+function stripHtml(h){ const d=document.createElement("div"); d.innerHTML=h; return d.textContent.replace(/\s+/g," ").trim(); }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* =========================================================
+   Maths: question generators (level 1–3)
+   Each returns {type, prompt (html), ans, show (html of correct answer), ex (worked explanation), ...}
+   ========================================================= */
+function Q(type, prompt, ans, show, ex, extra={}){ return {type, prompt, ans, show, ex, ...extra}; }
+function mcq(prompt, opts, correctIdx, ex){ const order = shuffle(opts.map((_,i)=>i)); return {type:"mcq", prompt, opts:order.map(i=>opts[i]), ans:order.indexOf(correctIdx), show:opts[correctIdx], ex}; }
+function factorsOf(n){ const f=[]; for(let i=1;i<=n;i++) if(n%i===0) f.push(i); return f; }
+const isPrime = n => n>1 && factorsOf(n).length===2;
+const UNITS_ = {cm2:"cm²", cm3:"cm³"};
+
+const MATH = [
+ {id:"m.pv", strand:"Number sense", name:"Place value", desc:"Value of a digit in numbers up to ten millions", gen(l){
+   const len=[6,7,8][l-1]; const ds=Array.from({length:len},(_,i)=> i===0?ri(1,9):ri(0,9));
+   const pos=ri(0,len-1); if(ds[pos]===0) ds[pos]=ri(1,9);
+   const place=len-1-pos, d=ds[pos], ans=d*10**place;
+   let s=""; ds.forEach((x,i)=>{ s += i===pos?`<mark>${x}</mark>`:x; if((len-1-i)%3===0 && i<len-1) s+=","; });
+   return Q("num", `What is the value of the underlined digit in<br><span class="bignum">${s}</span>?`, ans, fmt(ans),
+     `The ${d} is in the <b>${PLACES[place]}</b> place, so its value is ${d} × ${fmt(10**place)} = <b>${fmt(ans)}</b>.`);
+ }},
+ {id:"m.round", strand:"Number sense", name:"Rounding", desc:"Round to the nearest 10, 100, 1,000 or 10,000", gen(l){
+   const to = l===1 ? pick([10,100]) : l===2 ? pick([100,1000]) : pick([1000,10000]);
+   const N = ri(l===1?1000:10000, l===1?99999:l===2?999999:9999999);
+   const ans = Math.round(N/to)*to, nd = Math.floor(N/(to/10))%10;
+   return Q("num", `Round <span class="bignum">${fmt(N)}</span> to the nearest <b>${fmt(to)}</b>.`, ans, fmt(ans),
+     `Look at the digit just to the right of the ${PLACES[Math.log10(to)]} place. It is <b>${nd}</b>, which is ${nd>=5?"5 or more, so round <b>up</b>":"less than 5, so round <b>down</b>"}. ${fmt(N)} → <b>${fmt(ans)}</b>.`);
+ }},
+ {id:"m.negative", strand:"Number sense", name:"Negative numbers", desc:"Temperature changes and differences across zero", gen(l){
+   if(l===1){ const t=ri(-8,-1), r=ri(-t+1,15), a=t+r; return Q("num",`The temperature in Shimla is <b>${t}°C</b> at dawn. By noon it rises by <b>${r}°</b>. What is the temperature at noon?`,a,`${a}°C`,`Start at ${t} and count ${r} up the number line: ${-t} steps take you to 0, then ${r+t} more → <b>${a}°C</b>.`,{unit:"°C"}); }
+   if(l===2){ const t=ri(-3,10), f=ri(t+1,t+12), a=t-f; return Q("num",`It is <b>${t}°C</b> in Manali. At night the temperature falls by <b>${f}°</b>. What is the new temperature?`,a,`${a}°C`,`${t} − ${f}: ${t>0?`${t} steps take you down to 0, then ${f-t} more below zero`:`count ${f} steps down`} → <b>${a}°C</b>.`,{unit:"°C"}); }
+   const t1=ri(-15,-2), t2=ri(3,30), a=t2-t1; return Q("num",`In Leh it is <b>${t1}°C</b> and in Pune it is <b>${t2}°C</b>. How many degrees warmer is Pune?`,a,`${a}°`,`From ${t1} up to 0 is ${-t1} degrees, and from 0 up to ${t2} is ${t2} degrees. ${-t1} + ${t2} = <b>${a}</b>.`,{unit:"degrees"});
+ }},
+ {id:"m.decorder", strand:"Number sense", name:"Comparing decimals", desc:"Order decimals with different numbers of places", gen(l){
+   let vals;
+   for(let tries=0;tries<50;tries++){
+     const a=ri(1,8), b=ri(1,9), w=l===1?0:ri(1,9);
+     const c = l===1 ? [`0.${a}`,`0.${a}${b}`,`0.${b}`,`0.0${a}`] : l===2 ? [`${w}.${a}`,`${w}.${a}${b}`,`${w}.${b}${a}`,`${w}.0${b}`] : [`${w}.${a}0${b}`,`${w}.${a}${b}`,`${w}.0${a}${b}`,`${w}.${a}`];
+     if(new Set(c.map(Number)).size===4){ vals=c; break; }
+   }
+   const big=Math.random()<.5, nums=vals.map(Number), target=big?Math.max(...nums):Math.min(...nums);
+   const dp=Math.max(...vals.map(v=>v.split(".")[1].length));
+   const padded=vals.map(v=>{const [w,f]=v.split(".");return `${w}.${f.padEnd(dp,"0")}`}).sort((x,y)=>Number(x)-Number(y));
+   return mcq(`Which number is the <b>${big?"greatest":"smallest"}</b>?`, vals, nums.indexOf(target),
+     `Write them all with ${dp} decimal places and compare digit by digit: ${padded.join(" &lt; ")}. So the ${big?"greatest":"smallest"} is <b>${vals[nums.indexOf(target)]}</b>.`);
+ }},
+ {id:"m.mult", strand:"Operations", name:"Multiplication", desc:"3-digit × 1-digit up to 3-digit × 2-digit", gen(l){
+   const a = l===1?ri(100,999):l===2?ri(12,99):ri(120,999), b = l===1?ri(3,9):ri(12,99), ans=a*b;
+   const ex = b>=10 ? `${a} × ${b} = ${a} × ${Math.floor(b/10)*10} + ${a} × ${b%10} = ${fmt(a*Math.floor(b/10)*10)} + ${fmt(a*(b%10))} = <b>${fmt(ans)}</b>.`
+     : `Split ${a}: ${Math.floor(a/100)*100} × ${b} + ${a%100} × ${b} = ${fmt(Math.floor(a/100)*100*b)} + ${fmt((a%100)*b)} = <b>${fmt(ans)}</b>.`;
+   return Q("num", `<span class="bignum">${a} × ${b}</span> = ?`, ans, fmt(ans), ex);
+ }},
+ {id:"m.div", strand:"Operations", name:"Division with remainders", desc:"Long division, including remainders", gen(l){
+   const d = l===1?ri(2,9):l===2?ri(3,9):ri(11,25), q = l===1?ri(12,99):l===2?ri(100,999):ri(20,99), r = l===1?0:ri(0,d-1), N=d*q+r;
+   return Q("qr", `<span class="bignum">${fmt(N)} ÷ ${d}</span> = ?`, {q,r}, r?`${q} r ${r}`:`${q}`,
+     `${d} × ${q} = ${fmt(d*q)}${r?`, and ${fmt(N)} − ${fmt(d*q)} = ${r} left over`:""}. So the answer is <b>${q}${r?` r ${r}`:""}</b>.`, {hint:"If there is a remainder, write it like 23 r 4."});
+ }},
+ {id:"m.bodmas", strand:"Operations", name:"Order of operations", desc:"Brackets, then × and ÷, then + and −", gen(l){
+   if(l===1){ const a=ri(2,20),b=ri(2,9),c=ri(2,9),ans=a+b*c; return Q("num",`<span class="bignum">${a} + ${b} × ${c}</span> = ?`,ans,ans,`Multiply first: ${b} × ${c} = ${b*c}. Then ${a} + ${b*c} = <b>${ans}</b>.`); }
+   if(l===2){ const a=ri(2,12),b=ri(2,12),c=ri(2,9),d=ri(1,(a+b)*c-1),ans=(a+b)*c-d; return Q("num",`<span class="bignum">(${a} + ${b}) × ${c} − ${d}</span> = ?`,ans,ans,`Brackets first: ${a} + ${b} = ${a+b}. Then ${a+b} × ${c} = ${(a+b)*c}. Then ${(a+b)*c} − ${d} = <b>${ans}</b>.`); }
+   const d=ri(2,6),k=ri(2,6),c=ri(1,9),b=c+d*k,a=ri(2,9),e=ri(1,20),ans=a*k+e;
+   return Q("num",`<span class="bignum">${a} × (${b} − ${c}) ÷ ${d} + ${e}</span> = ?`,ans,ans,`Brackets: ${b} − ${c} = ${b-c}. Then left to right: ${a} × ${b-c} = ${a*(b-c)}, ÷ ${d} = ${a*k}. Finally + ${e} = <b>${ans}</b>.`);
+ }},
+ {id:"m.factors", strand:"Operations", name:"Factors, HCF and LCM", desc:"Factors, highest common factor, lowest common multiple", gen(l){
+   if(l===1){ const N=pick([24,36,48,60,72,84,90,96]); const fs=factorsOf(N).filter(f=>f>2&&f<N/2+1); const f=pick(fs);
+     const non=shuffle(Array.from({length:N},(_,i)=>i+3).filter(x=>N%x!==0&&x<N)).slice(0,3);
+     return mcq(`Which of these is a <b>factor</b> of ${N}?`,[f,...non].map(String),0,`${N} ÷ ${f} = ${N/f} exactly, so ${f} is a factor. The others leave a remainder.`); }
+   if(l===2){ const h=ri(2,12); let x,y; do{x=ri(1,7);y=ri(2,8)}while(x===y||gcd(x,y)!==1); const a=h*x,b=h*y;
+     return Q("num",`What is the <b>highest common factor</b> (HCF) of ${a} and ${b}?`,h,h,`Factors of ${a}: ${factorsOf(a).join(", ")}.<br>Factors of ${b}: ${factorsOf(b).join(", ")}.<br>The highest number in both lists is <b>${h}</b>.`); }
+   let a,b; do{a=ri(4,15);b=ri(4,15)}while(a===b); const L=lcm(a,b); const ma=[],mb=[]; for(let i=1;a*i<=L;i++) ma.push(a*i); for(let i=1;b*i<=L;i++) mb.push(b*i);
+   return Q("num",`Bus A leaves the stop every <b>${a} minutes</b> and bus B every <b>${b} minutes</b>. Both leave together at 8:00. After how many minutes will they next leave together?`,L,`${L} minutes`,`We need the lowest common multiple of ${a} and ${b}.<br>Multiples of ${a}: ${ma.join(", ")}.<br>Multiples of ${b}: ${mb.join(", ")}.<br>The first number in both lists is <b>${L}</b>.`,{unit:"minutes"});
+ }},
+ {id:"m.prime", strand:"Operations", name:"Prime numbers", desc:"Recognise primes and composites", gen(l){
+   const hi=l===1?30:l===2?60:100, lo=l===3?30:2;
+   const pr=[], co=[]; for(let n=lo;n<=hi;n++){ (isPrime(n)?pr:co).push(n); }
+   const oddCo = co.filter(n=>n%2===1 && n%5!==0);
+   const notQ = Math.random()<.35;
+   if(!notQ){ const p=pick(pr), cs=shuffle(l===1?co:oddCo.length>=3?oddCo:co).slice(0,3);
+     return mcq(`Which of these numbers is <b>prime</b>?`,[p,...cs].map(String),0,`${p} has exactly two factors, 1 and ${p}. ${cs.map(c=>{const f=factorsOf(c)[1];return `${c} = ${f} × ${c/f}`}).join("; ")}.`); }
+   const c=pick(l===1?co:oddCo.length?oddCo:co), ps=shuffle(pr).slice(0,3), f=factorsOf(c)[1];
+   return mcq(`Which of these numbers is <b>not</b> prime?`,[c,...ps].map(String),0,`${c} = ${f} × ${c/f}, so it has more than two factors. ${ps.join(", ")} are all prime.`);
+ }},
+ {id:"m.money", strand:"Operations", name:"Money word problems", desc:"Multi-step problems with rupees", gen(l){
+   if(l===1){ const a=ri(25,180), b=ri(15,95), ans=a+b; return Q("num",`Rishay buys a storybook for <b>₹${a}</b> and a set of colour pencils for <b>₹${b}</b>. How much does he spend altogether?`,ans,`₹${ans}`,`₹${a} + ₹${b} = <b>₹${ans}</b>.`,{unit:"₹",pre:true}); }
+   if(l===2){ const n=ri(3,6), p=ri(28,65), g=ri(40,120), tot=n*p+g, pay=tot<=500?500:1000, ans=pay-tot;
+     return Q("num",`Rishay buys <b>${n} notebooks</b> at <b>₹${p}</b> each and a geometry box for <b>₹${g}</b>. He pays with a <b>₹${pay}</b> note. How much change does he get?`,ans,`₹${ans}`,`Notebooks: ${n} × ₹${p} = ₹${n*p}. Total: ₹${n*p} + ₹${g} = ₹${tot}. Change: ₹${pay} − ₹${tot} = <b>₹${ans}</b>.`,{unit:"₹",pre:true}); }
+   if(Math.random()<.5){ const price=ri(16,60)*100, pct=pick([10,20,25,50]), ans=price*(100-pct)/100;
+     return Q("num",`A bicycle costs <b>₹${fmt(price)}</b>. In a sale it is <b>${pct}% off</b>. What is the sale price?`,ans,`₹${fmt(ans)}`,`${pct}% of ₹${fmt(price)} = ₹${fmt(price*pct/100)}. Sale price: ₹${fmt(price)} − ₹${fmt(price*pct/100)} = <b>₹${fmt(ans)}</b>.`,{unit:"₹",pre:true}); }
+   const c=ri(12,30)*10, k=ri(3,5), s=ri(24,32), tot=c*k*s, B=Math.floor(tot*ri(60,90)/100/1000)*1000, ans=tot-B;
+   return Q("num",`A school trip costs <b>₹${c}</b> per student. <b>${k} classes</b> of <b>${s} students</b> are going. The school has <b>₹${fmt(B)}</b> in its trip fund. How much more money is needed?`,ans,`₹${fmt(ans)}`,`Students: ${k} × ${s} = ${k*s}. Cost: ${k*s} × ₹${c} = ₹${fmt(tot)}. More needed: ₹${fmt(tot)} − ₹${fmt(B)} = <b>₹${fmt(ans)}</b>.`,{unit:"₹",pre:true});
+ }},
+ {id:"m.fequiv", strand:"Fractions, decimals and percentages", name:"Equivalent fractions", desc:"Find the missing number in equal fractions", gen(l){
+   let a,b; do{b=ri(2,12);a=ri(1,b-1)}while(gcd(a,b)!==1); const m=ri(2,l===1?5:12);
+   if(l<3) return Q("num",`Fill in the missing number: ${frac(a,b)} = ${frac("?",b*m)}`,a*m,a*m,`${b} × ${m} = ${b*m}, so multiply the top by ${m} too: ${a} × ${m} = <b>${a*m}</b>.`);
+   return Q("num",`Fill in the missing number: ${frac(a,b)} = ${frac(a*m,"?")}`,b*m,b*m,`${a} × ${m} = ${a*m}, so multiply the bottom by ${m} too: ${b} × ${m} = <b>${b*m}</b>.`);
+ }},
+ {id:"m.fsimp", strand:"Fractions, decimals and percentages", name:"Simplifying fractions", desc:"Write fractions in their simplest form", gen(l){
+   let a,b; do{b=ri(2,l===3?9:12);a=l===3?ri(b+1,3*b):ri(1,b-1)}while(gcd(a,b)!==1); const m=ri(2,l===1?4:l===2?8:12);
+   return Q("frac",`Write ${frac(a*m,b*m)} in its <b>simplest form</b>.`,[a,b],fracText(a,b),`The highest common factor of ${a*m} and ${b*m} is ${m}. ${a*m} ÷ ${m} = ${a} and ${b*m} ÷ ${m} = ${b}, so the answer is <b>${fracText(a,b)}</b>.`,{form:"simplest",hint:"Type a fraction like 3/4 or a mixed number like 1 1/2."});
+ }},
+ {id:"m.fadd", strand:"Fractions, decimals and percentages", name:"Adding and subtracting fractions", desc:"Same, related and different denominators", gen(l){
+   let d1,d2,a,b,op;
+   for(let t=0;t<100;t++){
+     if(l===1){ d1=d2=ri(5,12); } else if(l===2){ d1=ri(2,6); d2=d1*ri(2,3); if(Math.random()<.5)[d1,d2]=[d2,d1]; } else { d1=ri(2,9); do{d2=ri(2,9)}while(d2===d1); }
+     a=ri(1,d1-1); b=ri(1,d2-1); op=Math.random()<.5?"+":"−";
+     if(op==="−" && a/d1<=b/d2) continue; break;
+   }
+   const L=lcm(d1,d2), A=a*L/d1, B=b*L/d2, N=op==="+"?A+B:A-B, [n,d]=simp(N,L);
+   return Q("frac",`${frac(a,d1)} ${op} ${frac(b,d2)} = ?<div class="hint">Give your answer in its simplest form.</div>`,[n,d],fracText(n,d),
+     `${d1===d2?`The denominators are the same, so ${op==="+"?"add":"subtract"} the numerators: `:`Use the common denominator ${L}: ${frac(a,d1)} = ${frac(A,L)} and ${frac(b,d2)} = ${frac(B,L)}. `}${A} ${op} ${B} = ${N}, giving ${frac(N,L)}${(n!==N)?` = ${frac(n,d)}`:""}${n>d?` = ${mixed(Math.floor(n/d),n%d,d)}`:""}.`,{form:"simplest",hint:"Type a fraction like 5/6 or a mixed number like 1 1/4."});
+ }},
+ {id:"m.fof", strand:"Fractions, decimals and percentages", name:"Fraction of an amount", desc:"Find 3/4 of 48 and similar", gen(l){
+   const d=pick([2,3,4,5,6,8,10]); let n; do{n=ri(1,d-1)}while(gcd(n,d)!==1); const q=d*ri(2,l===1?10:l===2?25:60), ans=n*q/d;
+   const ctx = l===3 ? `Rishay’s family drove <b>${q} km</b> to Goa. ${frac(n,d)} of the journey was on the highway. How many kilometres was that?` : `What is ${frac(n,d)} of <b>${q}</b>?`;
+   return Q("num",ctx,ans,fmt(ans),`Find one part first: ${q} ÷ ${d} = ${q/d}. Then take ${n} part${n>1?"s":""}: ${q/d} × ${n} = <b>${ans}</b>.`,l===3?{unit:"km"}:{});
+ }},
+ {id:"m.mixed", strand:"Fractions, decimals and percentages", name:"Mixed numbers and improper fractions", desc:"Convert between the two forms", gen(l){
+   const w=ri(1,l===1?5:9), d=ri(2,9); let n; do{n=ri(1,d-1)}while(gcd(n,d)!==1);
+   if(l===1) return Q("frac",`Write ${mixed(w,n,d)} as an <b>improper fraction</b>.`,[w*d+n,d],frac(w*d+n,d),`${w} × ${d} = ${w*d}, plus ${n} = ${w*d+n}. Keep the denominator: <b>${frac(w*d+n,d)}</b>.`,{form:"improper",hint:"Type it like 7/3."});
+   return Q("frac",`Write ${frac(w*d+n,d)} as a <b>mixed number</b>.`,[w*d+n,d],mixed(w,n,d),`${w*d+n} ÷ ${d} = ${w} remainder ${n}, so it is <b>${w} and ${n}/${d}</b>.`,{form:"mixed",hint:"Type it like 2 1/3 (whole number, space, fraction)."});
+ }},
+ {id:"m.decops", strand:"Fractions, decimals and percentages", name:"Decimal calculations", desc:"Add, subtract, ×/÷ by 10, 100 and 1,000", gen(l){
+   if(l===1){ const a=ri(10,999)/10, b=ri(10,999)/10, ans=round6(a+b); return Q("num",`<span class="bignum">${a.toFixed(1)} + ${b.toFixed(1)}</span> = ?`,ans,ans.toFixed(1),`Line up the decimal points and add as usual: ${a.toFixed(1)} + ${b.toFixed(1)} = <b>${ans.toFixed(1)}</b>.`); }
+   if(l===2){ const A=ri(500,9999), B=ri(100,A-1), ans=round6((A-B)/100); return Q("num",`<span class="bignum">${(A/100).toFixed(2)} − ${(B/100).toFixed(2)}</span> = ?`,ans,ans.toFixed(2),`Line up the decimal points and subtract (exchange where needed): ${(A/100).toFixed(2)} − ${(B/100).toFixed(2)} = <b>${ans.toFixed(2)}</b>.`); }
+   const f=pick([10,100,1000]), mul=Math.random()<.5, x=mul?ri(1,9999)/1000:ri(1,9999)/10, ans=round6(mul?x*f:x/f), k=Math.log10(f);
+   return Q("num",`<span class="bignum">${fmt(x)} ${mul?"×":"÷"} ${fmt(f)}</span> = ?`,ans,fmt(ans),`${mul?"Multiplying":"Dividing"} by ${fmt(f)} moves every digit ${k} place${k>1?"s":""} to the ${mul?"left":"right"}: <b>${fmt(ans)}</b>.`);
+ }},
+ {id:"m.fdp", strand:"Fractions, decimals and percentages", name:"Fractions, decimals and percentages", desc:"Convert between forms; percentage of an amount", gen(l){
+   if(l===1){ const [n,d]=pick([[1,2],[1,4],[3,4],[1,5],[2,5],[3,5],[3,10],[7,10],[9,10]]), ans=n/d; return Q("num",`Write ${frac(n,d)} as a <b>decimal</b>.`,ans,String(ans),`${frac(n,d)} = ${frac(n*(100/d),100)} = <b>${ans}</b>.`); }
+   if(l===2){ const [n,d]=pick([[1,4],[3,4],[2,5],[3,20],[7,25],[9,50],[1,2],[1,5],[7,20],[11,25]]), ans=n*100/d; return Q("num",`Write ${frac(n,d)} as a <b>percentage</b>.`,ans,`${ans}%`,`Make the denominator 100: ${frac(n,d)} = ${frac(ans,100)} = <b>${ans}%</b>.`,{unit:"%"}); }
+   const p=pick([5,10,15,20,25,30,50,75]), A=ri(2,30)*20, ans=p*A/100;
+   return Q("num",`What is <b>${p}%</b> of <b>${A}</b>?`,ans,fmt(ans),`${p}% means ${p} out of 100. 1% of ${A} is ${A/100}, so ${p}% is ${A/100} × ${p} = <b>${fmt(ans)}</b>.`);
+ }},
+ {id:"m.convert", strand:"Measurement", name:"Converting units", desc:"Length, mass and capacity", gen(l){
+   const U=[["km","m",1000],["m","cm",100],["cm","mm",10],["kg","g",1000],["L","mL",1000]];
+   const [big,sm,f]=pick(U);
+   if(l===1){ const x=ri(2,15), ans=x*f; return Q("num",`<span class="bignum">${x} ${big}</span> = ? ${sm}`,ans,`${fmt(ans)} ${sm}`,`1 ${big} = ${fmt(f)} ${sm}, so ${x} × ${fmt(f)} = <b>${fmt(ans)} ${sm}</b>.`,{unit:sm}); }
+   if(l===2){ if(Math.random()<.5){ const xv=f===10?ri(11,99)/10:ri(5,39)/4, ans=round6(xv*f); return Q("num",`<span class="bignum">${fmt(xv)} ${big}</span> = ? ${sm}`,ans,`${fmt(ans)} ${sm}`,`1 ${big} = ${fmt(f)} ${sm}, so ${fmt(xv)} × ${fmt(f)} = <b>${fmt(ans)} ${sm}</b>.`,{unit:sm}); }
+     const y=ri(11,99)*(f/10), ans=round6(y/f); return Q("num",`<span class="bignum">${fmt(y)} ${sm}</span> = ? ${big}`,ans,`${fmt(ans)} ${big}`,`${fmt(f)} ${sm} = 1 ${big}, so ${fmt(y)} ÷ ${fmt(f)} = <b>${fmt(ans)} ${big}</b>.`,{unit:big}); }
+   const a=ri(2,9), b=ri(1,f-1), ans=a*f+b; return Q("num",`<span class="bignum">${a} ${big} ${b} ${sm}</span> = ? ${sm}`,ans,`${fmt(ans)} ${sm}`,`${a} ${big} = ${fmt(a*f)} ${sm}. Add ${b} ${sm}: ${fmt(a*f)} + ${b} = <b>${fmt(ans)} ${sm}</b>.`,{unit:sm});
+ }},
+ {id:"m.area", strand:"Measurement", name:"Perimeter and area", desc:"Rectangles, missing sides, triangles, compound shapes", gen(l){
+   if(l===1){ const a=ri(3,15), b=ri(2,12); if(Math.random()<.5) return Q("num",`A rectangle is <b>${a} cm</b> long and <b>${b} cm</b> wide. What is its <b>area</b>?`,a*b,`${a*b} cm²`,`Area = length × width = ${a} × ${b} = <b>${a*b} cm²</b>.`,{unit:"cm²"});
+     return Q("num",`A rectangle is <b>${a} cm</b> long and <b>${b} cm</b> wide. What is its <b>perimeter</b>?`,2*(a+b),`${2*(a+b)} cm`,`Perimeter = 2 × (length + width) = 2 × (${a} + ${b}) = <b>${2*(a+b)} cm</b>.`,{unit:"cm"}); }
+   if(l===2){ const a=ri(4,15), b=ri(3,12); if(Math.random()<.5) return Q("num",`A rectangular garden has an area of <b>${a*b} m²</b>. One side is <b>${a} m</b>. How long is the other side?`,b,`${b} m`,`Area = length × width, so width = ${a*b} ÷ ${a} = <b>${b} m</b>.`,{unit:"m"});
+     return Q("num",`A rectangle has a perimeter of <b>${2*(a+b)} cm</b>. Its length is <b>${a} cm</b>. What is its width?`,b,`${b} cm`,`Half the perimeter is ${a+b} cm (one length + one width). ${a+b} − ${a} = <b>${b} cm</b>.`,{unit:"cm"}); }
+   if(Math.random()<.5){ const bse=ri(3,12)*2, h=ri(3,14); return Q("num",`A triangle has a base of <b>${bse} cm</b> and a height of <b>${h} cm</b>. What is its area?`,bse*h/2,`${bse*h/2} cm²`,`Area of a triangle = ½ × base × height = ½ × ${bse} × ${h} = <b>${bse*h/2} cm²</b>.`,{unit:"cm²"}); }
+   const a=ri(6,12), b=ri(2,4), c=ri(2,5), d=ri(3,7), ans=a*b+c*d;
+   return Q("num",`An L-shaped room is made of two rectangles that do not overlap: one is <b>${a} m × ${b} m</b> and the other is <b>${c} m × ${d} m</b>. What is the total floor area?`,ans,`${ans} m²`,`${a} × ${b} = ${a*b} m² and ${c} × ${d} = ${c*d} m². Total: ${a*b} + ${c*d} = <b>${ans} m²</b>.`,{unit:"m²"});
+ }},
+ {id:"m.volume", strand:"Measurement", name:"Volume", desc:"Cuboids and cubes", gen(l){
+   if(l===1){ const a=ri(2,10),b=ri(2,8),c=ri(2,6); return Q("num",`A box is <b>${a} cm</b> long, <b>${b} cm</b> wide and <b>${c} cm</b> high. What is its volume?`,a*b*c,`${a*b*c} cm³`,`Volume = length × width × height = ${a} × ${b} × ${c} = <b>${a*b*c} cm³</b>.`,{unit:"cm³"}); }
+   if(l===2){ const s=ri(2,12); return Q("num",`What is the volume of a cube with edges <b>${s} cm</b> long?`,s**3,`${s**3} cm³`,`${s} × ${s} × ${s} = <b>${s**3} cm³</b>.`,{unit:"cm³"}); }
+   const a=ri(3,12),b=ri(2,10),c=ri(2,9),V=a*b*c; return Q("num",`A fish tank has a volume of <b>${V} cm³</b>. It is <b>${a} cm</b> long and <b>${b} cm</b> wide. How high is it?`,c,`${c} cm`,`Area of the base: ${a} × ${b} = ${a*b} cm². Height = ${V} ÷ ${a*b} = <b>${c} cm</b>.`,{unit:"cm"});
+ }},
+ {id:"m.time", strand:"Measurement", name:"Time and 24-hour clock", desc:"Durations, end times, 12 ↔ 24-hour", gen(l){
+   const t2s = m => `${String(Math.floor(m/60)%24).padStart(2,"0")}:${String(m%60).padStart(2,"0")}`;
+   if(l===1){ const s=ri(7*12,20*12)*5, dur=ri(4,22)*5; return Q("num",`A film starts at <b>${t2s(s)}</b> and ends at <b>${t2s(s+dur)}</b>. How many minutes long is it?`,dur,`${dur} minutes`,`From ${t2s(s)} to ${t2s(s+dur)}: count on to the next hour, then the rest. Total = <b>${dur} minutes</b>.`,{unit:"minutes"}); }
+   if(l===2){ const s=ri(6*12,18*12)*5, dur=ri(9,40)*5, e=s+dur; return Q("time",`A train leaves Mumbai at <b>${t2s(s)}</b>. The journey takes <b>${Math.floor(dur/60)} h ${dur%60} min</b>. At what time does it arrive? (24-hour clock)`,e%1440,t2s(e),`${t2s(s)} + ${Math.floor(dur/60)} h = ${t2s(s+Math.floor(dur/60)*60)}, then + ${dur%60} min = <b>${t2s(e)}</b>.`,{hint:"Type the time like 14:35."}); }
+   if(Math.random()<.5){ const h=ri(1,11), m=ri(0,11)*5, pm=Math.random()<.6, h24=(h%12)+(pm?12:0); return Q("time",`Write <b>${h}:${String(m).padStart(2,"0")} ${pm?"pm":"am"}</b> in 24-hour time.`,h24*60+m,`${String(h24).padStart(2,"0")}:${String(m).padStart(2,"0")}`,`${pm?`For pm times add 12 to the hour: ${h} + 12 = ${h24}`:`am times keep the same hour, with a 0 in front if needed`}. So it is <b>${String(h24).padStart(2,"0")}:${String(m).padStart(2,"0")}</b>.`,{hint:"Type the time like 19:35."}); }
+   const s=ri(21*12,23*12+6)*5, dur=ri(24,60)*5; return Q("num",`A flight leaves Delhi at <b>${t2s(s)}</b> and lands at <b>${t2s(s+dur)}</b> the next morning. How many minutes long is the flight?`,dur,`${dur} minutes`,`From ${t2s(s)} to midnight is ${1440-s} min. From midnight to ${t2s(s+dur)} is ${(s+dur)-1440} min. Total: <b>${dur} minutes</b>.`,{unit:"minutes"});
+ }},
+ {id:"m.angles", strand:"Shape and space", name:"Angles", desc:"Types of angle, angles on a line, in a triangle", gen(l){
+   if(l===1){ const kinds=[["Acute",ri(10,85)],["Right",90],["Obtuse",ri(95,175)],["Reflex",ri(190,350)]]; const [k,a]=pick(kinds);
+     return mcq(`What type of angle measures <b>${a}°</b>?`,["Acute","Right","Obtuse","Reflex"],["Acute","Right","Obtuse","Reflex"].indexOf(k),`Acute: less than 90°. Right: exactly 90°. Obtuse: between 90° and 180°. Reflex: between 180° and 360°. So ${a}° is <b>${k.toLowerCase()}</b>.`); }
+   if(l===2){ if(Math.random()<.5){ const a=ri(20,160); return Q("num",`Two angles sit on a straight line. One is <b>${a}°</b>. What is the other?`,180-a,`${180-a}°`,`Angles on a straight line add up to 180°. 180 − ${a} = <b>${180-a}°</b>.`,{unit:"°"}); }
+     const a=ri(40,150), b=ri(40,150); return Q("num",`Three angles meet at a point. Two of them are <b>${a}°</b> and <b>${b}°</b>. What is the third?`,360-a-b,`${360-a-b}°`,`Angles around a point add up to 360°. 360 − ${a} − ${b} = <b>${360-a-b}°</b>.`,{unit:"°"}); }
+   if(Math.random()<.5){ const a=ri(25,100), b=ri(20,150-a); return Q("num",`Two angles of a triangle are <b>${a}°</b> and <b>${b}°</b>. What is the third angle?`,180-a-b,`${180-a-b}°`,`Angles in a triangle add up to 180°. 180 − ${a} − ${b} = <b>${180-a-b}°</b>.`,{unit:"°"}); }
+   const apex=ri(10,70)*2; return Q("num",`An isosceles triangle has a top angle of <b>${apex}°</b>. The other two angles are equal. What is each of them?`,(180-apex)/2,`${(180-apex)/2}°`,`180 − ${apex} = ${180-apex}. The two equal angles share this: ${180-apex} ÷ 2 = <b>${(180-apex)/2}°</b>.`,{unit:"°"});
+ }},
+ {id:"m.solids", strand:"Shape and space", name:"3D shapes", desc:"Faces, edges, vertices; Euler’s rule", gen(l){
+   const S=[["cube",6,12,8],["cuboid",6,12,8],["triangular prism",5,9,6],["square-based pyramid",5,8,5],["triangular pyramid",4,6,4],["pentagonal prism",7,15,10],["hexagonal prism",8,18,12],["pentagonal pyramid",6,10,6]];
+   const s=pick(l===1?S.slice(0,5):S);
+   if(l<3){ const k=ri(0,2), nm=["faces","edges","vertices"][k], v=s[k+1]; return Q("num",`How many <b>${nm}</b> does a <b>${s[0]}</b> have?`,v,v,`A ${s[0]} has ${s[1]} faces, ${s[2]} edges and ${s[3]} vertices (corners).`); }
+   return Q("num",`A solid shape has <b>${s[1]} faces</b> and <b>${s[3]} vertices</b>. How many edges does it have?`,s[2],s[2],`Euler’s rule: faces + vertices − edges = 2. So edges = ${s[1]} + ${s[3]} − 2 = <b>${s[2]}</b>. (It could be a ${s[0]}.)`);
+ }},
+ {id:"m.coords", strand:"Shape and space", name:"Symmetry and coordinates", desc:"Lines of symmetry, translations, plotting", gen(l){
+   if(l===1){ const S=[["square",4],["rectangle (not a square)",2],["equilateral triangle",3],["regular hexagon",6],["isosceles triangle",1],["scalene triangle",0],["parallelogram (not a rectangle)",0],["regular pentagon",5],["kite",1],["regular octagon",8]]; const [s,n]=pick(S);
+     return Q("num",`How many <b>lines of symmetry</b> does a <b>${s}</b> have?`,n,n,`A ${s} has <b>${n}</b> line${n===1?"":"s"} of symmetry${n===0?": no fold makes the two halves match exactly":""}.`); }
+   if(l===2){ const x=ri(1,6), y=ri(3,9), dx=ri(1,5), dy=ri(1,y-1), right=Math.random()<.6, X=right?x+dx:Math.max(0,x-dx), Y=y-dy;
+     const realDx = right?dx:x-X; return Q("pair",`Point A is at <b>(${x}, ${y})</b>. It moves <b>${realDx} ${right?"right":"left"}</b> and <b>${dy} down</b>. Where is it now?`,[X,Y],`(${X}, ${Y})`,`x changes by ${right?"+":"−"}${realDx}: ${x} → ${X}. y changes by −${dy}: ${y} → ${Y}. New position: <b>(${X}, ${Y})</b>.`,{hint:"Type it like (4, 7)."}); }
+   const x1=ri(0,4), y1=ri(0,4), w=ri(2,6), h=ri(2,6); return Q("pair",`Three corners of a rectangle are at <b>(${x1}, ${y1})</b>, <b>(${x1+w}, ${y1})</b> and <b>(${x1+w}, ${y1+h})</b>. Where is the fourth corner?`,[x1,y1+h],`(${x1}, ${y1+h})`,`The fourth corner lines up with (${x1}, ${y1}) vertically and with (${x1+w}, ${y1+h}) horizontally, so it is <b>(${x1}, ${y1+h})</b>.`,{hint:"Type it like (4, 7)."});
+ }},
+ {id:"m.average", strand:"Data handling", name:"Mean, median, mode and range", desc:"Averages and spread of a data set", gen(l){
+   if(l===1){ if(Math.random()<.5){ const xs=Array.from({length:6},()=>ri(3,40)), r=Math.max(...xs)-Math.min(...xs); return Q("num",`Find the <b>range</b> of these scores: ${xs.join(", ")}`,r,r,`Range = highest − lowest = ${Math.max(...xs)} − ${Math.min(...xs)} = <b>${r}</b>.`); }
+     const m=ri(2,20); let xs; do{ xs=[m,m,m,...Array.from({length:4},()=>ri(1,25))]; }while(xs.filter(x=>x!==m).some((x,i,arr)=>arr.indexOf(x)!==i) || xs.filter(x=>x===m).length!==3); xs=shuffle(xs);
+     return Q("num",`Find the <b>mode</b> of: ${xs.join(", ")}`,m,m,`The mode is the value that appears most often. ${m} appears 3 times, so the mode is <b>${m}</b>.`); }
+   if(l===2){ const n=pick([5,7]); const xs=shuffle(Array.from({length:n},()=>ri(1,60))), s=xs.slice().sort((a,b)=>a-b), md=s[(n-1)/2];
+     return Q("num",`Find the <b>median</b> of: ${xs.join(", ")}`,md,md,`Put them in order: ${s.join(", ")}. The middle value is <b>${md}</b>.`); }
+   const n=5, mean=ri(8,40); let xs; do{ xs=Array.from({length:n-1},()=>ri(mean-12,mean+12)); xs.push(mean*n-xs.reduce((a,b)=>a+b,0)); }while(xs[n-1]<1||xs[n-1]>mean+20);
+   if(Math.random()<.5) return Q("num",`Rishay’s scores in five spelling tests were ${xs.join(", ")}. What is his <b>mean</b> score?`,mean,mean,`Add them: ${xs.join(" + ")} = ${mean*n}. Divide by ${n}: ${mean*n} ÷ ${n} = <b>${mean}</b>.`);
+   return Q("num",`The mean of five numbers is <b>${mean}</b>. Four of them are ${xs.slice(0,4).join(", ")}. What is the fifth number?`,xs[4],xs[4],`The total must be ${mean} × 5 = ${mean*5}. The four numbers add to ${xs.slice(0,4).reduce((a,b)=>a+b,0)}. ${mean*5} − ${xs.slice(0,4).reduce((a,b)=>a+b,0)} = <b>${xs[4]}</b>.`);
+ }},
+ {id:"m.prob", strand:"Data handling", name:"Probability", desc:"Likelihood words and simple probability fractions", gen(l){
+   if(l===1){ const W=["Impossible","Unlikely","Even chance","Likely","Certain"]; const S=[["rolling a 7 on a normal 1–6 dice",0],["getting heads when you toss a coin",2],["rolling a number less than 6 on a dice",3],["rolling a 6 on a dice",1],["the sun rising tomorrow",4],["picking a red sweet from a bag of 9 red and 1 yellow",3],["picking a blue marble from a bag with only green marbles",0],["it being Monday tomorrow if today is Sunday",4],["picking a heart from a bag holding one heart card and nine star cards",1]];
+     const [s,k]=pick(S); return mcq(`How likely is <b>${s}</b>?`,W,k,`It is <b>${W[k].toLowerCase()}</b>. Think about how many ways it can happen compared with all the possible outcomes.`); }
+   if(l===2){ const r=ri(1,8),b=ri(1,8),g=ri(1,8),T=r+b+g, c=pick([["red",r],["blue",b],["green",g]]);
+     return Q("frac",`A bag has <b>${r} red</b>, <b>${b} blue</b> and <b>${g} green</b> marbles. You pick one without looking. What is the probability it is <b>${c[0]}</b>?`,[c[1],T],frac(c[1],T),`There are ${c[1]} ${c[0]} marbles out of ${T} altogether, so the probability is <b>${frac(c[1],T)}</b>${gcd(c[1],T)>1?` = ${frac(...simp(c[1],T))}`:""}.`,{form:"any",hint:"Type a fraction like 3/10."}); }
+   const E=[["a number greater than 4 on a 1–6 dice",2,6],["an even number on a 1–6 dice",3,6],["a prime number on a 1–6 dice",3,6],["a number less than 3 on a 1–6 dice",2,6],["an even number on a spinner numbered 1–8",4,8],["a multiple of 3 on a spinner numbered 1–10",3,10]];
+   const [s,n,t]=pick(E); return Q("frac",`What is the probability of getting <b>${s}</b>?`,[n,t],frac(n,t),`There are ${n} favourable outcomes out of ${t} equally likely outcomes: ${frac(n,t)}${gcd(n,t)>1?` = <b>${frac(...simp(n,t))}</b>`:""}.`,{form:"any",hint:"Type a fraction like 1/3."});
+ }},
+ {id:"m.seq", strand:"Pattern and function", name:"Number patterns", desc:"Continue sequences and find the nth term", gen(l){
+   if(l===1){ const a=ri(1,30), d=ri(2,12), s=[0,1,2,3].map(i=>a+i*d); return Q("num",`What comes next? <span class="bignum">${s.join(", ")}, …</span>`,a+4*d,a+4*d,`The rule is <b>add ${d}</b>. ${s[3]} + ${d} = <b>${a+4*d}</b>.`); }
+   if(l===2){ if(Math.random()<.5){ const a=ri(60,150), d=ri(3,13), s=[0,1,2,3].map(i=>a-i*d); return Q("num",`What comes next? <span class="bignum">${s.join(", ")}, …</span>`,a-4*d,a-4*d,`The rule is <b>subtract ${d}</b>. ${s[3]} − ${d} = <b>${a-4*d}</b>.`); }
+     const a=ri(1,5), m=pick([2,3]), s=[0,1,2,3].map(i=>a*m**i); return Q("num",`What comes next? <span class="bignum">${s.join(", ")}, …</span>`,a*m**4,a*m**4,`Each term is <b>multiplied by ${m}</b>. ${s[3]} × ${m} = <b>${a*m**4}</b>.`); }
+   const a=ri(1,15), d=ri(2,9), n=pick([10,15,20,25,50]); return Q("num",`What is the <b>${n}th</b> term of <span class="bignum">${[0,1,2,3].map(i=>a+i*d).join(", ")}, …</span>?`,a+(n-1)*d,a+(n-1)*d,`Each term adds ${d}. The ${n}th term is the first term plus ${n-1} jumps of ${d}: ${a} + ${n-1} × ${d} = <b>${a+(n-1)*d}</b>.`);
+ }},
+ {id:"m.func", strand:"Pattern and function", name:"Function machines", desc:"Input–output rules and working backwards", gen(l){
+   const m=ri(2,9), c=ri(1,15);
+   if(l===1){ const x=ri(2,12); return Q("num",`Rule: <b>multiply by ${m}, then add ${c}</b>. The input is <b>${x}</b>. What is the output?`,m*x+c,m*x+c,`${x} × ${m} = ${m*x}, then + ${c} = <b>${m*x+c}</b>.`); }
+   if(l===2){ const x=ri(2,12), y=m*x+c; return Q("num",`Rule: <b>multiply by ${m}, then add ${c}</b>. The output is <b>${y}</b>. What was the input?`,x,x,`Work backwards with the opposite operations: ${y} − ${c} = ${y-c}, then ÷ ${m} = <b>${x}</b>.`); }
+   const xs=shuffle([1,2,3,4,5,6,7,8]).slice(0,3).sort((a,b)=>a-b), rows=xs.map(x=>`${x} → ${m*x+c}`).join(" &nbsp;·&nbsp; ");
+   const opts=[`× ${m} then + ${c}`,`+ ${m+c}`,`× ${m+1} then − ${Math.max(1,c-1)}`,`× ${m} then − ${c}`];
+   return mcq(`Which rule matches this machine? <br><span class="bignum" style="font-size:22px">${rows}</span>`,opts,0,`Check each pair: ${xs.map(x=>`${x} × ${m} + ${c} = ${m*x+c}`).join(", ")}. The rule is <b>× ${m} then + ${c}</b>.`);
+ }}
+];
+
+/* =========================================================
+   English
+   ========================================================= */
+/*@ENGLISH_BANK@*/
+const SPELL = [
+["necessary","neccessary","necesary","neccesary"],["separate","seperate","separete","seprate"],["definitely","definately","definitly","defenitely"],["beautiful","beautifull","beutiful","beautyful"],
+["environment","enviroment","environmant","enviornment"],["government","goverment","governmant","govermment"],["believe","beleive","belive","beleave"],["receive","recieve","receeve","receve"],
+["achieve","acheive","acheve","achive"],["library","libary","liberary","librery"],["February","Febuary","Februery","Febraury"],["Wednesday","Wensday","Wednsday","Wedensday"],
+["tomorrow","tommorow","tomorow","tommorrow"],["disappear","dissapear","disapear","dissappear"],["embarrass","embarass","embaras","embarras"],["occasion","occassion","ocassion","occasoin"],
+["rhythm","rythm","rhythem","rythym"],["especially","especialy","expecially","espescially"],["knowledge","knowlege","knowledg","nowledge"],["immediately","immediatly","imediately","immediatley"],
+["experiment","expiriment","experimant","exsperiment"],["temperature","temprature","temperture","tempreture"],["vegetable","vegtable","vegetible","vegitable"],["interesting","intresting","interisting","interestting"],
+["different","diffrent","differant","diferent"],["restaurant","restaraunt","resturant","restaurent"],["calendar","calender","calandar","calander"],["accommodate","accomodate","acommodate","acomodate"],
+["parallel","paralel","parralel","parallell"],["conscience","concience","consciense","conshience"],["mischievous","mischevious","mischievious","mischeivous"],["guarantee","garantee","guarentee","gaurantee"],
+["exaggerate","exagerate","exxagerate","exagerrate"],["privilege","priviledge","privilage","privelege"],["occurred","occured","ocurred","occurrd"],["humorous","humerous","humorus","humourus"]
+];
+const FIGS = ["Simile","Metaphor","Personification","Alliteration","Onomatopoeia","Hyperbole"];
+const FIG = [
+["‘The classroom was a zoo.’","Metaphor","It says the classroom <i>was</i> a zoo, without using ‘like’ or ‘as’, so it is a metaphor."],
+["‘She is as brave as a lion.’","Simile","It compares using ‘as … as’, so it is a simile."],
+["‘The wind whispered through the trees.’","Personification","Wind cannot really whisper; giving it a human action is personification."],
+["‘Peter Piper picked a peck of pickled peppers.’","Alliteration","Many words start with the same sound (p), which is alliteration."],
+["‘The bees buzzed and the old door creaked.’","Onomatopoeia","‘Buzzed’ and ‘creaked’ sound like the noises they describe."],
+["‘I’ve told you a million times!’","Hyperbole","It is a huge exaggeration for effect, which is hyperbole."],
+["‘The sun smiled down on the fields.’","Personification","The sun is given a human action (smiling)."],
+["‘Time is money.’","Metaphor","Time is described as if it were money, without ‘like’ or ‘as’."],
+["‘His hands were as cold as ice.’","Simile","It compares using ‘as … as’."],
+["‘Sizzle went the sausages in the pan.’","Onomatopoeia","‘Sizzle’ imitates the sound."],
+["‘My bag weighs a ton!’","Hyperbole","A school bag cannot really weigh a ton; it is an exaggeration."],
+["‘Silly snakes slither silently.’","Alliteration","The repeated ‘s’ sound at the start of words is alliteration."],
+["‘The stars were diamonds in the sky.’","Metaphor","The stars are called diamonds directly."],
+["‘The leaves danced in the wind.’","Personification","Leaves are given a human action (dancing)."],
+["‘He ran like the wind.’","Simile","It compares using ‘like’."]
+];
+const IDIOM = [
+["‘It’s raining cats and dogs’ means:",["It is raining very heavily","Animals are falling from the sky","It is a little cloudy","Pets are playing outside"],0],
+["‘Break the ice’ means:",["Help people feel relaxed when they first meet","Smash a block of ice","Go ice-skating","Make a drink cold"],0],
+["‘A piece of cake’ means:",["Something very easy","A dessert","Something sweet but small","A birthday party"],0],
+["‘Under the weather’ means:",["Feeling unwell","Standing under an umbrella","Watching the clouds","Being outdoors"],0],
+["‘Let the cat out of the bag’ means:",["Tell a secret by mistake","Free a pet","Go shopping","Start a fight"],0],
+["‘Hit the books’ means:",["Study hard","Throw books","Close a book","Buy books"],0],
+["‘Once in a blue moon’ means:",["Very rarely","Every night","When the moon is blue","Every month"],0],
+["‘Bite off more than you can chew’ means:",["Take on more than you can manage","Eat too fast","Have a big lunch","Talk too much"],0]
+];
+
+const ENG_SKILLS = (() => {
+  const cats = [...new Set(G.map(q=>q[0]))];
+  const blurb = {"Nouns":"Proper, common, collective and abstract nouns","Pronouns":"Choosing I/me, its/it’s, who/which","Tenses":"Past, present, future, continuous and perfect","Adjectives & adverbs":"Comparatives, superlatives, describing actions","Prepositions":"in/on/at, since/for, between/among","Conjunctions":"and, but, so, because, although, neither…nor","Articles":"a, an and the","Subject–verb agreement":"Singular and plural subjects","Punctuation":"Capitals, commas, apostrophes, speech marks","Vocabulary":"Synonyms and antonyms","Plurals & gender":"Irregular plurals and gender words","Confusing words":"Homophones like there/their/they’re","Sentences":"Sentence types, voice, reported speech","Word building":"Prefixes, suffixes and compound words"};
+  const sk = cats.map(c => ({id:"e."+c.replace(/[^A-Za-z]/g,"").toLowerCase(), strand:"Grammar", name:c, desc:blurb[c]||"", pool:()=>G.filter(q=>q[0]===c).map(q=>mcq(q[1],q[2],q[3],q[4]))}));
+  sk.push({id:"e.spelling", strand:"Vocabulary and spelling", name:"Spelling", desc:"Commonly misspelt Grade 5 words", pool:()=>SPELL.map(w=>mcq("Which word is spelt <b>correctly</b>?",w,0,`The correct spelling is <b>${w[0]}</b>.`))});
+  sk.push({id:"e.figurative", strand:"Vocabulary and spelling", name:"Figurative language and idioms", desc:"Simile, metaphor, personification, idioms", pool:()=>[
+    ...FIG.map(f=>{ const others=shuffle(FIGS.filter(x=>x!==f[1])).slice(0,3); return mcq(`${f[0]}<br>This is an example of:`,[f[1],...others],0,f[2]); }),
+    ...IDIOM.map(i=>mcq(i[0],i[1],i[2],`This idiom means <b>${i[1][i[2]].toLowerCase()}</b>.`))]});
+  sk.push({id:"e.reading", strand:"Reading", name:"Reading comprehension", desc:"Understanding stories, poems, letters and facts", pool:()=>P.flatMap(p=>[...p.mcq,...p.vocab].map(q=>({...mcq(esc(q[0]),q[1],q[2],`Look back at the ${p.poem?"poem":p.letter?"letter":"passage"}: the answer is <b>${esc(q[1][q[2]])}</b>.`), passage:p})))});
+  return sk;
+})();
+
+/* =========================================================
+   Unit of Inquiry
+   ========================================================= */
+const THEMES = ["Who we are","Where we are in place and time","How we express ourselves","How the world works","How we organize ourselves","Sharing the planet"];
+const CONCEPTS = {form:"What is it like?",function:"How does it work?",causation:"Why is it like it is?",change:"How is it changing?",connection:"How is it connected to other things?",perspective:"What are the points of view?",responsibility:"What is our responsibility?"};
+const EX_UNITS = [
+{id:"ex-body", example:true, theme:"Who we are", title:"Body systems", central:"The human body is made up of systems that work together to keep us alive and healthy.",
+ lois:["How body systems are structured and what they do","How body systems depend on each other","How our choices affect our body systems"], concepts:["form","function","connection","responsibility"],
+ vocab:["cell","tissue","organ","system","circulatory","respiratory","digestive","skeletal","nervous","muscular"],
+ qs:[
+ {t:"mcq",loi:0,c:"function",q:"Which organ pumps blood around the body?",o:["Heart","Lungs","Liver","Kidneys"],a:0,why:"The heart is a muscle that pumps blood through the circulatory system."},
+ {t:"mcq",loi:0,c:"form",q:"Which order goes from smallest to largest?",o:["cell → tissue → organ → system","organ → cell → system → tissue","tissue → cell → organ → system","system → organ → tissue → cell"],a:0,why:"Cells group into tissues, tissues into organs, and organs into systems."},
+ {t:"mcq",loi:0,c:"function",q:"What is the main job of the respiratory system?",o:["To take in oxygen and get rid of carbon dioxide","To break down food","To carry messages from the brain","To hold the body up"],a:0,why:"Breathing brings oxygen in and removes carbon dioxide."},
+ {t:"mcq",loi:0,c:"function",q:"Where are most nutrients from food absorbed into the blood?",o:["Small intestine","Stomach","Large intestine","Oesophagus"],a:0,why:"Food is broken down in the stomach, but most nutrients pass into the blood through the walls of the small intestine."},
+ {t:"mcq",loi:0,c:"form",q:"Which system is made up of the brain, spinal cord and nerves?",o:["Nervous","Skeletal","Digestive","Circulatory"],a:0,why:"The nervous system carries messages around the body."},
+ {t:"tf",loi:0,c:"function",q:"Arteries carry blood away from the heart.",a:true,why:"Arteries carry blood away from the heart; veins carry it back."},
+ {t:"tf",loi:0,c:"form",q:"An adult human skeleton has about 206 bones.",a:true,why:"Babies have more bones, which fuse together as they grow, leaving about 206."},
+ {t:"mcq",loi:0,c:"function",q:"What do the kidneys do?",o:["Filter waste from the blood to make urine","Pump blood","Digest food","Store oxygen"],a:0,why:"The kidneys clean the blood and make urine."},
+ {t:"mcq",loi:1,c:"connection",q:"Which two systems work together to get oxygen to every cell?",o:["Respiratory and circulatory","Digestive and skeletal","Nervous and muscular","Skeletal and respiratory"],a:0,why:"The lungs take in oxygen and the blood carries it to every cell."},
+ {t:"mcq",loi:1,c:"connection",q:"When you kick a football, which systems work together?",o:["Nervous, muscular and skeletal","Digestive and respiratory","Circulatory and digestive","Only the skeletal system"],a:0,why:"The brain sends a message through nerves, muscles contract and pull on bones."},
+ {t:"tf",loi:1,c:"connection",q:"The digestive system works on its own and does not need any other body system.",a:false,why:"It needs the circulatory system to carry nutrients, muscles to move food along and nerves to control it."},
+ {t:"mcq",loi:1,c:"causation",q:"Why does your heart beat faster when you run?",o:["Your muscles need more oxygen, so blood must be pumped faster","Your stomach is digesting food","Your bones are growing","Your brain is resting"],a:0,why:"Working muscles need more oxygen and energy, so the heart pumps faster."},
+ {t:"mcq",loi:2,c:"responsibility",q:"Which habit best keeps your bones strong?",o:["Eating calcium-rich food and exercising","Drinking fizzy drinks","Sitting all day","Skipping breakfast"],a:0,why:"Calcium (milk, curd, ragi, green vegetables) and exercise build strong bones."},
+ {t:"mcq",loi:2,c:"causation",q:"Smoking most directly harms which system?",o:["Respiratory","Skeletal","Digestive","Muscular"],a:0,why:"Smoke damages the lungs and airways."},
+ {t:"tf",loi:2,c:"responsibility",q:"Getting 9–12 hours of sleep helps a 10-year-old’s body grow and repair.",a:true,why:"Growth hormone is released mainly during deep sleep."},
+ {t:"explain",loi:1,c:"connection",q:"Explain how the respiratory and circulatory systems work together.",model:"The lungs (respiratory system) take in oxygen. Oxygen passes into the blood, and the heart (circulatory system) pumps this blood to every cell. The blood carries carbon dioxide back to the lungs to be breathed out."},
+ {t:"explain",loi:2,c:"responsibility",q:"Describe two choices you can make to keep your body systems healthy. Say which system each choice helps.",model:"Any two sensible choices linked to a system, e.g. regular exercise strengthens the heart (circulatory) and muscles; eating fruit and vegetables helps the digestive system; enough sleep helps the nervous system; not smoking protects the lungs (respiratory)."},
+ {t:"explain",loi:0,c:"function",q:"What would happen if one body system stopped working? Use an example.",model:"The other systems would be affected because they depend on each other. For example, if the heart stopped, blood would not carry oxygen to the brain and muscles, so they would stop working too."}
+ ]},
+{id:"ex-migration", example:true, theme:"Where we are in place and time", title:"Migration", central:"Migration is a response to challenges, risks and opportunities.",
+ lois:["Reasons why people and animals migrate","The effects of migration on people and places","How migration has shaped communities over time"], concepts:["causation","change","perspective","connection"],
+ vocab:["migration","immigrant","emigrant","refugee","push factor","pull factor","settlement","culture","diaspora"],
+ qs:[
+ {t:"mcq",loi:0,c:"form",q:"What is migration?",o:["Moving from one place to another to live, often for a long time","Going on a short holiday","Visiting a friend for a day","Building a new house"],a:0,why:"Migration means moving to live somewhere new."},
+ {t:"mcq",loi:0,c:"causation",q:"Which of these is a ‘push’ factor?",o:["War or conflict at home","Better jobs in another country","A good school abroad","Family living in another city"],a:0,why:"Push factors make people want to leave; pull factors attract them to a new place."},
+ {t:"mcq",loi:0,c:"causation",q:"Which of these is a ‘pull’ factor?",o:["Better job opportunities","Drought","Floods","Not enough schools"],a:0,why:"Better jobs attract (pull) people to a place."},
+ {t:"mcq",loi:0,c:"form",q:"A person forced to flee their country because of war or danger is called a:",o:["Refugee","Tourist","Citizen","Commuter"],a:0,why:"Refugees have to leave their country to be safe."},
+ {t:"mcq",loi:0,c:"form",q:"Moving from a village to a city in the same country is:",o:["Internal migration","International migration","Tourism","A pilgrimage"],a:0,why:"Moving within one country is internal migration."},
+ {t:"mcq",loi:0,c:"form",q:"Someone who leaves their own country to live in another is an ___ from their home country.",o:["emigrant","immigrant","native","resident"],a:0,why:"Emigrate = exit your country. Immigrate = come into a new one."},
+ {t:"tf",loi:0,c:"causation",q:"Amur falcons stop in Nagaland on their long migration mainly to feed before flying on.",a:true,why:"They rest and feed in Nagaland before crossing the Arabian Sea to Africa."},
+ {t:"mcq",loi:1,c:"perspective",q:"How might a child feel after moving to a new country?",o:["Excited and homesick at the same time","Nothing at all changes","Always angry","Only bored"],a:0,why:"Migration often brings mixed feelings: new opportunities and missing home."},
+ {t:"mcq",loi:1,c:"change",q:"Which is a possible positive effect of migration on the new place?",o:["New skills, foods and ideas are shared","Everyone stops speaking their language","Nothing changes","There are fewer workers"],a:0,why:"Migrants bring skills and culture that enrich the place they move to."},
+ {t:"mcq",loi:1,c:"change",q:"Which is a possible challenge for a village that many young people leave?",o:["Fewer people left to farm and work","More festivals","More schools open","Too many shops"],a:0,why:"When young adults leave, villages can lose workers."},
+ {t:"tf",loi:1,c:"perspective",q:"Everyone who migrates has the same reasons and the same experience.",a:false,why:"Reasons and experiences differ from person to person."},
+ {t:"mcq",loi:2,c:"connection",q:"The Parsi community in India originally came from:",o:["Persia (Iran)","China","Japan","Brazil"],a:0,why:"Zoroastrians from Persia settled in Gujarat more than a thousand years ago."},
+ {t:"mcq",loi:2,c:"connection",q:"Which is an example of migration changing a culture?",o:["Indian restaurants in London","A river flooding","A volcano erupting","The phases of the moon"],a:0,why:"People who migrated took their food and culture with them."},
+ {t:"mcq",loi:2,c:"change",q:"The Partition of India in 1947 led to:",o:["One of the largest migrations in history","No movement of people","A new ocean","The end of railways"],a:0,why:"Millions of people moved across the new borders."},
+ {t:"explain",loi:0,c:"causation",q:"Explain the difference between push and pull factors. Give one example of each.",model:"Push factors make people want to leave a place (e.g. war, drought, no jobs). Pull factors attract people to a new place (e.g. better jobs, safety, good schools, family)."},
+ {t:"explain",loi:1,c:"perspective",q:"A family moves from Kerala to Dubai for work. Describe one challenge and one opportunity they might face.",model:"Challenge: e.g. missing family, a new language, hot climate, new rules, making friends. Opportunity: e.g. a better-paid job, saving money, learning about new cultures, new schools."},
+ {t:"explain",loi:2,c:"connection",q:"How has migration shaped the food, language or festivals of your city? Give an example.",model:"Any example showing people bringing culture with them, e.g. many Indian cities have food from other states, people speak several languages, festivals from different communities are celebrated together."}
+ ]},
+{id:"ex-energy", example:true, theme:"How the world works", title:"Energy", central:"Energy can be transferred and transformed, and people make choices about how they use it.",
+ lois:["Forms of energy","How energy is transferred and transformed","Renewable and non-renewable sources and responsible use"], concepts:["form","change","causation","responsibility","perspective"],
+ vocab:["kinetic","potential","chemical","thermal","electrical","transform","transfer","renewable","non-renewable","fossil fuel"],
+ qs:[
+ {t:"mcq",loi:0,c:"form",q:"Energy stored in food and batteries is:",o:["Chemical energy","Sound energy","Light energy","Kinetic energy"],a:0,why:"Food and batteries store chemical energy."},
+ {t:"mcq",loi:0,c:"form",q:"A moving bicycle has:",o:["Kinetic energy","Only sound energy","Nuclear energy","No energy"],a:0,why:"Anything that moves has kinetic energy."},
+ {t:"mcq",loi:0,c:"form",q:"Energy stored in a stretched rubber band is:",o:["Elastic potential energy","Light energy","Thermal energy","Electrical energy"],a:0,why:"Stretched or squashed objects store elastic potential energy."},
+ {t:"mcq",loi:0,c:"form",q:"Which of these is NOT a form of energy?",o:["A shadow","Light","Heat","Sound"],a:0,why:"A shadow is where light is blocked; it is not energy."},
+ {t:"mcq",loi:1,c:"change",q:"In a torch, energy changes from:",o:["chemical → electrical → light (and heat)","light → chemical","sound → heat","kinetic → chemical"],a:0,why:"The battery’s chemical energy becomes electrical energy, then light and some heat."},
+ {t:"mcq",loi:1,c:"change",q:"A solar panel changes:",o:["light energy into electrical energy","electrical energy into light","heat into sound","chemical energy into kinetic energy"],a:0,why:"Solar cells turn sunlight into electricity."},
+ {t:"mcq",loi:1,c:"change",q:"When you rub your hands together, kinetic energy changes mainly into:",o:["Heat","Light","Chemical energy","Electrical energy"],a:0,why:"Friction turns movement into heat."},
+ {t:"tf",loi:1,c:"change",q:"Energy can be created out of nothing.",a:false,why:"Energy cannot be created or destroyed, only changed from one form to another."},
+ {t:"mcq",loi:1,c:"causation",q:"Heat moves from a hot cup of chai into your hands by:",o:["Conduction","Evaporation","Reflection","Magnetism"],a:0,why:"Heat travels through touching solids by conduction."},
+ {t:"mcq",loi:2,c:"form",q:"Which is a renewable energy source?",o:["Wind","Coal","Petrol","Natural gas"],a:0,why:"Wind will not run out; it is renewable."},
+ {t:"mcq",loi:2,c:"causation",q:"Why is coal called non-renewable?",o:["It takes millions of years to form and will run out","It is black","It burns quickly","It comes from the sun"],a:0,why:"Fossil fuels form over millions of years, much slower than we use them."},
+ {t:"mcq",loi:2,c:"responsibility",q:"Which action saves electricity?",o:["Switching off lights when you leave a room","Leaving the TV on standby all night","Opening the fridge often","Charging a phone all day"],a:0,why:"Switching off what you are not using saves energy."},
+ {t:"tf",loi:2,c:"causation",q:"Burning fossil fuels releases carbon dioxide, which adds to climate change.",a:true,why:"Carbon dioxide traps heat in the atmosphere."},
+ {t:"mcq",loi:2,c:"perspective",q:"One disadvantage of wind energy is:",o:["It only works when the wind blows","It makes smoke","It will run out","It burns coal"],a:0,why:"Wind is not steady, so electricity from it varies."},
+ {t:"mcq",loi:2,c:"form",q:"Hydroelectric power uses:",o:["Moving water","Sunlight","Burning wood","Wind"],a:0,why:"Flowing water turns turbines to make electricity."},
+ {t:"explain",loi:1,c:"change",q:"Describe the energy changes when you switch on a ceiling fan.",model:"Electrical energy changes into kinetic energy as the blades move. Some energy is also changed into sound and heat."},
+ {t:"explain",loi:2,c:"perspective",q:"Should your school put solar panels on the roof? Give one advantage and one disadvantage.",model:"Advantage: e.g. free, clean electricity from sunlight; lower bills; less pollution. Disadvantage: e.g. costly to install; less electricity on cloudy days or at night."},
+ {t:"explain",loi:2,c:"responsibility",q:"Suggest three ways your family could use less energy at home, and explain why it matters.",model:"Any three, e.g. switch off lights and fans, use LED bulbs, air-dry clothes, set the AC to 24°C. It matters because most electricity comes from burning fossil fuels, which causes pollution and climate change, and saves money."}
+ ]},
+{id:"ex-resources", example:true, theme:"Sharing the planet", title:"Natural resources", central:"Natural resources are limited, and how we use them affects living things and the future.",
+ lois:["Types of natural resources","How people use and share resources","Conservation and sustainable use"], concepts:["form","function","perspective","responsibility","causation"],
+ vocab:["natural resource","renewable","non-renewable","conservation","sustainable","deforestation","pollution","recycle"],
+ qs:[
+ {t:"mcq",loi:0,c:"form",q:"Which of these is a natural resource?",o:["Water","A plastic bag","A steel spoon","A notebook"],a:0,why:"Natural resources come from nature; the others are made by people."},
+ {t:"mcq",loi:0,c:"form",q:"Which natural resource is renewable if we look after it?",o:["Forests (if trees are replanted)","Coal","Petroleum","Natural gas"],a:0,why:"Trees can regrow; fossil fuels cannot be replaced in our lifetime."},
+ {t:"mcq",loi:0,c:"form",q:"Fossil fuels formed from:",o:["Remains of plants and animals over millions of years","Melted rocks","Sea water","Sunlight in one year"],a:0,why:"Coal, oil and gas formed from ancient living things."},
+ {t:"tf",loi:0,c:"form",q:"Only about 3% of Earth’s water is fresh water.",a:true,why:"Most water is salty sea water; much of the fresh water is frozen."},
+ {t:"mcq",loi:1,c:"function",q:"Trees give us:",o:["Wood, paper, fruit and oxygen","Only shade","Metal","Petrol"],a:0,why:"Trees provide many resources and produce oxygen."},
+ {t:"mcq",loi:1,c:"perspective",q:"If a factory takes too much water from a river, who might be affected?",o:["Farmers, fish and villages downstream","Nobody","Only the factory","Only tourists"],a:0,why:"Many living things share the same river."},
+ {t:"mcq",loi:1,c:"perspective",q:"Sharing resources fairly so everyone gets what they need is called:",o:["Fair (equitable) distribution","Pollution","Deforestation","Erosion"],a:0,why:"Equitable means fair to everyone."},
+ {t:"mcq",loi:1,c:"connection",q:"The Chipko movement in Uttarakhand was about:",o:["Protecting trees by hugging them","Building dams","Mining coal","Growing rice"],a:0,why:"Villagers hugged trees to stop them being cut down."},
+ {t:"mcq",loi:2,c:"responsibility",q:"The three Rs are:",o:["Reduce, Reuse, Recycle","Read, Write, Run","Rain, River, Rock","Repair, Rest, Return"],a:0,why:"Reduce first, then reuse, then recycle."},
+ {t:"mcq",loi:2,c:"causation",q:"What is a likely result of cutting down large areas of forest?",o:["Soil erosion and animals losing their homes","More rain everywhere","More tigers","Cleaner air"],a:0,why:"Tree roots hold soil; forests are habitats."},
+ {t:"mcq",loi:2,c:"responsibility",q:"Rainwater harvesting means:",o:["Collecting and storing rainwater to use later","Making it rain","Cleaning rivers","Drinking sea water"],a:0,why:"Stored rainwater can be used in dry months or to refill groundwater."},
+ {t:"tf",loi:2,c:"causation",q:"Recycling an aluminium can uses much less energy than making a new can from raw materials.",a:true,why:"Recycling aluminium saves most of the energy needed to make it new."},
+ {t:"mcq",loi:2,c:"responsibility",q:"Which is the BEST way to reduce waste?",o:["Avoid buying things you don’t need","Put everything in one bin","Burn the rubbish","Bury plastic"],a:0,why:"Reducing comes first: waste that is never made never has to be dealt with."},
+ {t:"explain",loi:0,c:"form",q:"Explain the difference between renewable and non-renewable resources, with an example of each.",model:"Renewable resources can be replaced naturally in a short time (e.g. sunlight, wind, water, trees if replanted). Non-renewable resources take millions of years to form and will run out (e.g. coal, oil, natural gas)."},
+ {t:"explain",loi:1,c:"perspective",q:"A new mine will create jobs but destroy part of a forest. Give two different points of view about it.",model:"e.g. A worker who needs a job may support the mine. A tribal family or an environmentalist may oppose it because it destroys homes, animals and trees. A good answer shows both sides."},
+ {t:"explain",loi:2,c:"responsibility",q:"Plan two actions your class could take to save water at school. Explain how each helps.",model:"Any two sensible actions with reasons, e.g. turning off taps while washing hands, reporting leaking taps, collecting rainwater for plants, using leftover drinking water for plants."}
+ ]}
+];
+
+/* =========================================================
+   State and storage
+   ========================================================= */
+const LS = "rishay-hub-v1";
+let S = {progress:{skills:{}, concepts:{}, daily:{}, updatedAt:0}, sessions:[], units:[], settings:{currentUnit:"ex-body", hidden:[], updatedAt:0}};
+try { const x = JSON.parse(localStorage.getItem(LS)||"null"); if (x && x.progress) S = {...S, ...x}; } catch(e){}
+let db = null, sample = null;
+let chain = Promise.resolve(), saveT = null, dirtyProgress = false;
+
+function persistLocal(){ try { localStorage.setItem(LS, JSON.stringify(S)); } catch(e){} }
+function dbWrite(path, body){ if(!db) return; const b = JSON.parse(JSON.stringify(body)); chain = chain.then(()=>db.doc(path).set(b)).then(()=>setSync(true)).catch(e=>setSync(false, e)); }
+function dbDelete(path){ if(!db) return; chain = chain.then(()=>db.doc(path).delete()).catch(()=>{}); }
+function saveProgress(){ S.progress.updatedAt = Date.now(); dirtyProgress = true; persistLocal(); clearTimeout(saveT); saveT = setTimeout(flushProgress, 2000); }
+function flushProgress(){ if(dirtyProgress){ dirtyProgress=false; dbWrite("progress/rishay", S.progress); } }
+function saveSettings(){ S.settings.updatedAt = Date.now(); persistLocal(); dbWrite("settings/main", S.settings); }
+function saveUnit(u){ persistLocal(); dbWrite("units/"+u.id, u); }
+let syncMsg = "Progress is saved on this device.";
+function setSync(ok, e){ syncMsg = ok ? "Progress is saved to your Claude account." : (e && e.code==="quota_exceeded" ? "Online storage is full. Progress is saved on this device." : "Could not save online just now. Progress is saved on this device."); const el=$("#sync"); if(el) el.textContent=syncMsg; }
+window.addEventListener("pagehide", flushProgress);
+
+/* =========================================================
+   Skills and mastery
+   ========================================================= */
+function allUnits(){ return [...EX_UNITS.filter(u=>!S.settings.hidden.includes(u.id)), ...S.units]; }
+function unitById(id){ return EX_UNITS.find(u=>u.id===id) || S.units.find(u=>u.id===id); }
+function currentUnit(){ const u = unitById(S.settings.currentUnit); return (u && allUnits().includes(u)) ? u : allUnits()[0] || null; }
+function uoiSkills(u){ return u.lois.map((l,i)=>({id:`u.${u.id}.${i}`, strand:u.title, name:l, desc:"", unit:u, loi:i})); }
+function skillById(id){
+  if(id.startsWith("m.")) return MATH.find(s=>s.id===id);
+  if(id.startsWith("e.")) return ENG_SKILLS.find(s=>s.id===id);
+  const m = id.match(/^u\.(.+)\.(\d+)$/); if(!m) return null; const u = unitById(m[1]); return u ? uoiSkills(u)[+m[2]] : null;
+}
+const subjOf = id => id[0]==="m"?"math":id[0]==="e"?"eng":"uoi";
+function stat(id){ return S.progress.skills[id]; }
+function mastery(st){ if(!st || !st.h || !st.h.length) return null; const h=st.h.slice(-12); let w=0,t=0; h.forEach((x,i)=>{const wt=1+i/h.length; w+=x*wt; t+=wt}); return w/t; }
+function status(st){
+  const m = mastery(st), n = st ? st.n : 0;
+  if(m===null || n<3) return {k:"new", label: n ? "Started" : "Not started", icon:"○"};
+  if(m<0.5) return {k:"needs", label:"Needs work", icon:"!"};
+  if(m<0.75) return {k:"learning", label:"Learning", icon:"◐"};
+  if(m>=0.9 && n>=12) return {k:"mastered", label:"Mastered", icon:"★"};
+  return {k:"secure", label:"Secure", icon:"●"};
+}
+function chip(st){ const s=status(st); return `<span class="chip ${s.k}"><span aria-hidden="true">${s.icon}</span>${s.label}</span>`; }
+function meter(m, subj){ const p = m===null ? 0 : Math.round(m*100); return `<div class="meter" role="img" aria-label="Mastery ${m===null?"not measured yet":p+" percent"}"><div class="bar ${subj}"><i style="width:${p}%"></i></div><span class="pct">${m===null?"–":p+"%"}</span></div>`; }
+function levelFor(id){ const m = mastery(stat(id)); if(m===null || m<0.6) return 1; if(m<0.85) return 2; return 3; }
+function record(id, score, concept){
+  const st = S.progress.skills[id] || (S.progress.skills[id] = {h:[], n:0, c:0, last:0});
+  st.h.push(score); if(st.h.length>20) st.h = st.h.slice(-20); st.n++; st.c += score; st.last = Date.now();
+  if(concept){ const cs = S.progress.concepts[concept] || (S.progress.concepts[concept] = {h:[], n:0, c:0}); cs.h.push(score); if(cs.h.length>30) cs.h=cs.h.slice(-30); cs.n++; cs.c+=score; }
+  const k = todayKey(), d = S.progress.daily[k] || (S.progress.daily[k] = {n:0, c:0}); d.n++; d.c += score;
+  saveProgress();
+}
+function subjectMastery(skills){ const ms = skills.map(s=>mastery(stat(s.id))).filter(m=>m!==null); return ms.length ? ms.reduce((a,b)=>a+b,0)/ms.length : null; }
+function securedCount(skills){ return skills.filter(s=>["secure","mastered"].includes(status(stat(s.id)).k)).length; }
+function weakest(skills, n=2){ return skills.map(s=>({s, m:mastery(stat(s.id))})).filter(x=>x.m!==null && (stat(x.s.id).n>=3)).sort((a,b)=>a.m-b.m).slice(0,n).map(x=>x.s); }
+function streak(){ let k = todayKey(), n = 0; if(!S.progress.daily[k]) k = addDays(k,-1); while(S.progress.daily[k] && S.progress.daily[k].n>0){ n++; k = addDays(k,-1); } return n; }
+function priority(id){ const st=stat(id), m=mastery(st); const stale = st ? Math.min(1,(Date.now()-st.last)/(7*864e5)) : 1; return (m===null?0.7:1-m) + stale*0.5 + Math.random()*0.15; }
+
+/* =========================================================
+   Building quiz items
+   ========================================================= */
+function unitItem(u, q){
+  const loi = Math.min(q.loi||0, u.lois.length-1), skill = `u.${u.id}.${loi}`;
+  if(q.t==="tf") return {skill, concept:q.c, q:{type:"mcq", prompt:`True or false? <b>${esc(q.q)}</b>`, opts:["True","False"], ans:q.a?0:1, show:q.a?"True":"False", ex:esc(q.why||"")}};
+  if(q.t==="explain") return {skill, concept:q.c, q:{type:"explain", prompt:esc(q.q), model:q.model||"", show:esc(q.model||""), ex:""}};
+  return {skill, concept:q.c, q:mcq(esc(q.q), q.o.map(esc), q.a, esc(q.why||""))};
+}
+function poolItems(skillObj, n){
+  if(skillObj.gen) return Array.from({length:n}, ()=>({skill:skillObj.id, lazy:true}));
+  if(skillObj.pool) return shuffle(skillObj.pool()).slice(0,n).map(q=>({skill:skillObj.id, q}));
+  const u = skillObj.unit; return shuffle(u.qs.filter(q=>(q.loi||0)===skillObj.loi)).slice(0,n).map(q=>unitItem(u,q));
+}
+function unitItems(u, n, opts={}){
+  let qs = shuffle(u.qs);
+  if(opts.noExplain) qs = qs.filter(q=>q.t!=="explain");
+  if(opts.balanced){ // spread across lines of inquiry and keep at most 3 written answers
+    const byLoi = u.lois.map((_,i)=>qs.filter(q=>(q.loi||0)===i)); const out=[]; let ex=0;
+    for(let r=0; out.length<n && r<40; r++) for(const list of byLoi){ const q=list.shift(); if(!q) continue; if(q.t==="explain"){ if(ex>=3) continue; ex++; } out.push(q); if(out.length>=n) break; }
+    qs = shuffle(out);
+  }
+  return qs.slice(0,n).map(q=>unitItem(u,q));
+}
+function todaysMix(){
+  const items = [];
+  const ms = MATH.slice().sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,5);
+  ms.forEach(s=>items.push({skill:s.id, lazy:true}));
+  ENG_SKILLS.slice().sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,4).forEach(s=>items.push(...poolItems(s,1)));
+  const u = currentUnit(); if(u && u.qs.length) items.push(...unitItems(u,3,{noExplain:false}));
+  return items;
+}
+
+/* =========================================================
+   Answer checking
+   ========================================================= */
+function parseNum(s){ s = String(s).replace(/[−–]/g,"-").replace(/[,\s₹%°]/g,"").replace(/(cm²|cm³|m²|cm|mm|km|kg|ml|mL|l|L|g|m|minutes|mins|min|degrees|deg|c|C)$/,""); return /^-?\d*\.?\d+$/.test(s) ? Number(s) : null; }
+function parseFrac(s){ s = s.trim().replace(/\s+/g," "); let m;
+  if((m=s.match(/^(\d+) (\d+)\/(\d+)$/))) return {w:+m[1], n:+m[2], d:+m[3], kind:"mixed"};
+  if((m=s.match(/^(\d+)\/(\d+)$/))) return {w:0, n:+m[1], d:+m[2], kind:"frac"};
+  if((m=s.match(/^\d+$/))) return {w:+s, n:0, d:1, kind:"int"};
+  return null; }
+function check(q, raw){
+  const s = String(raw ?? "").trim();
+  if(q.type==="mcq") return {score: raw===q.ans?1:0};
+  if(!s) return {score:0, empty:true};
+  if(q.type==="num"){ const x=parseNum(s); if(x===null) return {score:0, note:"That doesn’t look like a number."}; return {score: Math.abs(x-q.ans)<1e-6?1:0}; }
+  if(q.type==="qr"){ const m=s.replace(/,/g,"").toLowerCase().match(/^(\d+)\s*(?:r|rem|remainder)?\s*(\d+)?$/); if(!m) return {score:0, note:"Write it like 23 r 4."}; const qq=+m[1], rr=m[2]?+m[2]:0; return {score: qq===q.ans.q && rr===q.ans.r ? 1 : 0}; }
+  if(q.type==="pair"){ const m=s.match(/^\(?\s*(-?\d+)\s*,\s*(-?\d+)\s*\)?$/); if(!m) return {score:0, note:"Write it like (4, 7)."}; return {score: +m[1]===q.ans[0] && +m[2]===q.ans[1] ? 1 : 0}; }
+  if(q.type==="time"){ const m=s.replace(/\s/g,"").match(/^(\d{1,2})[:.]?(\d{2})$/); if(!m) return {score:0, note:"Write the time like 14:35."}; return {score: ((+m[1])*60 + (+m[2]))%1440 === q.ans ? 1 : 0}; }
+  if(q.type==="frac"){
+    const f = parseFrac(s); if(!f || f.d===0) return {score:0, note:"Write a fraction like 3/4 or a mixed number like 1 1/2."};
+    const [an,ad] = q.ans, num = f.w*f.d + f.n;
+    if(num*ad !== an*f.d) return {score:0};
+    if(q.form==="improper" && f.kind!=="frac") return {score:0, note:"Right value, but write it as an improper fraction (like 7/3)."};
+    if(q.form==="mixed" && !(f.kind==="mixed" && f.n<f.d) && !(f.kind==="int")) return {score:0, note:"Right value, but write it as a mixed number (like 2 1/3)."};
+    if(q.form==="simplest"){ if(f.kind!=="int" && gcd(f.n,f.d)!==1) return {score:0, note:"Right value, but it can be simplified further."}; if(f.kind==="mixed" && f.n>=f.d) return {score:0, note:"The fraction part should be less than 1."}; }
+    if(q.form==="mixed" && f.kind==="mixed" && gcd(f.n,f.d)!==1) return {score:0, note:"Right value, but simplify the fraction part."};
+    return {score:1};
+  }
+  if(q.type==="text"){ return {score: (q.accept||[]).some(a=>a.toLowerCase()===s.toLowerCase())?1:0}; }
+  return {score:0};
+}
+
+/* =========================================================
+   Views
+   ========================================================= */
+let view = {name:"home"};
+let quiz = null;
+function go(name, extra={}){ if(quiz && name!=="quiz" && !quiz.done){ /* leaving an active quiz keeps its answers recorded so far */ } view = {name, ...extra}; render(); window.scrollTo({top:0}); }
+document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if(g){ if(quiz && !quiz.done && view.name==="quiz"){ endQuiz(true); } go(g.dataset.go); } });
+
+function render(){
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-current", t.dataset.go===view.name || (view.name==="unitform" && t.dataset.go==="uoi") ? "page" : "false"));
+  const app = $("#app");
+  if(view.name==="home") app.innerHTML = homeView();
+  else if(view.name==="math") app.innerHTML = subjectView("math");
+  else if(view.name==="eng") app.innerHTML = subjectView("eng");
+  else if(view.name==="uoi") app.innerHTML = uoiView();
+  else if(view.name==="unitform") app.innerHTML = unitFormView();
+  else if(view.name==="parent") app.innerHTML = parentView();
+  else if(view.name==="quiz") app.innerHTML = quizView();
+  else if(view.name==="results") app.innerHTML = resultsView();
+  if(view.name==="quiz") focusAnswer();
+}
+
+function activityChart(){
+  const t = todayKey(); let cols="", labs="", max=1;
+  const days = Array.from({length:14},(_,i)=>addDays(t,i-13));
+  days.forEach(k=>{ const d=S.progress.daily[k]; if(d && d.n>max) max=d.n; });
+  days.forEach((k,i)=>{ const d=S.progress.daily[k]||{n:0,c:0}; const [y,m,dd]=k.split("-").map(Number); const dt=new Date(y,m-1,dd);
+    const tip = d.n ? `${dt.toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})}: ${d.n} questions, ${Math.round(d.c/d.n*100)}% correct` : `${dt.toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})}: no practice`;
+    cols += `<div class="col ${k===t?"today":""}" tabindex="0" data-tip="${esc(tip)}" aria-label="${esc(tip)}"><i style="height:${d.n?Math.max(4,d.n/max*100):0}%"></i></div>`;
+    labs += `<span>${i%2===1||k===t ? dt.toLocaleDateString("en-IN",{weekday:"narrow"}) : ""}</span>`;
+  });
+  return `<div class="row between"><h3 style="font-size:18px">Questions answered, last 14 days</h3><span class="small muted">Most in a day: ${max>1||Object.keys(S.progress.daily).length?max:0}</span></div><div class="chart">${cols}</div><div class="xlab">${labs}</div>`;
+}
+
+function weekStats(){ const t=todayKey(); let n=0,c=0; for(let i=0;i<7;i++){ const d=S.progress.daily[addDays(t,-i)]; if(d){n+=d.n;c+=d.c;} } return {n, acc: n? Math.round(c/n*100)+"%" : "–"}; }
+
+function homeView(){
+  const h = new Date().getHours(), greet = h<12?"Good morning":h<17?"Good afternoon":"Good evening";
+  const ws = weekStats(), u = currentUnit();
+  const mixPreview = [...MATH.slice().sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,3), ...ENG_SKILLS.slice().sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,2)];
+  const subjCard = (key, label, skills, extra) => { const m = subjectMastery(skills), wk = weakest(skills);
+    return `<section class="card subj"><h3><span class="dot d-${key}"></span>${label}</h3>
+      <div class="row between"><span class="big">${m===null?"–":Math.round(m*100)+"%"}</span><span class="small muted">${securedCount(skills)} of ${skills.length} skills secure</span></div>
+      ${meter(m, key)}
+      ${extra||""}
+      ${wk.length ? `<div class="small"><b>Practise next:</b><ul>${wk.map(s=>`<li>${esc(s.name)}</li>`).join("")}</ul></div>` : `<div class="small muted">Answer a few questions in each skill to see what to practise next.</div>`}
+      <div class="row"><button class="btn ${key}" type="button" data-go="${key}">Open ${label}</button></div></section>`; };
+  const recent = S.sessions.slice(0,5);
+  return `<section class="hello"><div class="eyebrow">${new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"})}</div><h1>${greet}, Rishay</h1></section>
+  <div class="tiles">
+    <div class="tile"><b style="color:var(--sun)">${streak()}</b><small>day streak</small></div>
+    <div class="tile"><b>${ws.n}</b><small>questions this week</small></div>
+    <div class="tile"><b>${ws.acc}</b><small>correct this week</small></div>
+    <div class="tile"><b>${Object.values(S.progress.skills).filter(st=>["secure","mastered"].includes(status(st).k)).length}</b><small>skills secure or mastered</small></div>
+  </div>
+  <section class="card mix">
+    <div><div class="eyebrow">Today’s mix · about 15 minutes</div><h2>12 questions picked from what needs practice most</h2>
+      <div class="chips">${mixPreview.map(s=>`<span class="tag"><span class="dot d-${subjOf(s.id)}"></span>${esc(s.name)}</span>`).join("")}${u?`<span class="tag"><span class="dot d-uoi"></span>${esc(u.title)}</span>`:""}</div></div>
+    <button class="btn solid" type="button" id="startMix">Start today’s mix</button>
+  </section>
+  <div class="grid3">
+    ${subjCard("math","Maths",MATH)}
+    ${subjCard("eng","English",ENG_SKILLS)}
+    ${u ? subjCard("uoi","Unit of Inquiry",uoiSkills(u),`<div class="small"><b>${esc(u.title)}</b> · <span class="muted">${esc(u.theme)}</span></div>`) : `<section class="card subj"><h3><span class="dot d-uoi"></span>Unit of Inquiry</h3><p class="muted small">Add Rishay’s current unit to start.</p><div class="row"><button class="btn uoi" type="button" data-go="unitform">Add a unit</button></div></section>`}
+  </div>
+  <section class="card">${activityChart()}</section>
+  <section class="card"><h3 style="font-size:18px;margin-bottom:6px">Recent sessions</h3>${recent.length ? recent.map(sessRow).join("") : `<p class="muted small">No sessions yet. Start with today’s mix or a full check-up in any subject.</p>`}</section>
+  <p class="status" id="sync">${esc(syncMsg)}</p>`;
+}
+function sessRow(s){ const p = s.n ? Math.round(s.score/s.n*100) : 0; return `<div class="sess"><span class="dot d-${s.subject==="mix"?"math":s.subject}" style="${s.subject==="mix"?"background:var(--chart)":""}"></span><span>${esc(s.title)} <span class="muted small">· ${new Date(s.at).toLocaleDateString("en-IN",{day:"numeric",month:"short"})}${s.mins?` · ${s.mins} min`:""}</span></span><span class="sc">${fmtScore(s.score)}/${s.n} · ${p}%</span></div>`; }
+const fmtScore = x => (Math.round(x*2)/2).toString();
+
+function skillRow(s, subj){ const st = stat(s.id); return `<div class="li"><div><div class="nm">${esc(s.name)}</div>${s.desc?`<div class="ds">${esc(s.desc)}</div>`:""}</div>${meter(mastery(st), subj)}${chip(st)}<button class="btn sm ${subj}" type="button" data-practise="${esc(s.id)}">Practise</button></div>`; }
+function subjectView(subj){
+  const skills = subj==="math" ? MATH : ENG_SKILLS, label = subj==="math"?"Maths":"English";
+  const strands = [...new Set(skills.map(s=>s.strand))];
+  const m = subjectMastery(skills);
+  const fullN = subj==="math" ? MATH.length : 20;
+  return `<div class="shead"><div><div class="eyebrow">${securedCount(skills)} of ${skills.length} skills secure</div><h1><span class="dot d-${subj}"></span>${label}</h1></div>
+    <div class="row"><span class="small muted">Overall mastery</span><div style="width:200px">${meter(m,subj)}</div><button class="btn solid" type="button" data-fulltest="${subj}">Full check-up · ${fullN} questions</button></div></div>
+  <p class="note">${subj==="math" ? "Maths questions are made fresh each time and get harder as a skill becomes secure (level 1 → 3). Every answer shows the worked method." : "Grammar, spelling, figurative language and reading. Every answer shows the rule behind it."} “Mastery” weighs recent answers more than old ones, so it reflects what Rishay knows now.</p>
+  ${strands.map(st=>{ const ss=skills.filter(s=>s.strand===st); return `<section class="card strand"><div class="strand-h"><h3>${esc(st)}</h3><button class="btn sm" type="button" data-strand="${subj}|${esc(st)}">Test this strand · ${Math.min(ss.length*2,16)} questions</button></div><div class="list">${ss.map(s=>skillRow(s,subj)).join("")}</div></section>`; }).join("")}`;
+}
+
+function uoiView(){
+  const units = allUnits(), u = currentUnit();
+  const conceptRows = Object.keys(CONCEPTS).map(c=>{ const st=S.progress.concepts[c]; return `<div class="concept"><div class="row between"><b style="text-transform:capitalize">${c}</b><span class="q">${CONCEPTS[c]}</span></div>${meter(mastery(st),"uoi")}</div>`; }).join("");
+  return `<div class="shead"><div><div class="eyebrow">PYP · Transdisciplinary themes</div><h1><span class="dot d-uoi"></span>Unit of Inquiry</h1></div><button class="btn uoi" type="button" data-go="unitform">Add Rishay’s unit</button></div>
+  <section class="units" aria-label="Units">${units.map(x=>`<button class="unit" type="button" data-unit="${esc(x.id)}" aria-pressed="${u&&x.id===u.id}"><span class="th">${esc(x.theme)}</span><b>${esc(x.title)}</b><span class="small muted">${x.qs.length} questions${x.example?" · example unit":""}</span></button>`).join("")}</section>
+  ${u ? `<section class="card">
+    <div class="eyebrow">${esc(u.theme)}${u.example?" · example unit, replace with the school’s own":""}</div>
+    <h2 style="font-size:26px;margin-top:4px">${esc(u.title)}</h2>
+    <p class="eyebrow" style="margin-top:12px">Central idea</p><p class="central">${esc(u.central)}</p>
+    <div class="row" style="margin:10px 0 4px"><button class="btn solid" type="button" data-unittest="${esc(u.id)}">Unit test · ${Math.min(20,u.qs.length)} questions</button><button class="btn uoi" type="button" data-unitquick="${esc(u.id)}">Quick quiz · 8 questions</button></div>
+    ${u.qs.length ? "" : `<p class="note">This unit has no questions yet. Open the Parent tab to create them with Claude or add your own.</p>`}
+    <h3 style="font-size:18px;margin-top:16px">Lines of inquiry</h3>
+    <div class="list">${uoiSkills(u).map(s=>`<div class="li"><div><div class="nm">${esc(s.name)}</div><div class="ds">${u.qs.filter(q=>(q.loi||0)===s.loi).length} questions</div></div>${meter(mastery(stat(s.id)),"uoi")}${chip(stat(s.id))}<button class="btn sm uoi" type="button" data-practise="${esc(s.id)}" ${u.qs.some(q=>(q.loi||0)===s.loi)?"":"disabled"}>Practise</button></div>`).join("")}</div>
+    ${u.concepts && u.concepts.length ? `<h3 style="font-size:18px;margin-top:16px">Key concepts in this unit</h3><div class="vocab">${u.concepts.map(c=>`<span style="text-transform:capitalize">${esc(c)}: ${esc(CONCEPTS[c]||"")}</span>`).join("")}</div>`:""}
+    ${u.vocab && u.vocab.length ? `<h3 style="font-size:18px;margin-top:16px">Vocabulary</h3><div class="vocab">${u.vocab.map(v=>`<span>${esc(v)}</span>`).join("")}</div>`:""}
+  </section>` : `<section class="card"><p>No units yet. Add Rishay’s current unit to begin.</p></section>`}
+  <section class="card"><h3 style="font-size:18px">Key concepts across all units</h3><p class="small muted" style="margin:2px 0 10px">PYP key concepts, measured from every Unit of Inquiry answer.</p><div class="concepts">${conceptRows}</div></section>`;
+}
+
+function unitFormView(){
+  return `<div class="shead"><div><div class="eyebrow">Parent</div><h1><span class="dot d-uoi"></span>Add a unit of inquiry</h1></div><button class="btn" type="button" data-go="uoi">Cancel</button></div>
+  <section class="card"><form class="form" id="unitForm">
+    <p class="note">Copy these from the unit planner or the letter the school sends home. The more detail you give, the better the questions.</p>
+    <label>Transdisciplinary theme<select id="uf-theme">${THEMES.map(t=>`<option>${t}</option>`).join("")}</select></label>
+    <label>Unit title<input id="uf-title" required placeholder="e.g. Systems in nature"></label>
+    <label>Central idea<textarea id="uf-central" required placeholder="e.g. Ecosystems are made of interdependent living and non-living things."></textarea></label>
+    <label>Lines of inquiry (one per line)<textarea id="uf-lois" required placeholder="The structure of ecosystems&#10;How living things depend on each other&#10;How human actions affect ecosystems"></textarea></label>
+    <div><b class="small">Key concepts</b><div class="checks">${Object.keys(CONCEPTS).map(c=>`<label><input type="checkbox" value="${c}" class="uf-c"> <span style="text-transform:capitalize">${c}</span></label>`).join("")}</div></div>
+    <label>Vocabulary (separate with commas)<input id="uf-vocab" placeholder="ecosystem, producer, consumer, decomposer, habitat"></label>
+    <label>What has been taught so far (optional)<textarea id="uf-notes" placeholder="Topics, books, field trips, experiments, facts the class has covered…"></textarea></label>
+    <div class="row">
+      <button class="btn solid" type="submit" id="uf-save">${sample ? "Save and create questions with Claude" : "Save unit"}</button>
+      <span class="status" id="uf-msg">${sample ? "Claude writes about 24 questions across the lines of inquiry. It takes about a minute." : "You can add questions yourself in the Parent tab after saving."}</span>
+    </div>
+  </form></section>`;
+}
+
+function parentView(){
+  const filt = view.filter || "all";
+  const rows = [...MATH, ...ENG_SKILLS, ...allUnits().flatMap(uoiSkills)].filter(s=>filt==="all"||subjOf(s.id)===filt)
+    .map(s=>({s, st:stat(s.id), m:mastery(stat(s.id))})).sort((a,b)=>(a.m===null?2:a.m)-(b.m===null?2:b.m));
+  const attention = [...MATH, ...ENG_SKILLS, ...allUnits().flatMap(uoiSkills)].map(s=>({s,st:stat(s.id),m:mastery(stat(s.id))})).filter(x=>x.m!==null && x.st.n>=3 && x.m<0.75).sort((a,b)=>a.m-b.m).slice(0,6);
+  let totalN=0,totalC=0; Object.values(S.progress.skills).forEach(st=>{totalN+=st.n;totalC+=st.c});
+  const ws = weekStats(), mins7 = S.sessions.filter(s=>Date.now()-s.at<7*864e5).reduce((a,s)=>a+(s.mins||0),0);
+  const mistakes = S.sessions.flatMap(s=>(s.wrong||[]).map(w=>({...w, at:s.at}))).slice(0,25);
+  return `<div class="shead"><div><div class="eyebrow">For parents</div><h1>Rishay’s progress</h1></div></div>
+  <div class="tiles">
+    <div class="tile"><b>${totalN}</b><small>questions answered in total</small></div>
+    <div class="tile"><b>${totalN?Math.round(totalC/totalN*100)+"%":"–"}</b><small>correct overall</small></div>
+    <div class="tile"><b>${ws.acc}</b><small>correct in the last 7 days</small></div>
+    <div class="tile"><b>${mins7}</b><small>minutes practised in the last 7 days</small></div>
+  </div>
+  <section class="card"><h3 style="font-size:19px">Needs attention</h3><p class="small muted" style="margin:2px 0 8px">Skills with at least 3 answers and mastery under 75%, weakest first.</p>
+    ${attention.length ? `<div class="list">${attention.map(x=>skillRow(x.s, subjOf(x.s.id))).join("")}</div>` : `<p class="small muted">Nothing flagged yet. Skills appear here once Rishay has answered at least 3 questions in them.</p>`}</section>
+  <section class="card"><div class="row between"><h3 style="font-size:19px">Every skill</h3>
+    <div class="filters" role="group" aria-label="Filter by subject">${[["all","All"],["math","Maths"],["eng","English"],["uoi","UOI"]].map(([k,l])=>`<button class="btn sm" type="button" data-filter="${k}" aria-pressed="${filt===k}">${l}</button>`).join("")}</div></div>
+    <div class="table-wrap" style="margin-top:8px"><table><thead><tr><th>Skill</th><th>Area</th><th class="num">Answered</th><th class="num">Correct</th><th class="num">Mastery</th><th>Status</th><th>Last practised</th></tr></thead><tbody>
+    ${rows.map(({s,st,m})=>`<tr><td class="wrap"><span class="dot d-${subjOf(s.id)}"></span> ${esc(s.name)}</td><td>${esc(s.strand)}</td><td class="num">${st?st.n:0}</td><td class="num">${st&&st.n?Math.round(st.c/st.n*100)+"%":"–"}</td><td class="num">${m===null?"–":Math.round(m*100)+"%"}</td><td>${chip(st)}</td><td>${st&&st.last?new Date(st.last).toLocaleDateString("en-IN",{day:"numeric",month:"short"}):"–"}</td></tr>`).join("")}
+    </tbody></table></div></section>
+  <section class="card"><h3 style="font-size:19px;margin-bottom:6px">Recent mistakes</h3>
+    ${mistakes.length ? `<div class="table-wrap"><table><thead><tr><th>Date</th><th>Skill</th><th>Question</th><th>Answered</th><th>Correct answer</th></tr></thead><tbody>${mistakes.map(w=>`<tr><td>${new Date(w.at).toLocaleDateString("en-IN",{day:"numeric",month:"short"})}</td><td>${esc((skillById(w.skill)||{name:w.skill}).name)}</td><td class="wrap">${esc(w.p)}</td><td class="wrap">${esc(w.given||"(blank)")}</td><td class="wrap">${esc(w.correct)}</td></tr>`).join("")}</tbody></table></div>` : `<p class="small muted">No mistakes recorded yet.</p>`}</section>
+  <section class="card"><h3 style="font-size:19px;margin-bottom:6px">All sessions</h3>${S.sessions.length ? S.sessions.slice(0,30).map(sessRow).join("") : `<p class="small muted">No sessions yet.</p>`}</section>
+  ${unitManager()}
+  <section class="card"><h3 style="font-size:19px">Start again</h3><p class="small muted">Clears all scores and sessions. Units you added are kept.</p><button class="btn danger" type="button" id="resetBtn">Reset all progress</button></section>
+  <p class="status" id="sync">${esc(syncMsg)}</p>`;
+}
+function unitManager(){
+  const u = unitById(view.manage) || currentUnit();
+  return `<section class="card"><div class="row between"><h3 style="font-size:19px">Units of inquiry</h3><button class="btn sm uoi" type="button" data-go="unitform">Add a unit</button></div>
+  <div class="table-wrap" style="margin-top:8px"><table><thead><tr><th>Unit</th><th>Theme</th><th class="num">Questions</th><th></th></tr></thead><tbody>
+  ${[...EX_UNITS, ...S.units].map(x=>{ const hidden=S.settings.hidden.includes(x.id); return `<tr><td class="wrap"><b>${esc(x.title)}</b>${x.example?` <span class="muted small">example</span>`:""}${S.settings.currentUnit===x.id?` <span class="chip secure">● Current</span>`:""}</td><td>${esc(x.theme)}</td><td class="num">${x.qs.length}</td><td><div class="row">
+    ${!hidden?`<button class="btn sm" type="button" data-setcur="${esc(x.id)}">Make current</button><button class="btn sm" type="button" data-manage="${esc(x.id)}">Questions</button>`:""}
+    ${x.example?`<button class="btn sm" type="button" data-hide="${esc(x.id)}">${hidden?"Show":"Hide"}</button>`:`<button class="btn sm danger" type="button" data-delunit="${esc(x.id)}">Delete</button>`}</div></td></tr>`; }).join("")}
+  </tbody></table></div>
+  ${u ? `<div style="margin-top:14px"><h4 style="font-size:17px">Questions in “${esc(u.title)}”</h4>
+    ${!u.example ? `<div class="row" style="margin:8px 0">${sample?`<button class="btn sm uoi" type="button" data-genmore="${esc(u.id)}">Create 10 more with Claude</button>`:""}<span class="status" id="gen-msg"></span></div>`:""}
+    <div class="qlist">${u.qs.map((q,i)=>`<div class="qi"><div><b>${q.t==="explain"?"Written":q.t==="tf"?"True/false":"Choice"}</b> · <span class="muted">LOI ${(q.loi||0)+1} · ${esc(q.c||"")}</span><br>${esc(q.q)}${q.t==="mcq"?`<br><span class="muted">✓ ${esc(q.o[q.a])}</span>`:q.t==="tf"?`<br><span class="muted">✓ ${q.a?"True":"False"}</span>`:""}</div>${u.example?"":`<button class="btn sm danger" type="button" data-delq="${esc(u.id)}|${i}">Remove</button>`}</div>`).join("") || `<p class="small muted">No questions yet.</p>`}</div>
+    ${u.example ? `<p class="small muted" style="margin-top:8px">Example units are built in and can’t be edited. Add your own unit to write questions.</p>` : manualQForm(u)}
+  </div>` : ""}
+  </section>`;
+}
+function manualQForm(u){
+  return `<form class="form" id="qForm" data-unit="${esc(u.id)}" style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px">
+    <b>Add a question yourself</b>
+    <div class="grid2"><label>Type<select id="qf-t"><option value="mcq">Multiple choice</option><option value="tf">True or false</option><option value="explain">Written answer</option></select></label>
+    <label>Line of inquiry<select id="qf-loi">${u.lois.map((l,i)=>`<option value="${i}">${i+1}. ${esc(l)}</option>`).join("")}</select></label></div>
+    <label>Key concept<select id="qf-c">${Object.keys(CONCEPTS).map(c=>`<option value="${c}">${c}</option>`).join("")}</select></label>
+    <label>Question<textarea id="qf-q" required></textarea></label>
+    <div id="qf-opts"><label>Correct answer<input id="qf-o0"></label><label>Wrong answer<input id="qf-o1"></label><label>Wrong answer<input id="qf-o2"></label><label>Wrong answer<input id="qf-o3"></label></div>
+    <label>Explanation or model answer<textarea id="qf-why"></textarea></label>
+    <div class="row"><button class="btn solid" type="submit">Add question</button><span class="status" id="qf-msg"></span></div>
+  </form>`;
+}
+
+/* ---------- quiz ---------- */
+function startQuiz(title, subject, items){
+  if(!items.length) return;
+  quiz = {id:uid(), title, subject, items, i:0, results:[], startedAt:Date.now(), done:false, run:{}, cur:null, sel:null, checked:false, fb:null};
+  prepare(); go("quiz");
+}
+function prepare(){
+  const it = quiz.items[quiz.i];
+  if(it.lazy){ const sk = skillById(it.skill); const base = levelFor(it.skill), adj = quiz.run[it.skill]||0; it.level = Math.max(1,Math.min(3,base+adj)); it.q = sk.gen(it.level); }
+  quiz.sel = null; quiz.checked = false; quiz.fb = null;
+}
+function quizView(){
+  const it = quiz.items[quiz.i], q = it.q, sk = skillById(it.skill), subj = subjOf(it.skill);
+  const n = quiz.items.length, p = quiz.i/n*100;
+  let input = "";
+  if(q.type==="mcq") input = `<div class="choices">${q.opts.map((o,k)=>{ let cls="choice"; if(quiz.checked){ if(k===q.ans) cls+=" right"; else if(k===quiz.sel) cls+=" wrong"; } return `<button type="button" class="${cls}" data-choice="${k}" aria-pressed="${quiz.sel===k}" ${quiz.checked?"disabled":""}><span class="k">${String.fromCharCode(65+k)}</span><span>${o}</span></button>`; }).join("")}</div>`;
+  else if(q.type==="explain") input = `<div class="ans"><textarea id="ans" ${quiz.checked?"disabled":""} placeholder="Write your answer in two to four sentences.">${esc(quiz.sel||"")}</textarea></div>`;
+  else { const mode = ["num","qr"].includes(q.type)?"decimal":"text"; input = `<div class="ans">${q.pre?`<span class="unitlbl">${esc(q.unit)}</span>`:""}<input id="ans" autocomplete="off" inputmode="${q.type==="num"?"decimal":"text"}" value="${esc(quiz.sel||"")}" ${quiz.checked?"disabled":""} aria-label="Your answer">${q.unit&&!q.pre?`<span class="unitlbl">${esc(q.unit)}</span>`:""}</div>${q.hint?`<div class="hint">${esc(q.hint)}</div>`:""}`; }
+  const passage = it.q.passage || (it.passage);
+  const pass = passage ? `<details class="passage ${passage.poem?"poem":""} ${passage.letter?"letter":""}" open><summary>${esc(passage.kind)}: ${esc(passage.title)}</summary>${passage.text.split(/\n\s*\n/).map(t=>`<p>${esc(t)}</p>`).join("")}</details>` : "";
+  return `<div class="quiz">
+    <div class="qtop"><div><div class="eyebrow">${esc(quiz.title)}</div><b>Question ${quiz.i+1} of ${n}</b></div><button class="btn sm" type="button" id="endQuiz">${quiz.confirmEnd?"Tap again to finish now":"Finish early"}</button></div>
+    <div class="qprog" aria-hidden="true"><i style="width:${p}%"></i></div>
+    <section class="qcard">
+      <div class="qmeta"><span class="tag"><span class="dot d-${subj}"></span>${esc(sk?sk.name:"")}</span>${it.level?`<span class="lvl" aria-label="Level ${it.level} of 3">${[1,2,3].map(x=>`<i class="${x<=it.level?"on":""}"></i>`).join("")} Level ${it.level}</span>`:""}</div>
+      ${pass}
+      <div class="prompt">${q.prompt}</div>
+      ${input}
+      <div id="fbBox">${quiz.fb ? fbHTML() : ""}</div>
+      <div class="qactions"><span class="small muted">${q.type==="mcq"?"Press A–D or click an answer.":"Press Enter to check."}</span>
+        ${quiz.checked ? `<button class="btn solid" type="button" id="nextQ">${quiz.i+1<n?"Next question":"See results"}</button>` : quiz.pendingSelf ? "" : `<button class="btn solid" type="button" id="checkQ" ${quiz.busy?"disabled":""}>${quiz.busy?"Checking…":"Check answer"}</button>`}
+      </div>
+    </section></div>`;
+}
+function fbHTML(){
+  const f = quiz.fb, q = quiz.items[quiz.i].q;
+  if(f.self) return `<div class="fb part"><h4>Compare with the model answer</h4><div class="model"><b>Model answer:</b> ${q.show}</div><p class="small" style="margin:10px 0 6px">How close was your answer?</p><div class="row"><button class="btn sm uoi" type="button" data-self="1">Got the main ideas</button><button class="btn sm" type="button" data-self="0.5">Partly</button><button class="btn sm danger" type="button" data-self="0">Missed it</button></div></div>`;
+  const cls = f.score>=1?"good":f.score>0?"part":"badf", head = f.score>=1?"✓ Correct":f.score>0?"◐ Partly right":"✗ Not quite";
+  return `<div class="fb ${cls}" role="status"><h4>${head}</h4>${f.note?`<div class="small">${esc(f.note)}</div>`:""}${f.score<1 && q.type!=="explain" ? `<div class="ex">The answer is <b>${q.show}</b>.</div>`:""}${f.claude?`<div class="ex">${esc(f.claude)}</div>`:""}${q.ex?`<div class="ex small">${q.ex}</div>`:""}${q.type==="explain"?`<div class="model"><b>Model answer:</b> ${q.show}</div>`:""}</div>`;
+}
+function readInput(){ const el = $("#ans"); if(el) quiz.sel = el.value; }
+async function doCheck(){
+  const it = quiz.items[quiz.i], q = it.q;
+  if(q.type!=="mcq") readInput();
+  if(q.type==="mcq" && quiz.sel===null) return;
+  if(q.type!=="mcq" && !String(quiz.sel||"").trim()) { const el=$("#ans"); if(el){ el.focus(); el.setAttribute("placeholder","Type your answer first"); } return; }
+  if(q.type==="explain"){
+    if(sample){
+      quiz.busy = true; render();
+      try{
+        const r = await sample.json(`You are a kind Grade 5 (IB PYP) teacher checking a student's short written answer for a Unit of Inquiry quiz. Judge only whether the main ideas are there, not spelling.
+
+Question: ${stripHtml(q.prompt)}
+Model answer: ${q.model}
+Student's answer: ${quiz.sel}
+
+Reply with only JSON: {"score": 1 or 0.5 or 0, "feedback": "one or two encouraging sentences to the student naming what was good and what was missing"}`, {modelTier:"quick", cache:false});
+        const sc = [0,0.5,1].includes(Number(r && r.score)) ? Number(r.score) : null;
+        quiz.busy = false;
+        if(sc===null) throw {code:"invalid_json"};
+        finishCheck(sc, {claude: String(r.feedback||"")});
+      }catch(e){ quiz.busy = false; if(e && (e.code==="not_granted"||e.code==="sampling_disabled")) sample=null; quiz.checked=false; quiz.pendingSelf=true; quiz.fb={self:true}; render(); }
+      return;
+    }
+    quiz.pendingSelf = true; quiz.fb = {self:true}; render(); return;
+  }
+  const r = check(q, quiz.sel);
+  finishCheck(r.score, {note:r.note});
+}
+function finishCheck(score, extra={}){
+  const it = quiz.items[quiz.i], q = it.q;
+  quiz.checked = true; quiz.pendingSelf = false; quiz.fb = {score, ...extra};
+  record(it.skill, score, it.concept);
+  if(it.lazy){ const r = quiz.run, k = it.skill; const recent = (quiz.results.filter(x=>x.skill===k).map(x=>x.score)).concat(score);
+    if(recent.slice(-2).every(x=>x>=1) && recent.length>=2) r[k] = Math.min(2,(r[k]||0)+1); if(score<1 && recent.slice(-2).every(x=>x<1) && recent.length>=2) r[k] = Math.max(-2,(r[k]||0)-1); }
+  const given = q.type==="mcq" ? (quiz.sel===null?"":stripHtml(q.opts[quiz.sel])) : String(quiz.sel||"");
+  quiz.results.push({skill:it.skill, score, p:stripHtml(q.prompt).slice(0,220), given:given.slice(0,300), correct:stripHtml(q.show).slice(0,300), ex:q.ex, promptHtml:q.prompt, showHtml:q.show});
+  render();
+}
+function nextQ(){ if(quiz.i+1 < quiz.items.length){ quiz.i++; prepare(); render(); } else endQuiz(false); }
+function endQuiz(early){
+  if(!quiz || quiz.done) return;
+  quiz.done = true;
+  const res = quiz.results; if(!res.length){ quiz = null; return; }
+  const score = res.reduce((a,r)=>a+r.score,0), mins = Math.max(1, Math.round((Date.now()-quiz.startedAt)/60000));
+  const skills = {}; res.forEach(r=>{ const s=skills[r.skill]||(skills[r.skill]=[0,0]); s[0]++; s[1]+=r.score; });
+  const sess = {id:quiz.id, at:Date.now(), title:quiz.title+(early?" (finished early)":""), subject:quiz.subject, n:res.length, score, mins, skills,
+    wrong:res.filter(r=>r.score<1).slice(0,20).map(r=>({skill:r.skill, p:r.p, given:r.given, correct:r.correct}))};
+  S.sessions.unshift(sess); if(S.sessions.length>300) S.sessions.length=300;
+  persistLocal(); dbWrite("sessions/"+sess.id, sess); flushProgress();
+  view = {name:"results"}; render(); window.scrollTo({top:0});
+}
+function resultsView(){
+  const res = quiz.results, n = res.length, score = res.reduce((a,r)=>a+r.score,0), pct = Math.round(score/n*100);
+  const msg = pct>=90?"Outstanding work!":pct>=75?"Great job — you know most of this well.":pct>=50?"Good effort. Look at the mistakes below and try again.":"This is tricky. Read each explanation, then practise the weakest skill.";
+  const bySkill = {}; res.forEach(r=>{ const s=bySkill[r.skill]||(bySkill[r.skill]=[0,0]); s[0]++; s[1]+=r.score; });
+  const worst = Object.entries(bySkill).sort((a,b)=>a[1][1]/a[1][0]-b[1][1]/b[1][0])[0];
+  return `<div class="quiz"><section class="qcard">
+    <div class="eyebrow">${esc(quiz.title)}</div>
+    <div class="row" style="gap:20px;margin-top:8px"><span class="score">${fmtScore(score)}<span class="muted" style="font-size:32px">/${n}</span></span><div><h2 style="font-size:24px">${msg}</h2><p class="muted" style="margin:4px 0 0">${pct}% correct · ${Math.max(1,Math.round((Date.now()-quiz.startedAt)/60000))} minutes</p></div></div>
+    <div class="table-wrap" style="margin-top:16px"><table><thead><tr><th>Skill</th><th class="num">Score</th><th>Mastery now</th></tr></thead><tbody>
+    ${Object.entries(bySkill).map(([id,[k,c]])=>{ const sk=skillById(id); return `<tr><td class="wrap"><span class="dot d-${subjOf(id)}"></span> ${esc(sk?sk.name:id)}</td><td class="num">${fmtScore(c)}/${k}</td><td style="min-width:160px">${meter(mastery(stat(id)),subjOf(id))}</td></tr>`; }).join("")}
+    </tbody></table></div>
+    <div class="row" style="margin-top:16px">${worst && worst[1][1]<worst[1][0] ? `<button class="btn solid" type="button" data-practise="${esc(worst[0])}">Practise ${esc((skillById(worst[0])||{name:""}).name)}</button>`:""}<button class="btn" type="button" data-go="home">Back to home</button></div>
+  </section>
+  ${res.some(r=>r.score<1) ? `<section class="qcard"><h3 style="font-size:20px;margin-bottom:10px">Look again at these</h3><div class="review">${res.filter(r=>r.score<1).map(r=>`<div class="rv"><div class="p">${r.promptHtml}</div><div class="a">Your answer: <b>${esc(r.given||"(blank)")}</b> · Correct: <b>${r.showHtml}</b></div>${r.ex?`<div class="a muted">${r.ex}</div>`:""}</div>`).join("")}</div></section>` : ""}
+  </div>`;
+}
+function focusAnswer(){ const el = $("#ans"); if(el && !el.disabled) el.focus({preventScroll:true}); else { const nb=$("#nextQ"); if(nb) nb.focus({preventScroll:true}); } }
+
+/* ---------- events ---------- */
+const app = $("#app");
+app.addEventListener("click", async e => {
+  const t = e.target.closest("button"); if(!t) return;
+  if(t.id==="startMix") return startQuiz("Today’s mix","mix",todaysMix());
+  if(t.dataset.practise){ const sk = skillById(t.dataset.practise); if(!sk) return; return startQuiz(`Practice: ${sk.name}`, subjOf(sk.id), poolItems(sk, 10)); }
+  if(t.dataset.fulltest){ const subj=t.dataset.fulltest; if(subj==="math") return startQuiz("Maths full check-up","math",shuffle(MATH).map(s=>({skill:s.id,lazy:true})));
+    return startQuiz("English full check-up","eng",shuffle([...ENG_SKILLS.flatMap(s=>poolItems(s,1)), ...poolItems(ENG_SKILLS.find(s=>s.id==="e.reading"),2), ...poolItems(ENG_SKILLS.find(s=>s.id==="e.spelling"),1)]).slice(0,20)); }
+  if(t.dataset.strand){ const [subj, st] = t.dataset.strand.split("|"); const skills=(subj==="math"?MATH:ENG_SKILLS).filter(s=>s.strand===st); const per = skills.length>=8?2:Math.ceil(16/skills.length);
+    return startQuiz(`${st} test`, subj, shuffle(skills.flatMap(s=>poolItems(s,per))).slice(0,16)); }
+  if(t.dataset.unit){ S.settings.currentUnit = t.dataset.unit; saveSettings(); return render(); }
+  if(t.dataset.unittest){ const u=unitById(t.dataset.unittest); return startQuiz(`${u.title}: unit test`,"uoi",unitItems(u,20,{balanced:true})); }
+  if(t.dataset.unitquick){ const u=unitById(t.dataset.unitquick); return startQuiz(`${u.title}: quick quiz`,"uoi",unitItems(u,8,{noExplain:true})); }
+  if(t.dataset.choice!==undefined && quiz && !quiz.checked){ quiz.sel = Number(t.dataset.choice); render(); return; }
+  if(t.id==="checkQ") return doCheck();
+  if(t.id==="nextQ") return nextQ();
+  if(t.dataset.self!==undefined){ quiz.pendingSelf=false; return finishCheck(Number(t.dataset.self), {note: Number(t.dataset.self)>=1?"Nice — you included the main ideas.":"Read the model answer again and notice what you left out."}); }
+  if(t.id==="endQuiz"){ if(!quiz.confirmEnd){ quiz.confirmEnd=true; render(); setTimeout(()=>{ if(quiz && !quiz.done){ quiz.confirmEnd=false; if(view.name==="quiz") render(); } },4000); return; } if(quiz.results.length) endQuiz(true); else { quiz=null; go("home"); } return; }
+  if(t.dataset.filter){ view.filter = t.dataset.filter; return render(); }
+  if(t.dataset.setcur){ S.settings.currentUnit = t.dataset.setcur; saveSettings(); return render(); }
+  if(t.dataset.manage){ view.manage = t.dataset.manage; render(); return; }
+  if(t.dataset.hide){ const id=t.dataset.hide; S.settings.hidden = S.settings.hidden.includes(id) ? S.settings.hidden.filter(x=>x!==id) : [...S.settings.hidden, id]; saveSettings(); return render(); }
+  if(t.dataset.delunit){ const id=t.dataset.delunit; if(t.dataset.armed!=="1"){ t.dataset.armed="1"; t.textContent="Tap again to delete"; return; } S.units = S.units.filter(u=>u.id!==id); persistLocal(); dbDelete("units/"+id); if(S.settings.currentUnit===id){ S.settings.currentUnit=(allUnits()[0]||{}).id||""; saveSettings(); } return render(); }
+  if(t.dataset.delq){ const [id,i]=t.dataset.delq.split("|"); const u=S.units.find(x=>x.id===id); if(!u) return; u.qs.splice(Number(i),1); saveUnit(u); return render(); }
+  if(t.dataset.genmore){ const u=S.units.find(x=>x.id===t.dataset.genmore); if(u) generateQuestions(u, 10, $("#gen-msg"), t); return; }
+  if(t.id==="resetBtn"){ if(t.dataset.armed!=="1"){ t.dataset.armed="1"; t.textContent="Tap again to erase all progress"; return; }
+    const old = S.sessions.map(s=>s.id); S.progress={skills:{},concepts:{},daily:{},updatedAt:Date.now()}; S.sessions=[]; persistLocal(); dbWrite("progress/rishay", S.progress); old.forEach(id=>dbDelete("sessions/"+id)); return render(); }
+});
+document.addEventListener("keydown", e => {
+  if(view.name!=="quiz" || !quiz || quiz.done) return;
+  const q = quiz.items[quiz.i].q;
+  if(e.key==="Enter" && !e.shiftKey){ if(e.target.tagName==="TEXTAREA") return; if(e.target.tagName==="BUTTON" && e.target.id!=="nextQ" && e.target.id!=="checkQ" && !e.target.dataset.choice) return; e.preventDefault(); if(quiz.checked) nextQ(); else if(!quiz.pendingSelf && !quiz.busy) doCheck(); return; }
+  if(q.type==="mcq" && !quiz.checked && /^[a-dA-D1-4]$/.test(e.key) && e.target.tagName!=="INPUT"){ const k = isNaN(e.key) ? e.key.toLowerCase().charCodeAt(0)-97 : Number(e.key)-1; if(k < q.opts.length){ quiz.sel=k; render(); } }
+});
+app.addEventListener("input", e => { if(e.target.id==="ans" && quiz) quiz.sel = e.target.value; });
+app.addEventListener("change", e => { if(e.target.id==="qf-t"){ const o=$("#qf-opts"); if(o) o.hidden = e.target.value!=="mcq"; } });
+app.addEventListener("submit", async e => {
+  e.preventDefault();
+  if(e.target.id==="unitForm"){
+    const title=$("#uf-title").value.trim(), central=$("#uf-central").value.trim(), lois=$("#uf-lois").value.split("\n").map(s=>s.trim()).filter(Boolean).slice(0,6);
+    if(!title || !central || !lois.length){ $("#uf-msg").textContent="Please fill in the title, central idea and at least one line of inquiry."; return; }
+    const u = {id:"u"+uid(), theme:$("#uf-theme").value, title, central, lois, concepts:[...document.querySelectorAll(".uf-c:checked")].map(c=>c.value),
+      vocab:$("#uf-vocab").value.split(",").map(s=>s.trim()).filter(Boolean).slice(0,30), notes:$("#uf-notes").value.trim().slice(0,3000), qs:[], createdAt:Date.now()};
+    S.units.push(u); S.settings.currentUnit = u.id; saveUnit(u); saveSettings();
+    if(sample){ $("#uf-save").disabled = true; await generateQuestions(u, 24, $("#uf-msg")); }
+    view = {name:"uoi"}; render(); return;
+  }
+  if(e.target.id==="qForm"){
+    const u = S.units.find(x=>x.id===e.target.dataset.unit); if(!u) return;
+    const t=$("#qf-t").value, q=$("#qf-q").value.trim(), why=$("#qf-why").value.trim(), loi=Number($("#qf-loi").value), c=$("#qf-c").value;
+    if(!q){ $("#qf-msg").textContent="Write the question first."; return; }
+    let item;
+    if(t==="mcq"){ const o=[0,1,2,3].map(i=>$("#qf-o"+i).value.trim()).filter(Boolean); if(o.length<2){ $("#qf-msg").textContent="Give the correct answer and at least one wrong answer."; return; } item={t,loi,c,q,o,a:0,why}; }
+    else if(t==="tf"){ item={t,loi,c,q,a:true,why}; const ans=$("#qf-o0").value.trim().toLowerCase(); if(ans.startsWith("f")) item.a=false; }
+    else item={t,loi,c,q,model:why};
+    u.qs.push(item); saveUnit(u); view.manage=u.id; render();
+  }
+});
+
+/* ---------- Claude: generate UOI questions ---------- */
+async function generateQuestions(u, n, msgEl, btn){
+  if(!sample) return;
+  if(btn) btn.disabled = true;
+  if(msgEl) msgEl.textContent = "Claude is writing questions. This takes about a minute…";
+  const existing = u.qs.map(q=>q.q).slice(0,60).join("\n");
+  const prompt = `You write assessment questions for an IB PYP Grade 5 student (age 10) in India, to test real understanding of a Unit of Inquiry, not just recall.
+
+Unit
+Transdisciplinary theme: ${u.theme}
+Title: ${u.title}
+Central idea: ${u.central}
+Lines of inquiry (index: text):
+${u.lois.map((l,i)=>`${i}: ${l}`).join("\n")}
+Key concepts: ${(u.concepts||[]).join(", ") || "choose suitable ones"}
+Vocabulary: ${(u.vocab||[]).join(", ") || "(none given)"}
+What has been taught: ${u.notes || "(not given)"}
+${existing ? `\nAlready in the bank, do not repeat:\n${existing}\n` : ""}
+Write exactly ${n} new questions, spread evenly across the lines of inquiry. Mix: about 60% multiple choice (4 options, one clearly correct, plausible wrong options), 20% true/false, 20% written answers that ask the student to explain, compare, give an example or take a perspective. Tag each with one PYP key concept from: form, function, causation, change, connection, perspective, responsibility. Keep facts accurate and age-appropriate; use Indian examples where natural. Keep each question under 30 words.
+
+Reply with only a JSON array. Each item is one of:
+{"t":"mcq","loi":0,"c":"function","q":"question","o":["correct option","wrong","wrong","wrong"],"a":0,"why":"one-sentence explanation"}
+{"t":"tf","loi":1,"c":"change","q":"statement","a":true,"why":"one-sentence explanation"}
+{"t":"explain","loi":2,"c":"perspective","q":"question","model":"model answer in 2-3 sentences"}`;
+  try{
+    const arr = await sample.json(prompt, {modelTier:"default", cache:false});
+    const KC = Object.keys(CONCEPTS);
+    const clean = (Array.isArray(arr)?arr:[]).map(x=>{
+      if(!x || typeof x.q!=="string") return null;
+      const loi = Math.max(0, Math.min(u.lois.length-1, Number(x.loi)||0)), c = KC.includes(x.c)?x.c:"form", q = x.q.slice(0,400);
+      if(x.t==="mcq" && Array.isArray(x.o) && x.o.length>=2 && Number.isInteger(x.a) && x.a>=0 && x.a<x.o.length) return {t:"mcq",loi,c,q,o:x.o.slice(0,5).map(s=>String(s).slice(0,200)),a:x.a,why:String(x.why||"").slice(0,400)};
+      if(x.t==="tf" && typeof x.a==="boolean") return {t:"tf",loi,c,q,a:x.a,why:String(x.why||"").slice(0,400)};
+      if(x.t==="explain") return {t:"explain",loi,c,q,model:String(x.model||"").slice(0,800)};
+      return null; }).filter(Boolean);
+    if(!clean.length) throw {code:"invalid_json"};
+    u.qs.push(...clean); saveUnit(u);
+    if(msgEl) msgEl.textContent = `Added ${clean.length} questions. Check them in the Parent tab.`;
+  }catch(e){
+    const code = e && e.code;
+    if(code==="not_granted"||code==="sampling_disabled") sample = null;
+    if(msgEl) msgEl.textContent = code==="rate_limited" ? "Claude is busy. Try again in a few minutes." : code==="not_granted"||code==="sampling_disabled" ? "Claude isn’t available here. Add questions yourself in the Parent tab." : "Claude couldn’t create questions this time. Try again from the Parent tab.";
+  } finally { if(btn) btn.disabled = false; if(view.name==="parent") render(); }
+}
+
+/* =========================================================
+   Boot
+   ========================================================= */
+render();
+(async () => {
+  if(!window.claude || !window.claude.use) return;
+  claude.use("sample").then(s => { if(s){ sample = s; if(["unitform","parent"].includes(view.name)) render(); } }).catch(()=>{});
+  try { db = await claude.use("db"); } catch(e) { db = null; }
+  if(!db) return;
+  try{
+    const [pg, sg, us, ss] = await Promise.all([db.doc("progress/rishay").get(), db.doc("settings/main").get(), db.collection("units").get(), db.collection("sessions").orderBy("at","desc").limit(300).get()]);
+    const clone = x => JSON.parse(JSON.stringify(x));
+    if(pg.exists){ const r = clone(pg.data()); if((r.updatedAt||0) >= (S.progress.updatedAt||0)) S.progress = {skills:{},concepts:{},daily:{},...r}; else dirtyProgress = true; } else if(S.progress.updatedAt) dirtyProgress = true;
+    if(sg.exists){ const r = clone(sg.data()); if((r.updatedAt||0) >= (S.settings.updatedAt||0)) S.settings = {hidden:[], ...r}; }
+    const remoteUnits = us.docs.map(d=>clone(d.data())).filter(u=>u && u.id && Array.isArray(u.qs));
+    const localOnly = S.units.filter(u=>!remoteUnits.some(r=>r.id===u.id));
+    S.units = [...remoteUnits, ...localOnly]; localOnly.forEach(u=>dbWrite("units/"+u.id, u));
+    const remoteS = ss.docs.map(d=>clone(d.data()));
+    const localS = S.sessions.filter(s=>!remoteS.some(r=>r.id===s.id)); localS.forEach(s=>dbWrite("sessions/"+s.id, s));
+    S.sessions = [...remoteS, ...localS].sort((a,b)=>b.at-a.at).slice(0,300);
+    persistLocal(); setSync(true); flushProgress();
+    if(view.name!=="quiz" && view.name!=="results" && view.name!=="unitform") render();
+  }catch(e){ db = null; setSync(false); }
+})();
+</script>
