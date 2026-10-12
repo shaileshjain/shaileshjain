@@ -12,7 +12,7 @@ def grab(name):
     return paper[start:end]
 bank = grab("G") + "\n\n" + grab("P") + "\n"
 src = (root / "src" / "hub.src.html").read_text()
-out = src.replace("/*@ENGLISH_BANK@*/", bank)
+out = src.replace("/*@ENGLISH_BANK@*/", bank).replace("/*@UNITS@*/", (root / "src" / "units-cambridge5.js").read_text())
 (root / "hub.html").write_text(out)
 (root / "index.html").write_text('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>' + out + "</body></html>")
 print("built", len(out), "bytes")

@@ -533,105 +533,15 @@ const ENG_SKILLS = (() => {
 /* =========================================================
    Unit of Inquiry
    ========================================================= */
-const THEMES = ["Who we are","Where we are in place and time","How we express ourselves","How the world works","How we organize ourselves","Sharing the planet"];
+const THEMES = ["Biology","Chemistry","Physics","Earth and space","Global Perspectives","Other"];
 const CONCEPTS = {form:"What is it like?",function:"How does it work?",causation:"Why is it like it is?",change:"How is it changing?",connection:"How is it connected to other things?",perspective:"What are the points of view?",responsibility:"What is our responsibility?"};
-const EX_UNITS = [
-{id:"ex-body", example:true, theme:"Who we are", title:"Body systems", central:"The human body is made up of systems that work together to keep us alive and healthy.",
- lois:["How body systems are structured and what they do","How body systems depend on each other","How our choices affect our body systems"], concepts:["form","function","connection","responsibility"],
- vocab:["cell","tissue","organ","system","circulatory","respiratory","digestive","skeletal","nervous","muscular"],
- qs:[
- {t:"mcq",loi:0,c:"function",q:"Which organ pumps blood around the body?",o:["Heart","Lungs","Liver","Kidneys"],a:0,why:"The heart is a muscle that pumps blood through the circulatory system."},
- {t:"mcq",loi:0,c:"form",q:"Which order goes from smallest to largest?",o:["cell → tissue → organ → system","organ → cell → system → tissue","tissue → cell → organ → system","system → organ → tissue → cell"],a:0,why:"Cells group into tissues, tissues into organs, and organs into systems."},
- {t:"mcq",loi:0,c:"function",q:"What is the main job of the respiratory system?",o:["To take in oxygen and get rid of carbon dioxide","To break down food","To carry messages from the brain","To hold the body up"],a:0,why:"Breathing brings oxygen in and removes carbon dioxide."},
- {t:"mcq",loi:0,c:"function",q:"Where are most nutrients from food absorbed into the blood?",o:["Small intestine","Stomach","Large intestine","Oesophagus"],a:0,why:"Food is broken down in the stomach, but most nutrients pass into the blood through the walls of the small intestine."},
- {t:"mcq",loi:0,c:"form",q:"Which system is made up of the brain, spinal cord and nerves?",o:["Nervous","Skeletal","Digestive","Circulatory"],a:0,why:"The nervous system carries messages around the body."},
- {t:"tf",loi:0,c:"function",q:"Arteries carry blood away from the heart.",a:true,why:"Arteries carry blood away from the heart; veins carry it back."},
- {t:"tf",loi:0,c:"form",q:"An adult human skeleton has about 206 bones.",a:true,why:"Babies have more bones, which fuse together as they grow, leaving about 206."},
- {t:"mcq",loi:0,c:"function",q:"What do the kidneys do?",o:["Filter waste from the blood to make urine","Pump blood","Digest food","Store oxygen"],a:0,why:"The kidneys clean the blood and make urine."},
- {t:"mcq",loi:1,c:"connection",q:"Which two systems work together to get oxygen to every cell?",o:["Respiratory and circulatory","Digestive and skeletal","Nervous and muscular","Skeletal and respiratory"],a:0,why:"The lungs take in oxygen and the blood carries it to every cell."},
- {t:"mcq",loi:1,c:"connection",q:"When you kick a football, which systems work together?",o:["Nervous, muscular and skeletal","Digestive and respiratory","Circulatory and digestive","Only the skeletal system"],a:0,why:"The brain sends a message through nerves, muscles contract and pull on bones."},
- {t:"tf",loi:1,c:"connection",q:"The digestive system works on its own and does not need any other body system.",a:false,why:"It needs the circulatory system to carry nutrients, muscles to move food along and nerves to control it."},
- {t:"mcq",loi:1,c:"causation",q:"Why does your heart beat faster when you run?",o:["Your muscles need more oxygen, so blood must be pumped faster","Your stomach is digesting food","Your bones are growing","Your brain is resting"],a:0,why:"Working muscles need more oxygen and energy, so the heart pumps faster."},
- {t:"mcq",loi:2,c:"responsibility",q:"Which habit best keeps your bones strong?",o:["Eating calcium-rich food and exercising","Drinking fizzy drinks","Sitting all day","Skipping breakfast"],a:0,why:"Calcium (milk, curd, ragi, green vegetables) and exercise build strong bones."},
- {t:"mcq",loi:2,c:"causation",q:"Smoking most directly harms which system?",o:["Respiratory","Skeletal","Digestive","Muscular"],a:0,why:"Smoke damages the lungs and airways."},
- {t:"tf",loi:2,c:"responsibility",q:"Getting 9–12 hours of sleep helps a 10-year-old’s body grow and repair.",a:true,why:"Growth hormone is released mainly during deep sleep."},
- {t:"explain",loi:1,c:"connection",q:"Explain how the respiratory and circulatory systems work together.",model:"The lungs (respiratory system) take in oxygen. Oxygen passes into the blood, and the heart (circulatory system) pumps this blood to every cell. The blood carries carbon dioxide back to the lungs to be breathed out."},
- {t:"explain",loi:2,c:"responsibility",q:"Describe two choices you can make to keep your body systems healthy. Say which system each choice helps.",model:"Any two sensible choices linked to a system, e.g. regular exercise strengthens the heart (circulatory) and muscles; eating fruit and vegetables helps the digestive system; enough sleep helps the nervous system; not smoking protects the lungs (respiratory)."},
- {t:"explain",loi:0,c:"function",q:"What would happen if one body system stopped working? Use an example.",model:"The other systems would be affected because they depend on each other. For example, if the heart stopped, blood would not carry oxygen to the brain and muscles, so they would stop working too."}
- ]},
-{id:"ex-migration", example:true, theme:"Where we are in place and time", title:"Migration", central:"Migration is a response to challenges, risks and opportunities.",
- lois:["Reasons why people and animals migrate","The effects of migration on people and places","How migration has shaped communities over time"], concepts:["causation","change","perspective","connection"],
- vocab:["migration","immigrant","emigrant","refugee","push factor","pull factor","settlement","culture","diaspora"],
- qs:[
- {t:"mcq",loi:0,c:"form",q:"What is migration?",o:["Moving from one place to another to live, often for a long time","Going on a short holiday","Visiting a friend for a day","Building a new house"],a:0,why:"Migration means moving to live somewhere new."},
- {t:"mcq",loi:0,c:"causation",q:"Which of these is a ‘push’ factor?",o:["War or conflict at home","Better jobs in another country","A good school abroad","Family living in another city"],a:0,why:"Push factors make people want to leave; pull factors attract them to a new place."},
- {t:"mcq",loi:0,c:"causation",q:"Which of these is a ‘pull’ factor?",o:["Better job opportunities","Drought","Floods","Not enough schools"],a:0,why:"Better jobs attract (pull) people to a place."},
- {t:"mcq",loi:0,c:"form",q:"A person forced to flee their country because of war or danger is called a:",o:["Refugee","Tourist","Citizen","Commuter"],a:0,why:"Refugees have to leave their country to be safe."},
- {t:"mcq",loi:0,c:"form",q:"Moving from a village to a city in the same country is:",o:["Internal migration","International migration","Tourism","A pilgrimage"],a:0,why:"Moving within one country is internal migration."},
- {t:"mcq",loi:0,c:"form",q:"Someone who leaves their own country to live in another is an ___ from their home country.",o:["emigrant","immigrant","native","resident"],a:0,why:"Emigrate = exit your country. Immigrate = come into a new one."},
- {t:"tf",loi:0,c:"causation",q:"Amur falcons stop in Nagaland on their long migration mainly to feed before flying on.",a:true,why:"They rest and feed in Nagaland before crossing the Arabian Sea to Africa."},
- {t:"mcq",loi:1,c:"perspective",q:"How might a child feel after moving to a new country?",o:["Excited and homesick at the same time","Nothing at all changes","Always angry","Only bored"],a:0,why:"Migration often brings mixed feelings: new opportunities and missing home."},
- {t:"mcq",loi:1,c:"change",q:"Which is a possible positive effect of migration on the new place?",o:["New skills, foods and ideas are shared","Everyone stops speaking their language","Nothing changes","There are fewer workers"],a:0,why:"Migrants bring skills and culture that enrich the place they move to."},
- {t:"mcq",loi:1,c:"change",q:"Which is a possible challenge for a village that many young people leave?",o:["Fewer people left to farm and work","More festivals","More schools open","Too many shops"],a:0,why:"When young adults leave, villages can lose workers."},
- {t:"tf",loi:1,c:"perspective",q:"Everyone who migrates has the same reasons and the same experience.",a:false,why:"Reasons and experiences differ from person to person."},
- {t:"mcq",loi:2,c:"connection",q:"The Parsi community in India originally came from:",o:["Persia (Iran)","China","Japan","Brazil"],a:0,why:"Zoroastrians from Persia settled in Gujarat more than a thousand years ago."},
- {t:"mcq",loi:2,c:"connection",q:"Which is an example of migration changing a culture?",o:["Indian restaurants in London","A river flooding","A volcano erupting","The phases of the moon"],a:0,why:"People who migrated took their food and culture with them."},
- {t:"mcq",loi:2,c:"change",q:"The Partition of India in 1947 led to:",o:["One of the largest migrations in history","No movement of people","A new ocean","The end of railways"],a:0,why:"Millions of people moved across the new borders."},
- {t:"explain",loi:0,c:"causation",q:"Explain the difference between push and pull factors. Give one example of each.",model:"Push factors make people want to leave a place (e.g. war, drought, no jobs). Pull factors attract people to a new place (e.g. better jobs, safety, good schools, family)."},
- {t:"explain",loi:1,c:"perspective",q:"A family moves from Kerala to Dubai for work. Describe one challenge and one opportunity they might face.",model:"Challenge: e.g. missing family, a new language, hot climate, new rules, making friends. Opportunity: e.g. a better-paid job, saving money, learning about new cultures, new schools."},
- {t:"explain",loi:2,c:"connection",q:"How has migration shaped the food, language or festivals of your city? Give an example.",model:"Any example showing people bringing culture with them, e.g. many Indian cities have food from other states, people speak several languages, festivals from different communities are celebrated together."}
- ]},
-{id:"ex-energy", example:true, theme:"How the world works", title:"Energy", central:"Energy can be transferred and transformed, and people make choices about how they use it.",
- lois:["Forms of energy","How energy is transferred and transformed","Renewable and non-renewable sources and responsible use"], concepts:["form","change","causation","responsibility","perspective"],
- vocab:["kinetic","potential","chemical","thermal","electrical","transform","transfer","renewable","non-renewable","fossil fuel"],
- qs:[
- {t:"mcq",loi:0,c:"form",q:"Energy stored in food and batteries is:",o:["Chemical energy","Sound energy","Light energy","Kinetic energy"],a:0,why:"Food and batteries store chemical energy."},
- {t:"mcq",loi:0,c:"form",q:"A moving bicycle has:",o:["Kinetic energy","Only sound energy","Nuclear energy","No energy"],a:0,why:"Anything that moves has kinetic energy."},
- {t:"mcq",loi:0,c:"form",q:"Energy stored in a stretched rubber band is:",o:["Elastic potential energy","Light energy","Thermal energy","Electrical energy"],a:0,why:"Stretched or squashed objects store elastic potential energy."},
- {t:"mcq",loi:0,c:"form",q:"Which of these is NOT a form of energy?",o:["A shadow","Light","Heat","Sound"],a:0,why:"A shadow is where light is blocked; it is not energy."},
- {t:"mcq",loi:1,c:"change",q:"In a torch, energy changes from:",o:["chemical → electrical → light (and heat)","light → chemical","sound → heat","kinetic → chemical"],a:0,why:"The battery’s chemical energy becomes electrical energy, then light and some heat."},
- {t:"mcq",loi:1,c:"change",q:"A solar panel changes:",o:["light energy into electrical energy","electrical energy into light","heat into sound","chemical energy into kinetic energy"],a:0,why:"Solar cells turn sunlight into electricity."},
- {t:"mcq",loi:1,c:"change",q:"When you rub your hands together, kinetic energy changes mainly into:",o:["Heat","Light","Chemical energy","Electrical energy"],a:0,why:"Friction turns movement into heat."},
- {t:"tf",loi:1,c:"change",q:"Energy can be created out of nothing.",a:false,why:"Energy cannot be created or destroyed, only changed from one form to another."},
- {t:"mcq",loi:1,c:"causation",q:"Heat moves from a hot cup of chai into your hands by:",o:["Conduction","Evaporation","Reflection","Magnetism"],a:0,why:"Heat travels through touching solids by conduction."},
- {t:"mcq",loi:2,c:"form",q:"Which is a renewable energy source?",o:["Wind","Coal","Petrol","Natural gas"],a:0,why:"Wind will not run out; it is renewable."},
- {t:"mcq",loi:2,c:"causation",q:"Why is coal called non-renewable?",o:["It takes millions of years to form and will run out","It is black","It burns quickly","It comes from the sun"],a:0,why:"Fossil fuels form over millions of years, much slower than we use them."},
- {t:"mcq",loi:2,c:"responsibility",q:"Which action saves electricity?",o:["Switching off lights when you leave a room","Leaving the TV on standby all night","Opening the fridge often","Charging a phone all day"],a:0,why:"Switching off what you are not using saves energy."},
- {t:"tf",loi:2,c:"causation",q:"Burning fossil fuels releases carbon dioxide, which adds to climate change.",a:true,why:"Carbon dioxide traps heat in the atmosphere."},
- {t:"mcq",loi:2,c:"perspective",q:"One disadvantage of wind energy is:",o:["It only works when the wind blows","It makes smoke","It will run out","It burns coal"],a:0,why:"Wind is not steady, so electricity from it varies."},
- {t:"mcq",loi:2,c:"form",q:"Hydroelectric power uses:",o:["Moving water","Sunlight","Burning wood","Wind"],a:0,why:"Flowing water turns turbines to make electricity."},
- {t:"explain",loi:1,c:"change",q:"Describe the energy changes when you switch on a ceiling fan.",model:"Electrical energy changes into kinetic energy as the blades move. Some energy is also changed into sound and heat."},
- {t:"explain",loi:2,c:"perspective",q:"Should your school put solar panels on the roof? Give one advantage and one disadvantage.",model:"Advantage: e.g. free, clean electricity from sunlight; lower bills; less pollution. Disadvantage: e.g. costly to install; less electricity on cloudy days or at night."},
- {t:"explain",loi:2,c:"responsibility",q:"Suggest three ways your family could use less energy at home, and explain why it matters.",model:"Any three, e.g. switch off lights and fans, use LED bulbs, air-dry clothes, set the AC to 24°C. It matters because most electricity comes from burning fossil fuels, which causes pollution and climate change, and saves money."}
- ]},
-{id:"ex-resources", example:true, theme:"Sharing the planet", title:"Natural resources", central:"Natural resources are limited, and how we use them affects living things and the future.",
- lois:["Types of natural resources","How people use and share resources","Conservation and sustainable use"], concepts:["form","function","perspective","responsibility","causation"],
- vocab:["natural resource","renewable","non-renewable","conservation","sustainable","deforestation","pollution","recycle"],
- qs:[
- {t:"mcq",loi:0,c:"form",q:"Which of these is a natural resource?",o:["Water","A plastic bag","A steel spoon","A notebook"],a:0,why:"Natural resources come from nature; the others are made by people."},
- {t:"mcq",loi:0,c:"form",q:"Which natural resource is renewable if we look after it?",o:["Forests (if trees are replanted)","Coal","Petroleum","Natural gas"],a:0,why:"Trees can regrow; fossil fuels cannot be replaced in our lifetime."},
- {t:"mcq",loi:0,c:"form",q:"Fossil fuels formed from:",o:["Remains of plants and animals over millions of years","Melted rocks","Sea water","Sunlight in one year"],a:0,why:"Coal, oil and gas formed from ancient living things."},
- {t:"tf",loi:0,c:"form",q:"Only about 3% of Earth’s water is fresh water.",a:true,why:"Most water is salty sea water; much of the fresh water is frozen."},
- {t:"mcq",loi:1,c:"function",q:"Trees give us:",o:["Wood, paper, fruit and oxygen","Only shade","Metal","Petrol"],a:0,why:"Trees provide many resources and produce oxygen."},
- {t:"mcq",loi:1,c:"perspective",q:"If a factory takes too much water from a river, who might be affected?",o:["Farmers, fish and villages downstream","Nobody","Only the factory","Only tourists"],a:0,why:"Many living things share the same river."},
- {t:"mcq",loi:1,c:"perspective",q:"Sharing resources fairly so everyone gets what they need is called:",o:["Fair (equitable) distribution","Pollution","Deforestation","Erosion"],a:0,why:"Equitable means fair to everyone."},
- {t:"mcq",loi:1,c:"connection",q:"The Chipko movement in Uttarakhand was about:",o:["Protecting trees by hugging them","Building dams","Mining coal","Growing rice"],a:0,why:"Villagers hugged trees to stop them being cut down."},
- {t:"mcq",loi:2,c:"responsibility",q:"The three Rs are:",o:["Reduce, Reuse, Recycle","Read, Write, Run","Rain, River, Rock","Repair, Rest, Return"],a:0,why:"Reduce first, then reuse, then recycle."},
- {t:"mcq",loi:2,c:"causation",q:"What is a likely result of cutting down large areas of forest?",o:["Soil erosion and animals losing their homes","More rain everywhere","More tigers","Cleaner air"],a:0,why:"Tree roots hold soil; forests are habitats."},
- {t:"mcq",loi:2,c:"responsibility",q:"Rainwater harvesting means:",o:["Collecting and storing rainwater to use later","Making it rain","Cleaning rivers","Drinking sea water"],a:0,why:"Stored rainwater can be used in dry months or to refill groundwater."},
- {t:"tf",loi:2,c:"causation",q:"Recycling an aluminium can uses much less energy than making a new can from raw materials.",a:true,why:"Recycling aluminium saves most of the energy needed to make it new."},
- {t:"mcq",loi:2,c:"responsibility",q:"Which is the BEST way to reduce waste?",o:["Avoid buying things you don’t need","Put everything in one bin","Burn the rubbish","Bury plastic"],a:0,why:"Reducing comes first: waste that is never made never has to be dealt with."},
- {t:"explain",loi:0,c:"form",q:"Explain the difference between renewable and non-renewable resources, with an example of each.",model:"Renewable resources can be replaced naturally in a short time (e.g. sunlight, wind, water, trees if replanted). Non-renewable resources take millions of years to form and will run out (e.g. coal, oil, natural gas)."},
- {t:"explain",loi:1,c:"perspective",q:"A new mine will create jobs but destroy part of a forest. Give two different points of view about it.",model:"e.g. A worker who needs a job may support the mine. A tribal family or an environmentalist may oppose it because it destroys homes, animals and trees. A good answer shows both sides."},
- {t:"explain",loi:2,c:"responsibility",q:"Plan two actions your class could take to save water at school. Explain how each helps.",model:"Any two sensible actions with reasons, e.g. turning off taps while washing hands, reporting leaking taps, collecting rainwater for plants, using leftover drinking water for plants."}
- ]}
-];
+/*@UNITS@*/
 
 /* =========================================================
    State and storage
    ========================================================= */
 const LS = "rishay-hub-v1";
-let S = {progress:{skills:{}, concepts:{}, daily:{}, updatedAt:0}, sessions:[], units:[], settings:{currentUnit:"ex-body", hidden:[], updatedAt:0}};
+let S = {progress:{skills:{}, concepts:{}, daily:{}, updatedAt:0}, sessions:[], units:[], settings:{currentUnit:"cs5-plants", hidden:[], updatedAt:0}};
 try { const x = JSON.parse(localStorage.getItem(LS)||"null"); if (x && x.progress) S = {...S, ...x}; } catch(e){}
 let db = null, sample = null;
 let chain = Promise.resolve(), saveT = null, dirtyProgress = false;
@@ -837,31 +747,31 @@ function subjectView(subj){
 function uoiView(){
   const units = allUnits(), u = currentUnit();
   const conceptRows = Object.keys(CONCEPTS).map(c=>{ const st=S.progress.concepts[c]; return `<div class="concept"><div class="row between"><b style="text-transform:capitalize">${c}</b><span class="q">${CONCEPTS[c]}</span></div>${meter(mastery(st),"uoi")}</div>`; }).join("");
-  return `<div class="shead"><div><div class="eyebrow">PYP · Transdisciplinary themes</div><h1><span class="dot d-uoi"></span>Unit of Inquiry</h1></div><button class="btn uoi" type="button" data-go="unitform">Add Rishay’s unit</button></div>
-  <section class="units" aria-label="Units">${units.map(x=>`<button class="unit" type="button" data-unit="${esc(x.id)}" aria-pressed="${u&&x.id===u.id}"><span class="th">${esc(x.theme)}</span><b>${esc(x.title)}</b><span class="small muted">${x.qs.length} questions${x.example?" · example unit":""}</span></button>`).join("")}</section>
+  return `<div class="shead"><div><div class="eyebrow">Cambridge Primary · Stage 5 Science</div><h1><span class="dot d-uoi"></span>Unit of Inquiry</h1></div><button class="btn uoi" type="button" data-go="unitform">Add Rishay’s unit</button></div>
+  <section class="units" aria-label="Units">${units.map(x=>`<button class="unit" type="button" data-unit="${esc(x.id)}" aria-pressed="${u&&x.id===u.id}"><span class="th">${esc(x.theme)}</span><b>${esc(x.title)}</b><span class="small muted">${x.qs.length} questions${x.builtin?" · Stage 5":""}</span></button>`).join("")}</section>
   ${u ? `<section class="card">
-    <div class="eyebrow">${esc(u.theme)}${u.example?" · example unit, replace with the school’s own":""}</div>
+    <div class="eyebrow">${esc(u.theme)}${u.builtin?" · Cambridge Primary Science, Stage 5":""}</div>
     <h2 style="font-size:26px;margin-top:4px">${esc(u.title)}</h2>
-    <p class="eyebrow" style="margin-top:12px">Central idea</p><p class="central">${esc(u.central)}</p>
+    <p class="eyebrow" style="margin-top:12px">Big idea</p><p class="central">${esc(u.central)}</p>
     <div class="row" style="margin:10px 0 4px"><button class="btn solid" type="button" data-unittest="${esc(u.id)}">Unit test · ${Math.min(20,u.qs.length)} questions</button><button class="btn uoi" type="button" data-unitquick="${esc(u.id)}">Quick quiz · 8 questions</button></div>
     ${u.qs.length ? "" : `<p class="note">This unit has no questions yet. Open the Parent tab to create them with Claude or add your own.</p>`}
     <h3 style="font-size:18px;margin-top:16px">Lines of inquiry</h3>
     <div class="list">${uoiSkills(u).map(s=>`<div class="li"><div><div class="nm">${esc(s.name)}</div><div class="ds">${u.qs.filter(q=>(q.loi||0)===s.loi).length} questions</div></div>${meter(mastery(stat(s.id)),"uoi")}${chip(stat(s.id))}<button class="btn sm uoi" type="button" data-practise="${esc(s.id)}" ${u.qs.some(q=>(q.loi||0)===s.loi)?"":"disabled"}>Practise</button></div>`).join("")}</div>
-    ${u.concepts && u.concepts.length ? `<h3 style="font-size:18px;margin-top:16px">Key concepts in this unit</h3><div class="vocab">${u.concepts.map(c=>`<span style="text-transform:capitalize">${esc(c)}: ${esc(CONCEPTS[c]||"")}</span>`).join("")}</div>`:""}
+    ${u.concepts && u.concepts.length ? `<h3 style="font-size:18px;margin-top:16px">Ways of thinking in this unit</h3><div class="vocab">${u.concepts.map(c=>`<span style="text-transform:capitalize">${esc(c)}: ${esc(CONCEPTS[c]||"")}</span>`).join("")}</div>`:""}
     ${u.vocab && u.vocab.length ? `<h3 style="font-size:18px;margin-top:16px">Vocabulary</h3><div class="vocab">${u.vocab.map(v=>`<span>${esc(v)}</span>`).join("")}</div>`:""}
   </section>` : `<section class="card"><p>No units yet. Add Rishay’s current unit to begin.</p></section>`}
-  <section class="card"><h3 style="font-size:18px">Key concepts across all units</h3><p class="small muted" style="margin:2px 0 10px">PYP key concepts, measured from every Unit of Inquiry answer.</p><div class="concepts">${conceptRows}</div></section>`;
+  <section class="card"><h3 style="font-size:18px">Ways of thinking across all units</h3><p class="small muted" style="margin:2px 0 10px">Every unit question is tagged with the kind of thinking it needs, so you can see whether Rishay can describe, explain causes or apply ideas.</p><div class="concepts">${conceptRows}</div></section>`;
 }
 
 function unitFormView(){
   return `<div class="shead"><div><div class="eyebrow">Parent</div><h1><span class="dot d-uoi"></span>Add a unit of inquiry</h1></div><button class="btn" type="button" data-go="uoi">Cancel</button></div>
   <section class="card"><form class="form" id="unitForm">
     <p class="note">Copy these from the unit planner or the letter the school sends home. The more detail you give, the better the questions.</p>
-    <label>Transdisciplinary theme<select id="uf-theme">${THEMES.map(t=>`<option>${t}</option>`).join("")}</select></label>
+    <label>Area<select id="uf-theme">${THEMES.map(t=>`<option>${t}</option>`).join("")}</select></label>
     <label>Unit title<input id="uf-title" required placeholder="e.g. Systems in nature"></label>
-    <label>Central idea<textarea id="uf-central" required placeholder="e.g. Ecosystems are made of interdependent living and non-living things."></textarea></label>
+    <label>Big idea or central idea<textarea id="uf-central" required placeholder="e.g. Ecosystems are made of interdependent living and non-living things."></textarea></label>
     <label>Lines of inquiry (one per line)<textarea id="uf-lois" required placeholder="The structure of ecosystems&#10;How living things depend on each other&#10;How human actions affect ecosystems"></textarea></label>
-    <div><b class="small">Key concepts</b><div class="checks">${Object.keys(CONCEPTS).map(c=>`<label><input type="checkbox" value="${c}" class="uf-c"> <span style="text-transform:capitalize">${c}</span></label>`).join("")}</div></div>
+    <div><b class="small">Ways of thinking to test</b><div class="checks">${Object.keys(CONCEPTS).map(c=>`<label><input type="checkbox" value="${c}" class="uf-c"> <span style="text-transform:capitalize">${c}</span></label>`).join("")}</div></div>
     <label>Vocabulary (separate with commas)<input id="uf-vocab" placeholder="ecosystem, producer, consumer, decomposer, habitat"></label>
     <label>What has been taught so far (optional)<textarea id="uf-notes" placeholder="Topics, books, field trips, experiments, facts the class has covered…"></textarea></label>
     <div class="row">
@@ -904,14 +814,14 @@ function unitManager(){
   const u = unitById(view.manage) || currentUnit();
   return `<section class="card"><div class="row between"><h3 style="font-size:19px">Units of inquiry</h3><button class="btn sm uoi" type="button" data-go="unitform">Add a unit</button></div>
   <div class="table-wrap" style="margin-top:8px"><table><thead><tr><th>Unit</th><th>Theme</th><th class="num">Questions</th><th></th></tr></thead><tbody>
-  ${[...EX_UNITS, ...S.units].map(x=>{ const hidden=S.settings.hidden.includes(x.id); return `<tr><td class="wrap"><b>${esc(x.title)}</b>${x.example?` <span class="muted small">example</span>`:""}${S.settings.currentUnit===x.id?` <span class="chip secure">● Current</span>`:""}</td><td>${esc(x.theme)}</td><td class="num">${x.qs.length}</td><td><div class="row">
+  ${[...EX_UNITS, ...S.units].map(x=>{ const hidden=S.settings.hidden.includes(x.id); return `<tr><td class="wrap"><b>${esc(x.title)}</b>${x.builtin?` <span class="muted small">Cambridge Stage 5</span>`:""}${S.settings.currentUnit===x.id?` <span class="chip secure">● Current</span>`:""}</td><td>${esc(x.theme)}</td><td class="num">${x.qs.length}</td><td><div class="row">
     ${!hidden?`<button class="btn sm" type="button" data-setcur="${esc(x.id)}">Make current</button><button class="btn sm" type="button" data-manage="${esc(x.id)}">Questions</button>`:""}
-    ${x.example?`<button class="btn sm" type="button" data-hide="${esc(x.id)}">${hidden?"Show":"Hide"}</button>`:`<button class="btn sm danger" type="button" data-delunit="${esc(x.id)}">Delete</button>`}</div></td></tr>`; }).join("")}
+    ${x.builtin?`<button class="btn sm" type="button" data-hide="${esc(x.id)}">${hidden?"Show":"Hide"}</button>`:`<button class="btn sm danger" type="button" data-delunit="${esc(x.id)}">Delete</button>`}</div></td></tr>`; }).join("")}
   </tbody></table></div>
   ${u ? `<div style="margin-top:14px"><h4 style="font-size:17px">Questions in “${esc(u.title)}”</h4>
-    ${!u.example ? `<div class="row" style="margin:8px 0">${sample?`<button class="btn sm uoi" type="button" data-genmore="${esc(u.id)}">Create 10 more with Claude</button>`:""}<span class="status" id="gen-msg"></span></div>`:""}
-    <div class="qlist">${u.qs.map((q,i)=>`<div class="qi"><div><b>${q.t==="explain"?"Written":q.t==="tf"?"True/false":"Choice"}</b> · <span class="muted">LOI ${(q.loi||0)+1} · ${esc(q.c||"")}</span><br>${esc(q.q)}${q.t==="mcq"?`<br><span class="muted">✓ ${esc(q.o[q.a])}</span>`:q.t==="tf"?`<br><span class="muted">✓ ${q.a?"True":"False"}</span>`:""}</div>${u.example?"":`<button class="btn sm danger" type="button" data-delq="${esc(u.id)}|${i}">Remove</button>`}</div>`).join("") || `<p class="small muted">No questions yet.</p>`}</div>
-    ${u.example ? `<p class="small muted" style="margin-top:8px">Example units are built in and can’t be edited. Add your own unit to write questions.</p>` : manualQForm(u)}
+    ${!u.builtin ? `<div class="row" style="margin:8px 0">${sample?`<button class="btn sm uoi" type="button" data-genmore="${esc(u.id)}">Create 10 more with Claude</button>`:""}<span class="status" id="gen-msg"></span></div>`:""}
+    <div class="qlist">${u.qs.map((q,i)=>`<div class="qi"><div><b>${q.t==="explain"?"Written":q.t==="tf"?"True/false":"Choice"}</b> · <span class="muted">LOI ${(q.loi||0)+1} · ${esc(q.c||"")}</span><br>${esc(q.q)}${q.t==="mcq"?`<br><span class="muted">✓ ${esc(q.o[q.a])}</span>`:q.t==="tf"?`<br><span class="muted">✓ ${q.a?"True":"False"}</span>`:""}</div>${u.builtin?"":`<button class="btn sm danger" type="button" data-delq="${esc(u.id)}|${i}">Remove</button>`}</div>`).join("") || `<p class="small muted">No questions yet.</p>`}</div>
+    ${u.builtin ? `<p class="small muted" style="margin-top:8px">Built-in Stage 5 units can’t be edited. Add your own unit to write extra questions.</p>` : manualQForm(u)}
   </div>` : ""}
   </section>`;
 }
@@ -978,7 +888,7 @@ async function doCheck(){
     if(sample){
       quiz.busy = true; render();
       try{
-        const r = await sample.json(`You are a kind Grade 5 (IB PYP) teacher checking a student's short written answer for a Unit of Inquiry quiz. Judge only whether the main ideas are there, not spelling.
+        const r = await sample.json(`You are a kind Cambridge Primary Stage 5 teacher checking a student's short written answer for a science or inquiry quiz. Judge only whether the main ideas are there, not spelling.
 
 Question: ${stripHtml(q.prompt)}
 Model answer: ${q.model}
@@ -1103,10 +1013,10 @@ async function generateQuestions(u, n, msgEl, btn){
   if(btn) btn.disabled = true;
   if(msgEl) msgEl.textContent = "Claude is writing questions. This takes about a minute…";
   const existing = u.qs.map(q=>q.q).slice(0,60).join("\n");
-  const prompt = `You write assessment questions for an IB PYP Grade 5 student (age 10) in India, to test real understanding of a Unit of Inquiry, not just recall.
+  const prompt = `You write assessment questions for a Cambridge Primary Stage 5 (Class 5, age 10) student in India, to test real understanding of a school unit, not just recall. Match the Cambridge Primary Stage 5 curriculum level.
 
 Unit
-Transdisciplinary theme: ${u.theme}
+Subject area: ${u.theme}
 Title: ${u.title}
 Central idea: ${u.central}
 Lines of inquiry (index: text):
@@ -1115,7 +1025,7 @@ Key concepts: ${(u.concepts||[]).join(", ") || "choose suitable ones"}
 Vocabulary: ${(u.vocab||[]).join(", ") || "(none given)"}
 What has been taught: ${u.notes || "(not given)"}
 ${existing ? `\nAlready in the bank, do not repeat:\n${existing}\n` : ""}
-Write exactly ${n} new questions, spread evenly across the lines of inquiry. Mix: about 60% multiple choice (4 options, one clearly correct, plausible wrong options), 20% true/false, 20% written answers that ask the student to explain, compare, give an example or take a perspective. Tag each with one PYP key concept from: form, function, causation, change, connection, perspective, responsibility. Keep facts accurate and age-appropriate; use Indian examples where natural. Keep each question under 30 words.
+Write exactly ${n} new questions, spread evenly across the lines of inquiry. Mix: about 60% multiple choice (4 options, one clearly correct, plausible wrong options), 20% true/false, 20% written answers that ask the student to explain, compare, give an example or take a perspective. Tag each with one way of thinking from: form, function, causation, change, connection, perspective, responsibility. Keep facts accurate and age-appropriate; use Indian examples where natural. Keep each question under 30 words.
 
 Reply with only a JSON array. Each item is one of:
 {"t":"mcq","loi":0,"c":"function","q":"question","o":["correct option","wrong","wrong","wrong"],"a":0,"why":"one-sentence explanation"}
