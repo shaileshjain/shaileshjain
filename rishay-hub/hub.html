@@ -198,6 +198,10 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 .fb .model{margin-top:8px;background:var(--soft);border-radius:8px;padding:8px 12px}
 .qactions{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
 
+details{border-top:1px solid var(--line);padding:8px 0}
+details summary{cursor:pointer}
+.bigword{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:.04em}
+.bigword mark{background:transparent;color:var(--eng);text-decoration:underline 3px;text-underline-offset:4px}
 /* results */
 .score{font-family:var(--font-display);font-size:64px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
 .review{display:flex;flex-direction:column;gap:10px}
@@ -773,6 +777,411 @@ vocab:[["‘Steep’ means:",["rising sharply","flat","wide","dark"],0],["‘Hom
 short:[["Write two things Arnav enjoyed at camp.","Trekking to the waterfall, singing around the campfire, seeing the stars, or making a new friend (any two)."],["Why do you think Arnav could see more stars in Manali than in Delhi?","Manali has clean air and few bright lights, while a big city like Delhi has lots of lights and pollution that hide the stars."]]}
 ];
 
+// Spelling bee words: [word, meaning, sentence that uses the word]. Levels 1–3.
+const BEE = [
+[
+["answer","something you say or write in reply to a question","Write your answer in the box."],
+["believe","to think that something is true","I believe you are telling the truth."],
+["breathe","to take air into your lungs and let it out","Breathe in slowly through your nose."],
+["build","to make something by putting parts together","We will build a sandcastle on the beach."],
+["busy","having a lot of things to do","Mum is busy cooking dinner."],
+["calendar","a chart showing the days, weeks and months of a year","Mark the holiday on the calendar."],
+["caught","the past tense of catch","Rishay caught the ball with one hand."],
+["certain","completely sure","I am certain I locked the door."],
+["complete","to finish something","Please complete your homework before dinner."],
+["decide","to make a choice","You must decide which book to borrow."],
+["describe","to say what something is like","Describe your favourite place in three sentences."],
+["different","not the same","The twins wear different coloured shirts."],
+["difficult","hard to do or understand","The last puzzle was very difficult."],
+["enough","as much as is needed","Do we have enough chairs for everyone?"],
+["entrance","the door or gate where you go in","Meet me at the main entrance of the zoo."],
+["exercise","physical activity that keeps you fit","Daily exercise keeps your heart healthy."],
+["favourite","liked more than all the others","Mango is my favourite fruit."],
+["February","the second month of the year","My cousin’s birthday is in February."],
+["forward","towards the front","Take one step forward."],
+["friend","a person you know well and like","My best friend lives next door."],
+["guard","to protect or watch over","A dog may guard the house at night."],
+["guess","to give an answer without being sure","Can you guess what is in the box?"],
+["height","how tall something is","The nurse measured my height."],
+["heard","the past tense of hear","We heard thunder in the distance."],
+["important","having great value or meaning","It is important to drink enough water."],
+["island","land with water all around it","Majuli is a river island in Assam."],
+["knowledge","what you know or have learnt","Reading books increases your knowledge."],
+["library","a place where books are kept for people to borrow","I borrowed two books from the library."],
+["minute","sixty seconds","Wait here for a minute."],
+["neighbour","a person who lives next to you","Our neighbour waters our plants when we travel."],
+["notice","to see or become aware of something","Did you notice the new painting in the hall?"],
+["often","many times","We often play cricket after school."],
+["opposite","completely different","Hot is the opposite of cold."],
+["people","men, women and children","Many people came to watch the parade."],
+["possible","able to happen or be done","Is it possible to finish by six?"],
+["question","a sentence that asks something","Raise your hand if you have a question."],
+["quarter","one of four equal parts","Cut the apple into a quarter for each of us."],
+["remember","to keep something in your mind","Remember to bring your water bottle."],
+["special","different from what is usual, in a good way","Today is a special day for our family."],
+["straight","not bent or curved","Draw a straight line with a ruler."],
+["strength","the quality of being strong","Lifting weights builds strength."],
+["surprise","something you did not expect","The party was a big surprise for Dadi."],
+["thought","an idea; the past tense of think","I thought the film was funny."],
+["through","in at one side and out of the other","The train went through a long tunnel."],
+["weight","how heavy something is","The weight of the bag is two kilograms."],
+["woman","an adult female person","The woman at the counter gave us our tickets."],
+["young","not old","The young puppy chased its tail."]
+],
+[
+["accident","something bad that happens by chance","He broke the glass by accident."],
+["address","the details of where someone lives","Write your address on the envelope."],
+["appear","to come into sight","Stars appear in the sky at night."],
+["awkward","clumsy or uncomfortable","There was an awkward silence after the joke."],
+["beginning","the start of something","The beginning of the story was exciting."],
+["bruise","a dark mark on the skin after a knock","I got a bruise when I fell off my bike."],
+["category","a group of things that are alike","Sort the animals into the right category."],
+["ceiling","the inside top surface of a room","A fan hangs from the ceiling."],
+["committee","a group of people chosen to plan or decide things","The school committee planned Sports Day."],
+["community","the people who live in one area","Our community cleaned the park together."],
+["curiosity","a strong wish to know or learn","Curiosity makes scientists ask questions."],
+["definite","certain; clearly decided","We need a definite answer by Friday."],
+["desperate","ready to try anything because there is little hope","The thirsty traveller was desperate for water."],
+["dictionary","a book that lists words and their meanings","Look up the word in the dictionary."],
+["disastrous","very bad; causing great damage","The flood was disastrous for the farmers."],
+["embarrass","to make someone feel shy or ashamed","Please don’t embarrass me in front of my friends."],
+["environment","the natural world around us","We must protect the environment."],
+["equipment","the tools needed for an activity","The cricket equipment is kept in the store room."],
+["especially","more than usual; particularly","I love fruit, especially mangoes."],
+["exaggerate","to make something sound bigger or better than it really is","Don’t exaggerate; the fish wasn’t that big!"],
+["excellent","very good","You did an excellent job on your project."],
+["explanation","words that make something clear","The teacher gave a clear explanation of fractions."],
+["familiar","well known to you","Her face looks familiar."],
+["foreign","from another country","She can speak two foreign languages."],
+["government","the group of people who run a country","The government built a new hospital."],
+["guarantee","a promise that something will happen","There is no guarantee that it will rain."],
+["identity","who or what someone is","Show your identity card at the gate."],
+["immediately","at once; without delay","Come here immediately!"],
+["interrupt","to stop someone while they are speaking","It is rude to interrupt."],
+["language","the words people use to speak and write","Tamil is a very old language."],
+["leisure","free time for rest or fun","Reading is my favourite leisure activity."],
+["marvellous","wonderful","We had a marvellous time at the fair."],
+["mischievous","playful in a naughty way","The mischievous monkey stole my banana."],
+["necessary","needed; must be done","Is it necessary to bring an umbrella?"],
+["nuisance","something annoying","The mosquitoes were a real nuisance."],
+["occasion","a special event or time","Diwali is a happy occasion."],
+["opportunity","a good chance to do something","The trip is a great opportunity to learn."],
+["parliament","the group of elected people who make a country’s laws","Parliament meets in New Delhi."],
+["persuade","to make someone agree by giving reasons","Can you persuade Dad to buy ice cream?"],
+["physical","to do with the body","Physical activity keeps us healthy."],
+["recommend","to suggest something as good","I recommend this book to everyone."],
+["restaurant","a place where you buy and eat meals","We had dinner at a South Indian restaurant."],
+["rhythm","a regular, repeated pattern of sounds","Clap to the rhythm of the music."],
+["separate","to move apart; not joined","Separate the egg yolk from the white."],
+["sincerely","truly and honestly","I sincerely hope you feel better soon."],
+["temperature","how hot or cold something is","The temperature dropped at night."],
+["thorough","careful and complete","Give the room a thorough clean."],
+["vegetable","a plant or part of a plant eaten as food","Carrot is my favourite vegetable."],
+["yacht","a sailing boat used for racing or holidays","A white yacht sailed into the harbour."]
+],
+[
+["accommodate","to have enough room for","The hall can accommodate two hundred people."],
+["acquaintance","a person you know slightly","He is an acquaintance from my swimming class."],
+["aggressive","ready to attack or argue","The aggressive dog barked at strangers."],
+["amateur","someone who does something for fun, not as a job","He is an amateur photographer."],
+["apparent","clear; easy to see","It was apparent that she was tired."],
+["bargain","something bought for less than its usual price","The shoes were a bargain at half price."],
+["bouquet","a bunch of flowers","She gave her teacher a bouquet of roses."],
+["camouflage","colours or patterns that help something blend in","A chameleon uses camouflage to hide."],
+["catastrophe","a sudden, terrible event","The earthquake was a catastrophe."],
+["conscience","the feeling inside you that tells right from wrong","My conscience told me to return the money."],
+["conscientious","careful to do things well and properly","She is a conscientious student who never misses homework."],
+["controversy","a big public disagreement","The new rule caused a lot of controversy."],
+["criticise","to point out what is wrong with something","It is easy to criticise but hard to help."],
+["deterrent","something that stops people from doing something","The tall fence is a deterrent to thieves."],
+["entrepreneur","a person who starts their own business","The young entrepreneur opened a bakery."],
+["exhausted","very tired","After the marathon, the runners were exhausted."],
+["fascinate","to interest someone very much","Volcanoes fascinate me."],
+["hindrance","something that gets in the way","The heavy bag was a hindrance on the climb."],
+["hygiene","keeping yourself and things clean to stay healthy","Good hygiene stops germs spreading."],
+["independent","free; not needing help from others","India became independent in 1947."],
+["irresistible","too tempting to say no to","The smell of fresh jalebis was irresistible."],
+["jewellery","rings, necklaces, bangles and similar things","Grandma keeps her jewellery in a wooden box."],
+["lightning","a flash of light in the sky during a storm","Lightning lit up the whole sky."],
+["maintenance","the work of keeping something in good condition","The lift is closed for maintenance."],
+["millennium","a period of one thousand years","The year 2000 began a new millennium."],
+["miniature","very small; a tiny copy","He collects miniature cars."],
+["occasionally","sometimes, but not often","We occasionally eat out on Sundays."],
+["occurrence","something that happens","Snow in Chennai would be a rare occurrence."],
+["onomatopoeia","a word that sounds like what it describes","‘Buzz’ is an example of onomatopoeia."],
+["parallel","always the same distance apart and never meeting","Railway tracks are parallel."],
+["pharmacy","a shop that sells medicines","Buy the cough syrup from the pharmacy."],
+["privilege","a special right or advantage","It is a privilege to meet the President."],
+["pronunciation","the way a word is said","Check the pronunciation in the dictionary."],
+["questionnaire","a set of written questions used to collect information","Please fill in this questionnaire."],
+["receipt","a paper that shows you have paid","Keep the receipt in case you return the shirt."],
+["rehearsal","a practice before a performance","The dance rehearsal is at four o’clock."],
+["sacrifice","giving up something you value for something more important","Freedom fighters made a great sacrifice for India."],
+["scissors","a tool with two blades for cutting","Cut along the line with scissors."],
+["silhouette","a dark shape against a lighter background","We saw the silhouette of a camel at sunset."],
+["sufficient","enough","Is there sufficient food for everyone?"],
+["surveillance","careful watching, often by guards or cameras","The bank is under camera surveillance."],
+["symmetrical","having two halves that match exactly","A butterfly’s wings are symmetrical."],
+["thoroughly","completely and carefully","Wash the vegetables thoroughly."],
+["tongue","the part of your mouth that you taste with","The doctor asked me to stick out my tongue."],
+["vacuum","a space with no air in it","Sound cannot travel through a vacuum."],
+["vicious","cruel or violent","The vicious storm tore the roof off the shed."],
+["Wednesday","the day after Tuesday","We have art class every Wednesday."]
+]
+];
+// American spellings accepted as correct, with a note about the British (Cambridge) spelling.
+const BEE_ALT = {favourite:"favorite", neighbour:"neighbor", marvellous:"marvelous", jewellery:"jewelry", criticise:"criticize"};
+
+// Synonyms: [word, meaning, [synonyms], antonym or "", sentence using the word, level]
+const SYN = [
+["big","large in size",["large","huge","enormous"],"small","They live in a big house near the lake.",1],
+["small","little in size",["little","tiny","miniature"],"big","A small bird sat on the window.",1],
+["happy","feeling pleased",["glad","cheerful","joyful"],"sad","Rishay was happy with his test result.",1],
+["sad","feeling unhappy",["unhappy","gloomy","miserable"],"happy","The sad puppy waited by the door.",1],
+["fast","moving quickly",["quick","rapid","swift"],"slow","The cheetah is a fast runner.",1],
+["begin","to start",["start","commence","launch"],"end","The match will begin at ten.",1],
+["end","to finish",["finish","complete","conclude"],"begin","The film will end at nine.",1],
+["angry","feeling cross",["cross","furious","annoyed"],"calm","Dad was angry when the vase broke.",1],
+["smart","clever",["clever","intelligent","bright"],"foolish","The smart crow dropped pebbles into the pot.",1],
+["brave","not afraid",["courageous","bold","fearless"],"cowardly","The brave firefighter saved the cat.",1],
+["scared","afraid",["afraid","frightened","terrified"],"fearless","The kitten was scared of the thunder.",1],
+["quiet","making little noise",["silent","hushed","soundless"],"noisy","The library is a quiet place.",1],
+["easy","not difficult",["simple","effortless","straightforward"],"difficult","The first question was easy.",1],
+["hard","difficult",["difficult","tough","challenging"],"easy","The maths puzzle was hard.",1],
+["rich","having a lot of money",["wealthy","well-off","prosperous"],"poor","The rich merchant built a temple.",1],
+["shout","to call out loudly",["yell","scream","bellow"],"whisper","Don’t shout in the classroom.",1],
+["tired","needing rest",["sleepy","weary","exhausted"],"energetic","After the hike we were tired.",1],
+["funny","making you laugh",["amusing","hilarious","comical"],"serious","Grandpa told a funny story.",1],
+["kind","caring towards others",["caring","gentle","thoughtful"],"cruel","Our kind neighbour shares her mangoes.",1],
+["pretty","nice to look at",["beautiful","lovely","attractive"],"ugly","She wore a pretty dress.",1],
+["old","having lived for a long time",["elderly","aged","ancient"],"young","An old man sat on the bench.",1],
+["cold","low in temperature",["chilly","freezing","icy"],"hot","It is cold in Shimla in December.",1],
+["help","to make things easier for someone",["assist","aid","support"],"hinder","Please help me carry these books.",1],
+["jump","to push yourself up into the air",["leap","hop","spring"],"","The frog will jump into the pond.",1],
+["look","to use your eyes to see something",["see","watch","gaze"],"ignore","Look at the rainbow!",1],
+["enormous","very big",["huge","gigantic","massive"],"tiny","An enormous elephant blocked the road.",2],
+["tiny","very small",["minute","miniature","little"],"enormous","A tiny ant carried a crumb.",2],
+["reply","to answer",["answer","respond","retort"],"ask","Please reply to my letter soon.",2],
+["famous","known by many people",["well-known","renowned","celebrated"],"unknown","Sachin Tendulkar is a famous cricketer.",2],
+["damp","slightly wet",["moist","wet","soggy"],"dry","Wipe the table with a damp cloth.",2],
+["gather","to bring together",["collect","assemble","accumulate"],"scatter","Gather the leaves into a pile.",2],
+["mend","to fix",["repair","fix","restore"],"break","Can you mend my torn shirt?",2],
+["precious","very valuable",["valuable","treasured","priceless"],"worthless","Water is a precious resource.",2],
+["weary","very tired",["tired","exhausted","fatigued"],"energetic","The weary travellers rested under a tree.",2],
+["furious","very angry",["enraged","livid","fuming"],"calm","The farmer was furious when goats ate his crops.",2],
+["timid","shy and easily frightened",["shy","nervous","bashful"],"bold","The timid deer ran into the forest.",2],
+["vanish","to disappear suddenly",["disappear","fade","evaporate"],"appear","The magician made the coin vanish.",2],
+["ill","not well",["sick","unwell","poorly"],"healthy","Riya stayed home because she was ill.",2],
+["error","a mistake",["mistake","fault","blunder"],"","There is an error in your sum.",2],
+["strange","unusual",["odd","peculiar","weird"],"ordinary","We heard a strange noise in the attic.",2],
+["fortunate","lucky",["lucky","blessed","favoured"],"unfortunate","We were fortunate to get the last seats.",2],
+["conceal","to hide",["hide","cover","disguise"],"reveal","He tried to conceal the broken toy behind his back.",2],
+["cautious","careful to avoid danger",["careful","wary","alert"],"careless","Be cautious when crossing the road.",2],
+["dull","boring; not interesting",["boring","dreary","tedious"],"exciting","The long speech was dull.",2],
+["eager","keen to do something",["keen","enthusiastic","willing"],"reluctant","The children were eager to open their gifts.",2],
+["fragile","easily broken",["delicate","breakable","flimsy"],"sturdy","Handle the glass bowl carefully; it is fragile.",2],
+["generous","happy to give or share",["giving","charitable","unselfish"],"selfish","Our generous teacher bought us snacks.",2],
+["journey","a trip from one place to another",["trip","voyage","expedition"],"","The journey to Goa took ten hours.",2],
+["observe","to watch carefully",["watch","notice","examine"],"ignore","Observe how the caterpillar moves.",2],
+["hurry","to move quickly",["rush","hasten","dash"],"dawdle","Hurry, or we will miss the bus!",2],
+["abundant","more than enough",["plentiful","ample","copious"],"scarce","Fish are abundant in this river.",3],
+["scarce","in short supply",["rare","scant","sparse"],"abundant","Water is scarce in the desert.",3],
+["diligent","hard-working and careful",["hard-working","industrious","conscientious"],"lazy","The diligent student revised every evening.",3],
+["anxious","worried",["worried","nervous","uneasy"],"calm","I felt anxious before the exam.",3],
+["courteous","polite",["polite","respectful","gracious"],"rude","The courteous waiter smiled at us.",3],
+["peculiar","strange",["strange","odd","unusual"],"normal","The milk had a peculiar smell.",3],
+["vast","very large in area",["immense","extensive","boundless"],"tiny","The Thar is a vast desert.",3],
+["prosper","to be successful",["thrive","flourish","succeed"],"fail","The village began to prosper after the new well was dug.",3],
+["hostile","unfriendly",["unfriendly","aggressive","antagonistic"],"friendly","The hostile crowd booed the referee.",3],
+["reluctant","unwilling",["unwilling","hesitant","unenthusiastic"],"eager","He was reluctant to jump into the cold pool.",3],
+["ponder","to think deeply",["consider","reflect","contemplate"],"ignore","She paused to ponder the riddle.",3],
+["astonish","to surprise greatly",["amaze","astound","stun"],"bore","The magician’s trick will astonish you.",3],
+["feeble","very weak",["weak","frail","faint"],"strong","The feeble kitten needed milk.",3],
+["gloomy","dark or sad",["dismal","dreary","bleak"],"cheerful","It was a gloomy, rainy morning.",3],
+["humble","not proud",["modest","unassuming","meek"],"arrogant","Despite winning, she stayed humble.",3],
+["inquisitive","curious",["curious","questioning","nosy"],"uninterested","The inquisitive child asked a hundred questions.",3],
+["meagre","very small in amount",["scanty","measly","insufficient"],"plentiful","The traveller had a meagre meal of dry bread.",3],
+["obstinate","stubborn",["stubborn","headstrong","inflexible"],"flexible","The obstinate donkey refused to move.",3],
+["radiant","shining brightly; glowing with happiness",["glowing","shining","beaming"],"dull","The bride had a radiant smile.",3],
+["serene","calm and peaceful",["peaceful","tranquil","placid"],"chaotic","The lake looked serene at dawn.",3],
+["tremendous","very great",["immense","colossal","mighty"],"slight","The crowd made a tremendous noise.",3],
+["vivid","bright and clear",["colourful","striking","brilliant"],"dull","She painted a vivid sunset.",3],
+["commence","to begin",["begin","start","initiate"],"conclude","The ceremony will commence at noon.",3],
+["cease","to stop",["stop","halt","discontinue"],"continue","The rain will cease by evening.",3],
+["elated","extremely happy",["overjoyed","thrilled","ecstatic"],"miserable","The team was elated after winning the cup.",3],
+["famished","very hungry",["starving","ravenous","hungry"],"full","After the trek we were famished.",3],
+["perilous","very dangerous",["dangerous","hazardous","risky"],"safe","The climb up the cliff was perilous.",3],
+["resilient","able to recover quickly from difficulty",["tough","hardy","adaptable"],"fragile","The resilient plant grew back after the storm.",3]
+];
+
+// ---- MaRRS International Spelling Bee, Level 4 ("Words Worth I") — Rishay's school study booklet ----
+const MARRS = {
+ // I. Find the correctly spelt words. [four words as printed, indices spelt correctly, indices accepted either way]
+ correct: [
+  [["percieve","tactics","talkative","appaling"],[1,2]],
+  [["closat","generous","aquire","occurrence"],[1,3]],
+  [["channal","cureous","dazzling","commision"],[2]],
+  [["chimmney","audience","fascinated","comission"],[1,2]],
+  [["devide","chisal","gigantic","desease"],[2]],
+  [["parcal","aggressive","mascular","collegue"],[1]],
+  [["prestigious","agreeable","enviroment","receive"],[0,1,3]],
+  [["supress","vacency","countless","compell"],[2]],
+  [["eppisode","obidient","coincidence","cumputer"],[2]],
+  [["exposure","biogrophay","acceptable","accordance"],[0,2,3]],
+  [["reluctant","achive","accommodate","wierd"],[0,2]],
+  [["heritege","discipline","belive","therapeutic"],[1,3]],
+  [["akward","bayonat","cemetery","emphatic"],[2,3]],
+  [["staggered","guarantee","embarrased","strech"],[0,1]],
+  [["miniscule","tapestry","existence","supress"],[1,2],[0]],
+  [["reasonable","constellation","obstacales","turbulant"],[0,1]],
+  [["operater","extremely","disturbence","continantel"],[1]],
+  [["concenterate","disolved","perpetual","sampels"],[2]],
+  [["comfert","utansils","incidant","staggered"],[3]],
+  [["scoundrel","perpetual","audience","disinfectent"],[0,1,2]]
+ ],
+ fix: {percieve:"perceive",appaling:"appalling",closat:"closet",aquire:"acquire",channal:"channel",cureous:"curious",commision:"commission",chimmney:"chimney",comission:"commission",devide:"divide",chisal:"chisel",desease:"disease",parcal:"parcel",mascular:"muscular",collegue:"colleague",enviroment:"environment",supress:"suppress",vacency:"vacancy",compell:"compel",eppisode:"episode",obidient:"obedient",cumputer:"computer",biogrophay:"biography",achive:"achieve",wierd:"weird",heritege:"heritage",belive:"believe",akward:"awkward",bayonat:"bayonet",embarrased:"embarrassed",strech:"stretch",miniscule:"minuscule",obstacales:"obstacles",turbulant:"turbulent",operater:"operator",disturbence:"disturbance",continantel:"continental",concenterate:"concentrate",disolved:"dissolved",sampels:"samples",comfert:"comfort",utansils:"utensils",incidant:"incident",disinfectent:"disinfectant"},
+ // II. Anagrams: [given word, clue, answer]
+ anagram: [
+  ["eastern","very serious and sincere","earnest"],
+  ["starlet","to surprise somebody suddenly in a way that slightly shocks or frightens them","startle"],
+  ["startle","a young female actor who is thought likely to be famous in the future","starlet"],
+  ["percussion","faster than the speed of sound","supersonic"],
+  ["artist","a narrow passage of water that connects two seas or large areas of water","strait"],
+  ["hatred","a supply that is not large enough","dearth"],
+  ["detail","to become larger","dilate"],
+  ["remote","a piece of rock from space that produces a bright light as it travels through the atmosphere","meteor"],
+  ["please","(of time) to go past","elapse"],
+  ["rental","one of the two branched horns that grow on the head of a male deer","antler"],
+  ["stance","the act of climbing or moving up","ascent"],
+  ["bustle","not very obvious or easy to notice","subtle"],
+  ["nectar","a state between sleeping and waking in which a person does not move but can hear what is said","trance"],
+  ["trade","to put your foot on something","tread"],
+  ["lament","a covering, or a layer of something that covers a surface","mantle"],
+  ["mutilate","most extreme, important or final","ultimate"],
+  ["tinsel","to join (for example, the army)","enlist"],
+  ["sector","to go with somebody to protect or guard them, or to show them the way","escort"],
+  ["forest","to encourage the development or growth of ideas or feelings","foster"],
+  ["recuse","to save someone or something from a dangerous situation","rescue"]
+ ],
+ // III. Match the meaning to the word: ten sets of [word, meaning]; the sixth word in each set was the extra option
+ match: [
+  [["nefarious","wicked and immoral"],["colossal","very large"],["castigate","to criticise someone or something severely"],["largesse","generosity, especially with money"],["cistern","a tank that stores the water supply for a building"],["marinate","to soak food in a sauce before cooking it"]],
+  [["simmer","to cook something at or just below boiling point"],["chastise","to scold or criticise someone severely"],["shin","the front part of the leg between the knee and the foot"],["taint","to spoil something; a trace of something bad"],["cede","to give up land or power, often because of military or political pressure"],["ascot","a wide scarf-like tie worn around the neck"]],
+  [["loathe","to hate someone or something"],["lustre","the brightness that a shiny surface has"],["gabber","someone who talks continuously and eagerly"],["balaclava","a closely fitting covering for the head and neck"],["sheen","a soft shine on a smooth surface"],["putrid","rotten and smelling very bad"]],
+  [["keen","eager; wanting to do something"],["impair","to spoil something or make it weaker"],["taunt","to say unkind or insulting things to upset someone"],["adulterate","to make food or drink less pure by adding another substance to it"],["pungent","smelling or tasting very strong and sharp"],["lavish","rich, expensive or very generous"]],
+  [["calibrate","to mark units on a measuring instrument so that it measures accurately"],["scourge","something that causes great suffering or a lot of trouble"],["pneumatic","operated by air pressure"],["catastrophe","a sudden event that causes great trouble or destruction"],["blemish","a mark or fault that spoils something, such as a fault in someone’s character"],["mesmerise","to hold someone’s attention completely"]],
+  [["sinuous","curving and twisting gracefully while moving"],["cease","to stop happening"],["culminate","to end at a particular point, often the highest point"],["reluctant","not willing to do something"],["sift","to put through a sieve to remove large pieces or lumps"],["blur","something that cannot be seen clearly"]],
+  [["flout","to deliberately disobey a rule"],["principal","first in order of importance; the head of a school"],["enquiry","an official process to find out the cause of something"],["principle","a basic idea or rule that explains how something happens"],["favour","a kind thing that you do to help somebody"],["sarcasm","saying the opposite of what you mean in order to mock someone"]],
+  [["deprave","to make somebody morally bad"],["foul","dirty and smelling bad"],["caricature","a drawing that exaggerates someone’s features in a funny or critical way"],["smudge","a dirty mark with no clear shape"],["distort","to change the shape, appearance or sound of something"],["curate","to choose and organise things, for example for a museum"]],
+  [["cajole","to persuade somebody to do something by being very nice to them"],["embezzlement","stealing money that you are responsible for"],["callous","not caring about other people’s feelings, pain or problems"],["iconoclast","a person who criticises popular beliefs or established customs"],["alacrity","cheerful eagerness and readiness"],["fatuous","silly and pointless"]],
+  [["construe","to understand a word, sentence or action in a particular way"],["obdurate","refusing to change your mind or your actions"],["egregious","extremely bad"],["incumbent","a person who holds an official position"],["beguile","to charm or trick somebody into doing something"],["inveterate","having a habit that is unlikely to change"]]
+ ],
+ // IV. Odd one out: [words, index of the odd one, what the other three share, meaning of the odd one]
+ odd: [
+  [["deem","figure","consider","hunch"],3,"to think or believe","a hunch is a feeling you have without proof"],
+  [["bellow","holler","simmer","yell"],2,"to shout loudly","simmer means to cook just below boiling point"],
+  [["jaunt","ramble","odyssey","trundle"],3,"a trip or journey","trundle means to move slowly and heavily, often on wheels"],
+  [["mesmerise","entrance","beguile","implicate"],3,"to charm or fascinate","implicate means to show that someone is involved in something wrong"],
+  [["groovy","fine","splendid","middling"],3,"very good","middling means only average"],
+  [["condone","forbid","proscribe","interdict"],0,"to ban","condone means to accept or allow bad behaviour"],
+  [["abate","wane","diminish","rouse"],3,"to become less","rouse means to wake someone or stir them up"],
+  [["accord","squabble","hassle","spat"],0,"a quarrel","an accord is an agreement"],
+  [["saucy","brazen","impudent","demure"],3,"rude and cheeky","demure means shy, quiet and modest"],
+  [["morose","sullen","plaintive","jocund"],3,"sad or gloomy","jocund means cheerful"],
+  [["revere","deify","profane","venerate"],2,"to respect deeply or worship","profane means showing disrespect for holy things"],
+  [["myriad","manifold","galore","austere"],3,"many; in large numbers","austere means plain, simple and strict"],
+  [["rustic","gauche","hick","suave"],3,"simple, unsophisticated or awkward","suave means charming, confident and polished"],
+  [["confound","evince","fuddle","baffle"],1,"to confuse","evince means to show clearly"],
+  [["manifest","murky","pellucid","lucid"],1,"clear","murky means dark and unclear"],
+  [["precipitate","intrigue","sediment","deposition"],1,"solid matter that settles out of a liquid","intrigue means a secret plan, or to fascinate"],
+  [["conspiracy","collusion","connivance","conation"],3,"secret plotting together","conation is the mental urge to act"],
+  [["pillage","loot","palisade","plunder"],2,"to steal by force","a palisade is a fence of wooden stakes"],
+  [["mandate","decree","edict","rescind"],3,"an official order","rescind means to cancel an order or law"],
+  [["amend","rectify","ameliorate","tarnish"],3,"to improve or correct","tarnish means to spoil or make dull"]
+ ],
+ // Spoken spelling bee list: every correctly spelt word from section I (plus the correct forms of the misspelt ones)
+ words: [
+  ["tactics","plans or methods used to win or succeed","The coach explained the team’s tactics."],
+  ["talkative","liking to talk a lot","My talkative parrot never stops chattering."],
+  ["perceive","to notice or become aware of something","Dogs can perceive sounds that we cannot hear."],
+  ["appalling","shocking and very bad","The flood left the roads in an appalling state."],
+  ["closet","a cupboard for storing things","Hang your coat in the closet."],
+  ["generous","happy to give or share","Our generous neighbour shared her mangoes."],
+  ["acquire","to get or gain something","You acquire new words by reading."],
+  ["occurrence","something that happens","A solar eclipse is a rare occurrence."],
+  ["channel","a narrow passage of water; a television station","Boats sailed through the narrow channel."],
+  ["curious","eager to know or learn","The curious cat peeped into the box."],
+  ["dazzling","so bright that it is hard to look at","The fireworks were dazzling."],
+  ["commission","an official group given a special task","The government set up a commission to study the floods."],
+  ["chimney","a pipe that carries smoke out of a building","Smoke rose from the chimney."],
+  ["audience","the people watching or listening to a performance","The audience clapped loudly."],
+  ["fascinated","very interested","Rishay was fascinated by the dinosaur skeleton."],
+  ["divide","to split into parts","Divide the cake into eight pieces."],
+  ["chisel","a tool with a sharp edge for shaping wood or stone","The sculptor shaped the stone with a chisel."],
+  ["gigantic","extremely large","A gigantic wave crashed onto the shore."],
+  ["disease","an illness","Malaria is a disease spread by mosquitoes."],
+  ["parcel","a package wrapped for sending","The postman delivered a parcel."],
+  ["aggressive","ready to attack or argue","The aggressive goose chased the children."],
+  ["muscular","having strong, well-developed muscles","The wrestler had muscular arms."],
+  ["colleague","a person you work with","Mum had lunch with a colleague."],
+  ["prestigious","respected and admired","She won a prestigious award."],
+  ["agreeable","pleasant; willing to agree","The weather was agreeable for a picnic."],
+  ["environment","the natural world around us","Plastic harms the environment."],
+  ["receive","to get something that is given or sent","Did you receive my letter?"],
+  ["suppress","to stop something or hold it back","He tried to suppress a giggle."],
+  ["vacancy","an empty place, job or room","The hotel has no vacancy tonight."],
+  ["countless","too many to count","There are countless stars in the sky."],
+  ["compel","to force someone to do something","Heavy rain may compel us to stay indoors."],
+  ["episode","one part of a series or a story","I watched the new episode of the show."],
+  ["obedient","doing what you are told","The obedient dog sat when it was told."],
+  ["coincidence","two things happening together by chance","What a coincidence that we wore the same shirt!"],
+  ["computer","an electronic machine that stores and processes information","We use a computer in the IT lab."],
+  ["exposure","being open to something, such as sun or danger","Too much exposure to the sun can burn your skin."],
+  ["biography","the story of a person’s life, written by someone else","I read a biography of Dr A P J Abdul Kalam."],
+  ["acceptable","good enough; allowed","Is it acceptable to wear trainers to school?"],
+  ["accordance","agreement; following a rule","Act in accordance with the school rules."],
+  ["reluctant","unwilling","He was reluctant to jump into the cold water."],
+  ["achieve","to succeed in doing something","Work hard and you will achieve your goal."],
+  ["accommodate","to have enough room for","The bus can accommodate forty children."],
+  ["weird","very strange","We heard a weird noise at night."],
+  ["heritage","traditions and buildings passed down from the past","The Taj Mahal is part of India’s heritage."],
+  ["discipline","training to follow rules; self-control","Practising every day needs discipline."],
+  ["believe","to think that something is true","I believe in you."],
+  ["therapeutic","helping to heal or relax","Gardening can be therapeutic."],
+  ["awkward","clumsy or uncomfortable","He felt awkward on his first day."],
+  ["bayonet","a long blade fixed to the end of a rifle","The soldier’s rifle had a bayonet."],
+  ["cemetery","a place where dead people are buried","Wild flowers grew around the old cemetery."],
+  ["emphatic","said strongly and clearly","Her answer was an emphatic ‘no’."],
+  ["staggered","walked unsteadily; very surprised","The tired runner staggered over the finish line."],
+  ["guarantee","a promise that something will happen or work","The watch comes with a one-year guarantee."],
+  ["embarrassed","feeling shy, awkward or ashamed","I was embarrassed when I tripped on stage."],
+  ["stretch","to make something longer or wider by pulling; to reach out","Stretch your arms before you run."],
+  ["minuscule","extremely small","The ant carried a minuscule crumb."],
+  ["tapestry","a cloth with pictures woven into it","A tapestry hung on the palace wall."],
+  ["existence","the state of being real or alive","Dinosaurs went out of existence long ago."],
+  ["reasonable","fair and sensible","That is a reasonable price."],
+  ["constellation","a group of stars that forms a pattern","Orion is a famous constellation."],
+  ["obstacles","things that block the way","The race had many obstacles."],
+  ["turbulent","moving in a wild, uneven way","The plane shook in the turbulent air."],
+  ["operator","a person who works a machine","The crane operator lifted the steel beams."],
+  ["extremely","very","It was extremely hot in May."],
+  ["disturbance","something that interrupts or upsets","Please work without causing a disturbance."],
+  ["continental","to do with a continent","Asia has many continental climates."],
+  ["concentrate","to give all your attention to something","It is hard to concentrate when it is noisy."],
+  ["dissolved","mixed into a liquid until it disappeared","The sugar dissolved in the tea."],
+  ["perpetual","never ending","The traffic made a perpetual hum."],
+  ["samples","small parts that show what the whole is like","The shop gave out free samples of cake."],
+  ["comfort","to make someone feel better; a relaxed feeling","She tried to comfort her crying brother."],
+  ["utensils","tools used in the kitchen","Wash the cooking utensils after use."],
+  ["incident","an event, often an unusual one","The teacher reported the incident to the principal."],
+  ["disinfectant","a liquid that kills germs","Clean the floor with disinfectant."],
+  ["scoundrel","a dishonest or wicked person","The scoundrel stole the old man’s purse."]
+ ]
+};
+// Section III and anagram words are added to the spoken bee too (meaning only).
+MARRS.match.forEach(set=>set.forEach(([w,m])=>{ if(!MARRS.words.some(x=>x[0]===w)) MARRS.words.push([w,m,""]); }));
+MARRS.anagram.forEach(([g,c,a])=>{ if(!MARRS.words.some(x=>x[0]===a)) MARRS.words.push([a,c,""]); });
+
 const SPELL = [
 ["necessary","neccessary","necesary","neccesary"],["separate","seperate","separete","seprate"],["definitely","definately","definitly","defenitely"],["beautiful","beautifull","beutiful","beautyful"],
 ["environment","enviroment","environmant","enviornment"],["government","goverment","governmant","govermment"],["believe","beleive","belive","beleave"],["receive","recieve","receeve","receve"],
@@ -813,15 +1222,53 @@ const IDIOM = [
 ["‘Bite off more than you can chew’ means:",["Take on more than you can manage","Eat too fast","Have a big lunch","Talk too much"],0]
 ];
 
+/* ---------- spelling bee, synonyms and MaRRS helpers ---------- */
+const SPEECH = typeof window!=="undefined" && "speechSynthesis" in window && typeof SpeechSynthesisUtterance!=="undefined";
+function speak(text, rate=0.82){ if(!SPEECH || !text) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); const vs=speechSynthesis.getVoices(); const v=vs.find(x=>/en[-_]IN/i.test(x.lang))||vs.find(x=>/en[-_]GB/i.test(x.lang))||vs.find(x=>/^en/i.test(x.lang)); if(v){ u.voice=v; u.lang=v.lang; } else u.lang="en-GB"; u.rate=rate; speechSynthesis.speak(u); }catch(e){} }
+const reEsc = w => w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+function blankWord(sentence, word){ return sentence.replace(new RegExp(reEsc(word),"gi"), "_____"); }
+function pickUnused(list, used, key){ const fresh=list.filter(x=>!used.has(key(x))); const x=pick(fresh.length?fresh:list); used.add(key(x)); return x; }
+function spellQ(w, def, sent){ const alt = BEE_ALT[w.toLowerCase()];
+  return {type:"spell", word:w, def, sent, prompt:"Listen to the word, then type its spelling.", accept:[w], alt: alt?[alt]:[], show:w,
+    ex:`<b>${esc(w)}</b>: ${esc(def)}.${sent?` <i>${esc(sent)}</i>`:""}`}; }
+function markDiff(given, word){ let out=""; for(let i=0;i<word.length;i++){ const ok=(given[i]||"").toLowerCase()===word[i].toLowerCase(); out += ok ? esc(word[i]) : `<mark>${esc(word[i])}</mark>`; } return out; }
+function synBanned(e){ const set=new Set([e[0],...e[2]]); SYN.forEach(o=>{ if(o===e) return; if(set.has(o[0]) || o[2].some(x=>set.has(x)) || o[2].includes(e[0])){ set.add(o[0]); o[2].forEach(x=>set.add(x)); } }); return set; }
+function synQ(l, used){
+  const e = pickUnused(SYN.filter(x=>x[5]===l), used, x=>x[0]);
+  const [w, mean, syns, ant, sent] = e;
+  const banned = synBanned(e); if(ant) banned.add(ant);
+  const others = shuffle([...new Set(SYN.flatMap(x=>[x[0],...x[2]]))].filter(x=>!banned.has(x)));
+  const ex = `<b>${esc(w)}</b> means ${esc(mean)}. Synonyms: ${syns.map(esc).join(", ")}.${ant?` Opposite (antonym): ${esc(ant)}.`:""}`;
+  const mode = l===3 && Math.random()<0.35 ? "not" : Math.random()<0.5 ? "context" : "same";
+  if(mode==="not") return mcq(`Which word is <b>not</b> a synonym of <b>${esc(w)}</b>?`, [ant||others[0], ...syns.slice(0,3)], 0, ex);
+  const right = pick(syns), wrong = [...(ant?[ant]:[]), ...others].slice(0,3);
+  if(mode==="context"){ const sh = esc(sent).replace(new RegExp(`\\b${reEsc(w)}\\b`,"i"), m=>`<b><u>${m}</u></b>`); return mcq(`${sh}<br>Which word could replace the underlined word without changing the meaning?`, [right,...wrong], 0, ex); }
+  return mcq(`Which word means the <b>same</b> as <b>${esc(w)}</b>?`, [right,...wrong], 0, ex);
+}
+function multiQ(ws, ok, opt=[]){
+  const fixes = ws.map((w,i)=> ok.includes(i)||opt.includes(i) ? null : `${esc(w)} → <b>${esc(MARRS.fix[w]||"")}</b>`).filter(Boolean);
+  return {type:"multi", prompt:"Select <b>all</b> the words that are spelt correctly. There may be more than one.", opts:ws, correct:ok, optional:opt, show: ok.map(i=>ws[i]).join(", "),
+    ex:`Corrections: ${fixes.join(", ")}.${opt.length?` (“${esc(ws[opt[0]])}” is a common variant of the standard spelling <b>minuscule</b>, so it is not marked either way.)`:""}`};
+}
+
 const ENG_SKILLS = (() => {
   const cats = [...new Set(G.map(q=>q[0]))];
   const blurb = {"Nouns":"Proper, common, collective and abstract nouns","Pronouns":"Choosing I/me, its/it’s, who/which","Tenses":"Past, present, future, continuous and perfect","Adjectives & adverbs":"Comparatives, superlatives, describing actions","Prepositions":"in/on/at, since/for, between/among","Conjunctions":"and, but, so, because, although, neither…nor","Articles":"a, an and the","Subject–verb agreement":"Singular and plural subjects","Punctuation":"Capitals, commas, apostrophes, speech marks","Vocabulary":"Synonyms and antonyms","Plurals & gender":"Irregular plurals and gender words","Confusing words":"Homophones like there/their/they’re","Sentences":"Sentence types, voice, reported speech","Word building":"Prefixes, suffixes and compound words"};
   const sk = cats.map(c => ({id:"e."+c.replace(/[^A-Za-z]/g,"").toLowerCase(), strand:"Grammar", name:c, desc:blurb[c]||"", pool:()=>G.filter(q=>q[0]===c).map(q=>mcq(q[1],q[2],q[3],q[4]))}));
-  sk.push({id:"e.spelling", strand:"Vocabulary and spelling", name:"Spelling", desc:"Commonly misspelt Grade 5 words", pool:()=>SPELL.map(w=>mcq("Which word is spelt <b>correctly</b>?",w,0,`The correct spelling is <b>${w[0]}</b>.`))});
+  sk.push({id:"e.spelling", strand:"Vocabulary and spelling", name:"Spot the correct spelling", desc:"Commonly misspelt Grade 5 words", pool:()=>SPELL.map(w=>mcq("Which word is spelt <b>correctly</b>?",w,0,`The correct spelling is <b>${w[0]}</b>.`))});
   sk.push({id:"e.figurative", strand:"Vocabulary and spelling", name:"Figurative language and idioms", desc:"Simile, metaphor, personification, idioms", pool:()=>[
     ...FIG.map(f=>{ const others=shuffle(FIGS.filter(x=>x!==f[1])).slice(0,3); return mcq(`${f[0]}<br>This is an example of:`,[f[1],...others],0,f[2]); }),
     ...IDIOM.map(i=>mcq(i[0],i[1],i[2],`This idiom means <b>${i[1][i[2]].toLowerCase()}</b>.`))]});
   sk.push({id:"e.reading", strand:"Reading", name:"Reading comprehension", desc:"Understanding stories, poems, letters and facts", pool:()=>P.flatMap(p=>[...p.mcq,...p.vocab].map(q=>({...mcq(esc(q[0]),q[1],q[2],`Look back at the ${p.poem?"poem":p.letter?"letter":"passage"}: the answer is <b>${esc(q[1][q[2]])}</b>.`), passage:p})))});
+  sk.push({id:"e.spellbee", strand:"Spelling bee and synonyms", name:"Spelling bee", desc:"Hear a word, then spell it (gets harder as he improves)", gen(l, used=new Set()){ const [w,d,t]=pickUnused(BEE[l-1], used, x=>x[0]); return spellQ(w,d,t); }});
+  sk.push({id:"e.synonyms", strand:"Spelling bee and synonyms", name:"Synonyms", desc:"Words with the same or similar meaning (gets harder as he improves)", gen(l, used=new Set()){ return synQ(l, used); }});
+  const MS = "MaRRS Spelling Bee · Level 4";
+  sk.push({id:"e.marrs.spell", strand:MS, flat:true, name:"Spell it: school word list", desc:`Hear and spell all ${MARRS.words.length} words from the Level 4 booklet`, gen(l, used=new Set()){ const [w,d,t]=pickUnused(MARRS.words, used, x=>x[0]); return spellQ(w,d,t); }});
+  sk.push({id:"e.marrs.correct", strand:MS, name:"Find the correctly spelt words", desc:"Booklet section I", pool:()=>MARRS.correct.map(([ws,ok,opt])=>multiQ(ws,ok,opt||[]))});
+  sk.push({id:"e.marrs.anagram", strand:MS, name:"Anagrams", desc:"Booklet section II: rearrange the letters to fit the clue", pool:()=>MARRS.anagram.map(([g,c,a])=>({type:"text", prompt:`Rearrange the letters of <span class="bignum">${g.toUpperCase()}</span> to make a word that means:<br><i>${esc(c)}</i>`, accept:[a], show:a, ex:`${esc(g)} → <b>${esc(a)}</b>: ${esc(c)}.`, hint:`Use all ${g.length} letters.`}))});
+  sk.push({id:"e.marrs.meaning", strand:MS, name:"Match the meaning", desc:"Booklet section III: advanced words and their meanings", pool:()=>MARRS.match.flatMap(set=>set.map(([w,m],i)=>{ const o=shuffle(set.filter((_,j)=>j!==i)).slice(0,3);
+    return Math.random()<0.5 ? mcq(`Which word means: <i>${esc(m)}</i>?`, [w,...o.map(x=>x[0])], 0, `<b>${esc(w)}</b>: ${esc(m)}.`) : mcq(`What does <b>${esc(w)}</b> mean?`, [m,...o.map(x=>x[1])].map(esc), 0, `<b>${esc(w)}</b>: ${esc(m)}.`); }))});
+  sk.push({id:"e.marrs.odd", strand:MS, name:"Odd one out", desc:"Booklet section IV: three words share a meaning", pool:()=>MARRS.odd.map(([ws,k,g,om])=>mcq("Three of these words are related in meaning. Which is the <b>odd one out</b>?", ws, k, `The other three mean <i>${esc(g)}</i>; ${esc(om)}.`))});
   return sk;
 })();
 
@@ -1063,7 +1510,8 @@ function todaysMix(){
   const items = [];
   const ms = MATH.slice().sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,5);
   ms.forEach(s=>items.push({skill:s.id, lazy:true}));
-  ENG_SKILLS.slice().sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,4).forEach(s=>items.push(...poolItems(s,1)));
+  const forced = ["e.synonyms","e.marrs.spell"].map(skillById); forced.forEach(s=>items.push(...poolItems(s,1)));
+  ENG_SKILLS.filter(s=>!forced.includes(s)).sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,2).forEach(s=>items.push(...poolItems(s,1)));
   const u = currentUnit(); if(u && u.qs.length) items.push(...unitItems(u,3,{noExplain:false}));
   return items;
 }
@@ -1080,7 +1528,10 @@ function parseFrac(s){ s = s.trim().replace(/\s+/g," "); let m;
 function check(q, raw){
   const s = String(raw ?? "").trim();
   if(q.type==="mcq") return {score: raw===q.ans?1:0};
+  if(q.type==="multi"){ const cor=new Set(q.correct), sel=(raw||[]).filter(i=>!q.optional.includes(i)); const wrong=sel.filter(i=>!cor.has(i)).length, hit=sel.filter(i=>cor.has(i)).length;
+    if(!wrong && hit===cor.size) return {score:1}; if(!wrong && hit>0) return {score:0.5, note:"You found some of the correct words, but not all of them."}; return {score:0}; }
   if(!s) return {score:0, empty:true};
+  if(q.type==="spell"){ const v=s.toLowerCase(); if(q.accept.some(a=>a.toLowerCase()===v)) return {score:1}; if(q.alt.some(a=>a.toLowerCase()===v)) return {score:1, note:`That is the American spelling. In British English (used by Cambridge and in Indian spelling bees) it is “${q.word}”.`}; return {score:0}; }
   if(q.type==="num"){ const x=parseNum(s); if(x===null) return {score:0, note:"That doesn’t look like a number."}; return {score: Math.abs(x-q.ans)<1e-6?1:0}; }
   if(q.type==="qr"){ const m=s.replace(/,/g,"").toLowerCase().match(/^(\d+)\s*(?:r|rem|remainder)?\s*(\d+)?$/); if(!m) return {score:0, note:"Write it like 23 r 4."}; const qq=+m[1], rr=m[2]?+m[2]:0; return {score: qq===q.ans.q && rr===q.ans.r ? 1 : 0}; }
   if(q.type==="pair"){ const m=s.match(/^\(?\s*(-?\d+)\s*,\s*(-?\d+)\s*\)?$/); if(!m) return {score:0, note:"Write it like (4, 7)."}; return {score: +m[1]===q.ans[0] && +m[2]===q.ans[1] ? 1 : 0}; }
@@ -1118,7 +1569,7 @@ function render(){
   else if(view.name==="parent") app.innerHTML = parentView();
   else if(view.name==="quiz") app.innerHTML = quizView();
   else if(view.name==="results") app.innerHTML = resultsView();
-  if(view.name==="quiz") focusAnswer();
+  if(view.name==="quiz"){ focusAnswer(); const q = quiz.items[quiz.i].q; if(q.type==="spell" && !quiz.checked && quiz.saidFor!==quiz.i && navigator.userActivation && navigator.userActivation.hasBeenActive){ quiz.saidFor = quiz.i; speak(q.word); } }
 }
 
 function activityChart(){
@@ -1172,6 +1623,22 @@ function sessRow(s){ const p = s.n ? Math.round(s.score/s.n*100) : 0; return `<d
 const fmtScore = x => (Math.round(x*2)/2).toString();
 
 function skillRow(s, subj){ const st = stat(s.id); return `<div class="li"><div><div class="nm">${esc(s.name)}</div>${s.desc?`<div class="ds">${esc(s.desc)}</div>`:""}</div>${meter(mastery(st), subj)}${chip(st)}<button class="btn sm ${subj}" type="button" data-practise="${esc(s.id)}">Practise</button></div>`; }
+function engFeatured(){
+  const m = id => mastery(stat(id));
+  const card = (title, body, btn, key, ids) => `<section class="card subj"><h3>${title}</h3><p class="small muted" style="margin:0">${body}</p>${meter(subjectMastery(ids.map(skillById)),"eng")}<div class="row"><button class="btn solid" type="button" data-quiz="${key}">${btn}</button></div></section>`;
+  const bySyn = l => SYN.filter(x=>x[5]===l).map(x=>`<tr><td><b>${esc(x[0])}</b></td><td class="wrap">${esc(x[1])}</td><td class="wrap">${x[2].map(esc).join(", ")}</td><td>${esc(x[3]||"–")}</td></tr>`).join("");
+  return `<div class="grid3">
+    ${card("Spelling bee","15 words from Rishay’s MaRRS Level 4 list. Each word is read aloud with its meaning; he types the spelling.","Start spelling bee","bee",["e.marrs.spell"])}
+    ${card("MaRRS practice test","20 questions in the booklet’s four formats: correct spellings, anagrams, meanings and odd one out.","Start practice test","marrs",["e.marrs.correct","e.marrs.anagram","e.marrs.meaning","e.marrs.odd"])}
+    ${card("Synonym challenge","15 synonym questions, in context and on their own. They get harder as he improves.","Start synonym challenge","syn",["e.synonyms"])}
+  </div>
+  <section class="card"><h3 style="font-size:19px">Study the words</h3><p class="small muted" style="margin:2px 0 8px">Read through these before a test. Tap a heading to open it.</p>
+    ${[1,2,3].map(l=>`<details><summary><b>Synonyms, level ${l}</b> <span class="muted small">(${SYN.filter(x=>x[5]===l).length} words)</span></summary><div class="table-wrap"><table><thead><tr><th>Word</th><th>Meaning</th><th>Synonyms</th><th>Opposite</th></tr></thead><tbody>${bySyn(l)}</tbody></table></div></details>`).join("")}
+    <details><summary><b>MaRRS Level 4: word meanings</b> <span class="muted small">(${MARRS.match.flat().length} words)</span></summary><div class="table-wrap"><table><thead><tr><th>Word</th><th>Meaning</th></tr></thead><tbody>${MARRS.match.flat().map(([w,mn])=>`<tr><td><b>${esc(w)}</b></td><td class="wrap">${esc(mn)}</td></tr>`).join("")}</tbody></table></div></details>
+    <details><summary><b>MaRRS Level 4: spelling list</b> <span class="muted small">(${MARRS.words.length} words)</span></summary><div class="table-wrap"><table><thead><tr><th>Word</th><th>Meaning</th></tr></thead><tbody>${MARRS.words.map(([w,mn])=>`<tr><td><b>${esc(w)}</b></td><td class="wrap">${esc(mn)}</td></tr>`).join("")}</tbody></table></div></details>
+    <details><summary><b>MaRRS Level 4: odd one out</b> <span class="muted small">(${MARRS.odd.length} sets)</span></summary><div class="table-wrap"><table><thead><tr><th>Words</th><th>Odd one out</th><th>Why</th></tr></thead><tbody>${MARRS.odd.map(([ws,k,g,om])=>`<tr><td class="wrap">${ws.map(esc).join(", ")}</td><td><b>${esc(ws[k])}</b></td><td class="wrap">The others mean “${esc(g)}”; ${esc(om)}.</td></tr>`).join("")}</tbody></table></div></details>
+  </section>`;
+}
 function subjectView(subj){
   const skills = subj==="math" ? MATH : ENG_SKILLS, label = subj==="math"?"Maths":"English";
   const strands = [...new Set(skills.map(s=>s.strand))];
@@ -1179,7 +1646,8 @@ function subjectView(subj){
   const fullN = subj==="math" ? MATH.length : 20;
   return `<div class="shead"><div><div class="eyebrow">${securedCount(skills)} of ${skills.length} skills secure</div><h1><span class="dot d-${subj}"></span>${label}</h1></div>
     <div class="row"><span class="small muted">Overall mastery</span><div style="width:200px">${meter(m,subj)}</div><button class="btn solid" type="button" data-fulltest="${subj}">Full check-up · ${fullN} questions</button></div></div>
-  <p class="note">${subj==="math" ? "Maths questions are made fresh each time and get harder as a skill becomes secure (level 1 → 3). Every answer shows the worked method." : "Grammar, spelling, figurative language and reading. Every answer shows the rule behind it."} “Mastery” weighs recent answers more than old ones, so it reflects what Rishay knows now.</p>
+  <p class="note">${subj==="math" ? "Maths questions are made fresh each time and get harder as a skill becomes secure (level 1 → 3). Every answer shows the worked method." : "Grammar, spelling bee, synonyms, figurative language and reading. Every answer shows the rule or meaning behind it."} “Mastery” weighs recent answers more than old ones, so it reflects what Rishay knows now.</p>
+  ${subj==="eng" ? engFeatured() : ""}
   ${strands.map(st=>{ const ss=skills.filter(s=>s.strand===st); return `<section class="card strand"><div class="strand-h"><h3>${esc(st)}</h3><button class="btn sm" type="button" data-strand="${subj}|${esc(st)}">Test this strand · ${Math.min(ss.length*2,16)} questions</button></div><div class="list">${ss.map(s=>skillRow(s,subj)).join("")}</div></section>`; }).join("")}`;
 }
 
@@ -1285,14 +1753,19 @@ function startQuiz(title, subject, items){
 }
 function prepare(){
   const it = quiz.items[quiz.i];
-  if(it.lazy){ const sk = skillById(it.skill); const base = levelFor(it.skill), adj = quiz.run[it.skill]||0; it.level = Math.max(1,Math.min(3,base+adj)); it.q = sk.gen(it.level); }
-  quiz.sel = null; quiz.checked = false; quiz.fb = null;
+  if(it.lazy){ const sk = skillById(it.skill); const base = levelFor(it.skill), adj = quiz.run[it.skill]||0; it.level = Math.max(1,Math.min(3,base+adj)); it.q = sk.gen(it.level, quiz.used || (quiz.used = new Set())); }
+  quiz.sel = null; quiz.checked = false; quiz.fb = null; quiz.hintUsed = false;
 }
 function quizView(){
   const it = quiz.items[quiz.i], q = it.q, sk = skillById(it.skill), subj = subjOf(it.skill);
   const n = quiz.items.length, p = quiz.i/n*100;
   let input = "";
   if(q.type==="mcq") input = `<div class="choices">${q.opts.map((o,k)=>{ let cls="choice"; if(quiz.checked){ if(k===q.ans) cls+=" right"; else if(k===quiz.sel) cls+=" wrong"; } return `<button type="button" class="${cls}" data-choice="${k}" aria-pressed="${quiz.sel===k}" ${quiz.checked?"disabled":""}><span class="k">${String.fromCharCode(65+k)}</span><span>${o}</span></button>`; }).join("")}</div>`;
+  else if(q.type==="multi") input = `<div class="choices">${q.opts.map((o,k)=>{ const on=(quiz.sel||[]).includes(k); let cls="choice"; if(quiz.checked){ if(q.correct.includes(k)) cls+=" right"; else if(on && !q.optional.includes(k)) cls+=" wrong"; } return `<button type="button" class="${cls}" data-mchoice="${k}" aria-pressed="${on}" ${quiz.checked?"disabled":""}><span class="k">${on?"✓":String.fromCharCode(65+k)}</span><span>${esc(o)}</span></button>`; }).join("")}</div>`;
+  else if(q.type==="spell") input = `<div class="bee">${SPEECH ? `<div class="row"><button class="btn solid" type="button" data-say="word">Hear the word</button><button class="btn sm" type="button" data-say="slow">Say it slowly</button><button class="btn sm" type="button" data-say="def">Hear the meaning</button>${q.sent?`<button class="btn sm" type="button" data-say="sent">Hear it in a sentence</button>`:""}</div>` : `<p class="note">Sound isn’t available in this browser, so use the meaning${q.sent?" and the sentence":""} below. A parent can also read the word aloud.</p>`}
+      <p style="margin:12px 0 2px"><b>Meaning:</b> ${esc(q.def)}</p>${q.sent?`<p class="muted" style="margin:0 0 12px"><b>Sentence:</b> ${esc(blankWord(q.sent,q.word))}</p>`:`<div style="height:10px"></div>`}</div>
+      <div class="ans"><input id="ans" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" value="${esc(quiz.sel||"")}" ${quiz.checked?"disabled":""} aria-label="Type the spelling"></div>
+      ${quiz.checked ? "" : `<div class="hint">${quiz.hintUsed ? `Hint: ${q.word.length} letters, starting with “${esc(q.word[0])}”. A correct answer now earns half a mark.` : `<button class="btn sm" type="button" id="beeHint">Show a hint (half a mark)</button>`}</div>`}`;
   else if(q.type==="explain") input = `<div class="ans"><textarea id="ans" ${quiz.checked?"disabled":""} placeholder="Write your answer in two to four sentences.">${esc(quiz.sel||"")}</textarea></div>`;
   else { const mode = ["num","qr"].includes(q.type)?"decimal":"text"; input = `<div class="ans">${q.pre?`<span class="unitlbl">${esc(q.unit)}</span>`:""}<input id="ans" autocomplete="off" inputmode="${q.type==="num"?"decimal":"text"}" value="${esc(quiz.sel||"")}" ${quiz.checked?"disabled":""} aria-label="Your answer">${q.unit&&!q.pre?`<span class="unitlbl">${esc(q.unit)}</span>`:""}</div>${q.hint?`<div class="hint">${esc(q.hint)}</div>`:""}`; }
   const passage = it.q.passage || (it.passage);
@@ -1301,12 +1774,12 @@ function quizView(){
     <div class="qtop"><div><div class="eyebrow">${esc(quiz.title)}</div><b>Question ${quiz.i+1} of ${n}</b></div><button class="btn sm" type="button" id="endQuiz">${quiz.confirmEnd?"Tap again to finish now":"Finish early"}</button></div>
     <div class="qprog" aria-hidden="true"><i style="width:${p}%"></i></div>
     <section class="qcard">
-      <div class="qmeta"><span class="tag"><span class="dot d-${subj}"></span>${esc(sk?sk.name:"")}</span>${it.level?`<span class="lvl" aria-label="Level ${it.level} of 3">${[1,2,3].map(x=>`<i class="${x<=it.level?"on":""}"></i>`).join("")} Level ${it.level}</span>`:""}</div>
+      <div class="qmeta"><span class="tag"><span class="dot d-${subj}"></span>${esc(sk?sk.name:"")}</span>${it.level && !(sk&&sk.flat)?`<span class="lvl" aria-label="Level ${it.level} of 3">${[1,2,3].map(x=>`<i class="${x<=it.level?"on":""}"></i>`).join("")} Level ${it.level}</span>`:""}</div>
       ${pass}
       <div class="prompt">${q.prompt}</div>
       ${input}
       <div id="fbBox">${quiz.fb ? fbHTML() : ""}</div>
-      <div class="qactions"><span class="small muted">${q.type==="mcq"?"Press A–D or click an answer.":"Press Enter to check."}</span>
+      <div class="qactions"><span class="small muted">${q.type==="mcq"?"Press A–D or click an answer.":q.type==="multi"?"Click every correct word, then check.":"Press Enter to check."}</span>
         ${quiz.checked ? `<button class="btn solid" type="button" id="nextQ">${quiz.i+1<n?"Next question":"See results"}</button>` : quiz.pendingSelf ? "" : `<button class="btn solid" type="button" id="checkQ" ${quiz.busy?"disabled":""}>${quiz.busy?"Checking…":"Check answer"}</button>`}
       </div>
     </section></div>`;
@@ -1315,14 +1788,15 @@ function fbHTML(){
   const f = quiz.fb, q = quiz.items[quiz.i].q;
   if(f.self) return `<div class="fb part"><h4>Compare with the model answer</h4><div class="model"><b>Model answer:</b> ${q.show}</div><p class="small" style="margin:10px 0 6px">How close was your answer?</p><div class="row"><button class="btn sm uoi" type="button" data-self="1">Got the main ideas</button><button class="btn sm" type="button" data-self="0.5">Partly</button><button class="btn sm danger" type="button" data-self="0">Missed it</button></div></div>`;
   const cls = f.score>=1?"good":f.score>0?"part":"badf", head = f.score>=1?"✓ Correct":f.score>0?"◐ Partly right":"✗ Not quite";
-  return `<div class="fb ${cls}" role="status"><h4>${head}</h4>${f.note?`<div class="small">${esc(f.note)}</div>`:""}${f.score<1 && q.type!=="explain" ? `<div class="ex">The answer is <b>${q.show}</b>.</div>`:""}${f.claude?`<div class="ex">${esc(f.claude)}</div>`:""}${q.ex?`<div class="ex small">${q.ex}</div>`:""}${q.type==="explain"?`<div class="model"><b>Model answer:</b> ${q.show}</div>`:""}</div>`;
+  return `<div class="fb ${cls}" role="status"><h4>${head}</h4>${f.note?`<div class="small">${esc(f.note)}</div>`:""}${f.score<1 && q.type==="spell" ? `<div class="ex">You wrote <b>${esc(quiz.sel||"")}</b>. The correct spelling is <span class="bigword">${markDiff(String(quiz.sel||""), q.word)}</span></div>` : f.score<1 && q.type!=="explain" ? `<div class="ex">The answer is <b>${q.type==="multi"?esc(q.show):q.show}</b>.</div>`:""}${f.claude?`<div class="ex">${esc(f.claude)}</div>`:""}${q.ex?`<div class="ex small">${q.ex}</div>`:""}${q.type==="explain"?`<div class="model"><b>Model answer:</b> ${q.show}</div>`:""}</div>`;
 }
 function readInput(){ const el = $("#ans"); if(el) quiz.sel = el.value; }
 async function doCheck(){
   const it = quiz.items[quiz.i], q = it.q;
-  if(q.type!=="mcq") readInput();
+  if(q.type!=="mcq" && q.type!=="multi") readInput();
   if(q.type==="mcq" && quiz.sel===null) return;
-  if(q.type!=="mcq" && !String(quiz.sel||"").trim()) { const el=$("#ans"); if(el){ el.focus(); el.setAttribute("placeholder","Type your answer first"); } return; }
+  if(q.type==="multi" && !(quiz.sel||[]).length) return;
+  if(q.type!=="mcq" && q.type!=="multi" && !String(quiz.sel||"").trim()) { const el=$("#ans"); if(el){ el.focus(); el.setAttribute("placeholder","Type your answer first"); } return; }
   if(q.type==="explain"){
     if(sample){
       quiz.busy = true; render();
@@ -1344,6 +1818,7 @@ Reply with only JSON: {"score": 1 or 0.5 or 0, "feedback": "one or two encouragi
     quiz.pendingSelf = true; quiz.fb = {self:true}; render(); return;
   }
   const r = check(q, quiz.sel);
+  if(q.type==="spell" && quiz.hintUsed && r.score===1){ r.score = 0.5; r.note = ((r.note||"")+" Correct, with a hint: half a mark.").trim(); }
   finishCheck(r.score, {note:r.note});
 }
 function finishCheck(score, extra={}){
@@ -1352,7 +1827,7 @@ function finishCheck(score, extra={}){
   record(it.skill, score, it.concept);
   if(it.lazy){ const r = quiz.run, k = it.skill; const recent = (quiz.results.filter(x=>x.skill===k).map(x=>x.score)).concat(score);
     if(recent.slice(-2).every(x=>x>=1) && recent.length>=2) r[k] = Math.min(2,(r[k]||0)+1); if(score<1 && recent.slice(-2).every(x=>x<1) && recent.length>=2) r[k] = Math.max(-2,(r[k]||0)-1); }
-  const given = q.type==="mcq" ? (quiz.sel===null?"":stripHtml(q.opts[quiz.sel])) : String(quiz.sel||"");
+  const given = q.type==="mcq" ? (quiz.sel===null?"":stripHtml(q.opts[quiz.sel])) : q.type==="multi" ? (quiz.sel||[]).map(i=>q.opts[i]).join(", ") : String(quiz.sel||"");
   quiz.results.push({skill:it.skill, score, p:stripHtml(q.prompt).slice(0,220), given:given.slice(0,300), correct:stripHtml(q.show).slice(0,300), ex:q.ex, promptHtml:q.prompt, showHtml:q.show});
   render();
 }
@@ -1400,6 +1875,13 @@ app.addEventListener("click", async e => {
   if(t.dataset.unit){ S.settings.currentUnit = t.dataset.unit; saveSettings(); return render(); }
   if(t.dataset.unittest){ const u=unitById(t.dataset.unittest); return startQuiz(`${u.title}: unit test`,"uoi",unitItems(u,20,{balanced:true})); }
   if(t.dataset.unitquick){ const u=unitById(t.dataset.unitquick); return startQuiz(`${u.title}: quick quiz`,"uoi",unitItems(u,8,{noExplain:true})); }
+  if(t.dataset.mchoice!==undefined && quiz && !quiz.checked){ const k=Number(t.dataset.mchoice), set=new Set(quiz.sel||[]); set.has(k)?set.delete(k):set.add(k); quiz.sel=[...set].sort(); render(); return; }
+  if(t.dataset.say && quiz){ const q=quiz.items[quiz.i].q, m=t.dataset.say; speak(m==="def"?q.def:m==="sent"?q.sent:q.word, m==="slow"?0.5:0.82); return; }
+  if(t.id==="beeHint" && quiz){ readInput(); quiz.hintUsed = true; render(); return; }
+  if(t.dataset.quiz){ const k=t.dataset.quiz;
+    if(k==="bee") return startQuiz("Spelling bee: school word list","eng",poolItems(skillById("e.marrs.spell"),15));
+    if(k==="syn") return startQuiz("Synonym challenge","eng",poolItems(skillById("e.synonyms"),15));
+    if(k==="marrs") return startQuiz("MaRRS Level 4 practice test","eng",["e.marrs.correct","e.marrs.anagram","e.marrs.meaning","e.marrs.odd"].flatMap(id=>poolItems(skillById(id),5))); }
   if(t.dataset.choice!==undefined && quiz && !quiz.checked){ quiz.sel = Number(t.dataset.choice); render(); return; }
   if(t.id==="checkQ") return doCheck();
   if(t.id==="nextQ") return nextQ();
@@ -1419,7 +1901,7 @@ document.addEventListener("keydown", e => {
   if(view.name!=="quiz" || !quiz || quiz.done) return;
   const q = quiz.items[quiz.i].q;
   if(e.key==="Enter" && !e.shiftKey){ if(e.target.tagName==="TEXTAREA") return; if(e.target.tagName==="BUTTON" && e.target.id!=="nextQ" && e.target.id!=="checkQ" && !e.target.dataset.choice) return; e.preventDefault(); if(quiz.checked) nextQ(); else if(!quiz.pendingSelf && !quiz.busy) doCheck(); return; }
-  if(q.type==="mcq" && !quiz.checked && /^[a-dA-D1-4]$/.test(e.key) && e.target.tagName!=="INPUT"){ const k = isNaN(e.key) ? e.key.toLowerCase().charCodeAt(0)-97 : Number(e.key)-1; if(k < q.opts.length){ quiz.sel=k; render(); } }
+  if((q.type==="mcq"||q.type==="multi") && !quiz.checked && /^[a-dA-D1-4]$/.test(e.key) && e.target.tagName!=="INPUT"){ const k = isNaN(e.key) ? e.key.toLowerCase().charCodeAt(0)-97 : Number(e.key)-1; if(k < q.opts.length){ if(q.type==="mcq") quiz.sel=k; else { const set=new Set(quiz.sel||[]); set.has(k)?set.delete(k):set.add(k); quiz.sel=[...set].sort(); } render(); } }
 });
 app.addEventListener("input", e => { if(e.target.id==="ans" && quiz) quiz.sel = e.target.value; });
 app.addEventListener("change", e => { if(e.target.id==="qf-t"){ const o=$("#qf-opts"); if(o) o.hidden = e.target.value!=="mcq"; } });

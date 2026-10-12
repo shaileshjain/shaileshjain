@@ -198,6 +198,10 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 .fb .model{margin-top:8px;background:var(--soft);border-radius:8px;padding:8px 12px}
 .qactions{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
 
+details{border-top:1px solid var(--line);padding:8px 0}
+details summary{cursor:pointer}
+.bigword{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:.04em}
+.bigword mark{background:transparent;color:var(--eng);text-decoration:underline 3px;text-underline-offset:4px}
 /* results */
 .score{font-family:var(--font-display);font-size:64px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
 .review{display:flex;flex-direction:column;gap:10px}
@@ -478,6 +482,7 @@ const MATH = [
    English
    ========================================================= */
 /*@ENGLISH_BANK@*/
+/*@ENGLISH_EXTRA@*/
 const SPELL = [
 ["necessary","neccessary","necesary","neccesary"],["separate","seperate","separete","seprate"],["definitely","definately","definitly","defenitely"],["beautiful","beautifull","beutiful","beautyful"],
 ["environment","enviroment","environmant","enviornment"],["government","goverment","governmant","govermment"],["believe","beleive","belive","beleave"],["receive","recieve","receeve","receve"],
@@ -518,15 +523,53 @@ const IDIOM = [
 ["‘Bite off more than you can chew’ means:",["Take on more than you can manage","Eat too fast","Have a big lunch","Talk too much"],0]
 ];
 
+/* ---------- spelling bee, synonyms and MaRRS helpers ---------- */
+const SPEECH = typeof window!=="undefined" && "speechSynthesis" in window && typeof SpeechSynthesisUtterance!=="undefined";
+function speak(text, rate=0.82){ if(!SPEECH || !text) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); const vs=speechSynthesis.getVoices(); const v=vs.find(x=>/en[-_]IN/i.test(x.lang))||vs.find(x=>/en[-_]GB/i.test(x.lang))||vs.find(x=>/^en/i.test(x.lang)); if(v){ u.voice=v; u.lang=v.lang; } else u.lang="en-GB"; u.rate=rate; speechSynthesis.speak(u); }catch(e){} }
+const reEsc = w => w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+function blankWord(sentence, word){ return sentence.replace(new RegExp(reEsc(word),"gi"), "_____"); }
+function pickUnused(list, used, key){ const fresh=list.filter(x=>!used.has(key(x))); const x=pick(fresh.length?fresh:list); used.add(key(x)); return x; }
+function spellQ(w, def, sent){ const alt = BEE_ALT[w.toLowerCase()];
+  return {type:"spell", word:w, def, sent, prompt:"Listen to the word, then type its spelling.", accept:[w], alt: alt?[alt]:[], show:w,
+    ex:`<b>${esc(w)}</b>: ${esc(def)}.${sent?` <i>${esc(sent)}</i>`:""}`}; }
+function markDiff(given, word){ let out=""; for(let i=0;i<word.length;i++){ const ok=(given[i]||"").toLowerCase()===word[i].toLowerCase(); out += ok ? esc(word[i]) : `<mark>${esc(word[i])}</mark>`; } return out; }
+function synBanned(e){ const set=new Set([e[0],...e[2]]); SYN.forEach(o=>{ if(o===e) return; if(set.has(o[0]) || o[2].some(x=>set.has(x)) || o[2].includes(e[0])){ set.add(o[0]); o[2].forEach(x=>set.add(x)); } }); return set; }
+function synQ(l, used){
+  const e = pickUnused(SYN.filter(x=>x[5]===l), used, x=>x[0]);
+  const [w, mean, syns, ant, sent] = e;
+  const banned = synBanned(e); if(ant) banned.add(ant);
+  const others = shuffle([...new Set(SYN.flatMap(x=>[x[0],...x[2]]))].filter(x=>!banned.has(x)));
+  const ex = `<b>${esc(w)}</b> means ${esc(mean)}. Synonyms: ${syns.map(esc).join(", ")}.${ant?` Opposite (antonym): ${esc(ant)}.`:""}`;
+  const mode = l===3 && Math.random()<0.35 ? "not" : Math.random()<0.5 ? "context" : "same";
+  if(mode==="not") return mcq(`Which word is <b>not</b> a synonym of <b>${esc(w)}</b>?`, [ant||others[0], ...syns.slice(0,3)], 0, ex);
+  const right = pick(syns), wrong = [...(ant?[ant]:[]), ...others].slice(0,3);
+  if(mode==="context"){ const sh = esc(sent).replace(new RegExp(`\\b${reEsc(w)}\\b`,"i"), m=>`<b><u>${m}</u></b>`); return mcq(`${sh}<br>Which word could replace the underlined word without changing the meaning?`, [right,...wrong], 0, ex); }
+  return mcq(`Which word means the <b>same</b> as <b>${esc(w)}</b>?`, [right,...wrong], 0, ex);
+}
+function multiQ(ws, ok, opt=[]){
+  const fixes = ws.map((w,i)=> ok.includes(i)||opt.includes(i) ? null : `${esc(w)} → <b>${esc(MARRS.fix[w]||"")}</b>`).filter(Boolean);
+  return {type:"multi", prompt:"Select <b>all</b> the words that are spelt correctly. There may be more than one.", opts:ws, correct:ok, optional:opt, show: ok.map(i=>ws[i]).join(", "),
+    ex:`Corrections: ${fixes.join(", ")}.${opt.length?` (“${esc(ws[opt[0]])}” is a common variant of the standard spelling <b>minuscule</b>, so it is not marked either way.)`:""}`};
+}
+
 const ENG_SKILLS = (() => {
   const cats = [...new Set(G.map(q=>q[0]))];
   const blurb = {"Nouns":"Proper, common, collective and abstract nouns","Pronouns":"Choosing I/me, its/it’s, who/which","Tenses":"Past, present, future, continuous and perfect","Adjectives & adverbs":"Comparatives, superlatives, describing actions","Prepositions":"in/on/at, since/for, between/among","Conjunctions":"and, but, so, because, although, neither…nor","Articles":"a, an and the","Subject–verb agreement":"Singular and plural subjects","Punctuation":"Capitals, commas, apostrophes, speech marks","Vocabulary":"Synonyms and antonyms","Plurals & gender":"Irregular plurals and gender words","Confusing words":"Homophones like there/their/they’re","Sentences":"Sentence types, voice, reported speech","Word building":"Prefixes, suffixes and compound words"};
   const sk = cats.map(c => ({id:"e."+c.replace(/[^A-Za-z]/g,"").toLowerCase(), strand:"Grammar", name:c, desc:blurb[c]||"", pool:()=>G.filter(q=>q[0]===c).map(q=>mcq(q[1],q[2],q[3],q[4]))}));
-  sk.push({id:"e.spelling", strand:"Vocabulary and spelling", name:"Spelling", desc:"Commonly misspelt Grade 5 words", pool:()=>SPELL.map(w=>mcq("Which word is spelt <b>correctly</b>?",w,0,`The correct spelling is <b>${w[0]}</b>.`))});
+  sk.push({id:"e.spelling", strand:"Vocabulary and spelling", name:"Spot the correct spelling", desc:"Commonly misspelt Grade 5 words", pool:()=>SPELL.map(w=>mcq("Which word is spelt <b>correctly</b>?",w,0,`The correct spelling is <b>${w[0]}</b>.`))});
   sk.push({id:"e.figurative", strand:"Vocabulary and spelling", name:"Figurative language and idioms", desc:"Simile, metaphor, personification, idioms", pool:()=>[
     ...FIG.map(f=>{ const others=shuffle(FIGS.filter(x=>x!==f[1])).slice(0,3); return mcq(`${f[0]}<br>This is an example of:`,[f[1],...others],0,f[2]); }),
     ...IDIOM.map(i=>mcq(i[0],i[1],i[2],`This idiom means <b>${i[1][i[2]].toLowerCase()}</b>.`))]});
   sk.push({id:"e.reading", strand:"Reading", name:"Reading comprehension", desc:"Understanding stories, poems, letters and facts", pool:()=>P.flatMap(p=>[...p.mcq,...p.vocab].map(q=>({...mcq(esc(q[0]),q[1],q[2],`Look back at the ${p.poem?"poem":p.letter?"letter":"passage"}: the answer is <b>${esc(q[1][q[2]])}</b>.`), passage:p})))});
+  sk.push({id:"e.spellbee", strand:"Spelling bee and synonyms", name:"Spelling bee", desc:"Hear a word, then spell it (gets harder as he improves)", gen(l, used=new Set()){ const [w,d,t]=pickUnused(BEE[l-1], used, x=>x[0]); return spellQ(w,d,t); }});
+  sk.push({id:"e.synonyms", strand:"Spelling bee and synonyms", name:"Synonyms", desc:"Words with the same or similar meaning (gets harder as he improves)", gen(l, used=new Set()){ return synQ(l, used); }});
+  const MS = "MaRRS Spelling Bee · Level 4";
+  sk.push({id:"e.marrs.spell", strand:MS, flat:true, name:"Spell it: school word list", desc:`Hear and spell all ${MARRS.words.length} words from the Level 4 booklet`, gen(l, used=new Set()){ const [w,d,t]=pickUnused(MARRS.words, used, x=>x[0]); return spellQ(w,d,t); }});
+  sk.push({id:"e.marrs.correct", strand:MS, name:"Find the correctly spelt words", desc:"Booklet section I", pool:()=>MARRS.correct.map(([ws,ok,opt])=>multiQ(ws,ok,opt||[]))});
+  sk.push({id:"e.marrs.anagram", strand:MS, name:"Anagrams", desc:"Booklet section II: rearrange the letters to fit the clue", pool:()=>MARRS.anagram.map(([g,c,a])=>({type:"text", prompt:`Rearrange the letters of <span class="bignum">${g.toUpperCase()}</span> to make a word that means:<br><i>${esc(c)}</i>`, accept:[a], show:a, ex:`${esc(g)} → <b>${esc(a)}</b>: ${esc(c)}.`, hint:`Use all ${g.length} letters.`}))});
+  sk.push({id:"e.marrs.meaning", strand:MS, name:"Match the meaning", desc:"Booklet section III: advanced words and their meanings", pool:()=>MARRS.match.flatMap(set=>set.map(([w,m],i)=>{ const o=shuffle(set.filter((_,j)=>j!==i)).slice(0,3);
+    return Math.random()<0.5 ? mcq(`Which word means: <i>${esc(m)}</i>?`, [w,...o.map(x=>x[0])], 0, `<b>${esc(w)}</b>: ${esc(m)}.`) : mcq(`What does <b>${esc(w)}</b> mean?`, [m,...o.map(x=>x[1])].map(esc), 0, `<b>${esc(w)}</b>: ${esc(m)}.`); }))});
+  sk.push({id:"e.marrs.odd", strand:MS, name:"Odd one out", desc:"Booklet section IV: three words share a meaning", pool:()=>MARRS.odd.map(([ws,k,g,om])=>mcq("Three of these words are related in meaning. Which is the <b>odd one out</b>?", ws, k, `The other three mean <i>${esc(g)}</i>; ${esc(om)}.`))});
   return sk;
 })();
 
@@ -624,7 +667,8 @@ function todaysMix(){
   const items = [];
   const ms = MATH.slice().sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,5);
   ms.forEach(s=>items.push({skill:s.id, lazy:true}));
-  ENG_SKILLS.slice().sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,4).forEach(s=>items.push(...poolItems(s,1)));
+  const forced = ["e.synonyms","e.marrs.spell"].map(skillById); forced.forEach(s=>items.push(...poolItems(s,1)));
+  ENG_SKILLS.filter(s=>!forced.includes(s)).sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,2).forEach(s=>items.push(...poolItems(s,1)));
   const u = currentUnit(); if(u && u.qs.length) items.push(...unitItems(u,3,{noExplain:false}));
   return items;
 }
@@ -641,7 +685,10 @@ function parseFrac(s){ s = s.trim().replace(/\s+/g," "); let m;
 function check(q, raw){
   const s = String(raw ?? "").trim();
   if(q.type==="mcq") return {score: raw===q.ans?1:0};
+  if(q.type==="multi"){ const cor=new Set(q.correct), sel=(raw||[]).filter(i=>!q.optional.includes(i)); const wrong=sel.filter(i=>!cor.has(i)).length, hit=sel.filter(i=>cor.has(i)).length;
+    if(!wrong && hit===cor.size) return {score:1}; if(!wrong && hit>0) return {score:0.5, note:"You found some of the correct words, but not all of them."}; return {score:0}; }
   if(!s) return {score:0, empty:true};
+  if(q.type==="spell"){ const v=s.toLowerCase(); if(q.accept.some(a=>a.toLowerCase()===v)) return {score:1}; if(q.alt.some(a=>a.toLowerCase()===v)) return {score:1, note:`That is the American spelling. In British English (used by Cambridge and in Indian spelling bees) it is “${q.word}”.`}; return {score:0}; }
   if(q.type==="num"){ const x=parseNum(s); if(x===null) return {score:0, note:"That doesn’t look like a number."}; return {score: Math.abs(x-q.ans)<1e-6?1:0}; }
   if(q.type==="qr"){ const m=s.replace(/,/g,"").toLowerCase().match(/^(\d+)\s*(?:r|rem|remainder)?\s*(\d+)?$/); if(!m) return {score:0, note:"Write it like 23 r 4."}; const qq=+m[1], rr=m[2]?+m[2]:0; return {score: qq===q.ans.q && rr===q.ans.r ? 1 : 0}; }
   if(q.type==="pair"){ const m=s.match(/^\(?\s*(-?\d+)\s*,\s*(-?\d+)\s*\)?$/); if(!m) return {score:0, note:"Write it like (4, 7)."}; return {score: +m[1]===q.ans[0] && +m[2]===q.ans[1] ? 1 : 0}; }
@@ -679,7 +726,7 @@ function render(){
   else if(view.name==="parent") app.innerHTML = parentView();
   else if(view.name==="quiz") app.innerHTML = quizView();
   else if(view.name==="results") app.innerHTML = resultsView();
-  if(view.name==="quiz") focusAnswer();
+  if(view.name==="quiz"){ focusAnswer(); const q = quiz.items[quiz.i].q; if(q.type==="spell" && !quiz.checked && quiz.saidFor!==quiz.i && navigator.userActivation && navigator.userActivation.hasBeenActive){ quiz.saidFor = quiz.i; speak(q.word); } }
 }
 
 function activityChart(){
@@ -733,6 +780,22 @@ function sessRow(s){ const p = s.n ? Math.round(s.score/s.n*100) : 0; return `<d
 const fmtScore = x => (Math.round(x*2)/2).toString();
 
 function skillRow(s, subj){ const st = stat(s.id); return `<div class="li"><div><div class="nm">${esc(s.name)}</div>${s.desc?`<div class="ds">${esc(s.desc)}</div>`:""}</div>${meter(mastery(st), subj)}${chip(st)}<button class="btn sm ${subj}" type="button" data-practise="${esc(s.id)}">Practise</button></div>`; }
+function engFeatured(){
+  const m = id => mastery(stat(id));
+  const card = (title, body, btn, key, ids) => `<section class="card subj"><h3>${title}</h3><p class="small muted" style="margin:0">${body}</p>${meter(subjectMastery(ids.map(skillById)),"eng")}<div class="row"><button class="btn solid" type="button" data-quiz="${key}">${btn}</button></div></section>`;
+  const bySyn = l => SYN.filter(x=>x[5]===l).map(x=>`<tr><td><b>${esc(x[0])}</b></td><td class="wrap">${esc(x[1])}</td><td class="wrap">${x[2].map(esc).join(", ")}</td><td>${esc(x[3]||"–")}</td></tr>`).join("");
+  return `<div class="grid3">
+    ${card("Spelling bee","15 words from Rishay’s MaRRS Level 4 list. Each word is read aloud with its meaning; he types the spelling.","Start spelling bee","bee",["e.marrs.spell"])}
+    ${card("MaRRS practice test","20 questions in the booklet’s four formats: correct spellings, anagrams, meanings and odd one out.","Start practice test","marrs",["e.marrs.correct","e.marrs.anagram","e.marrs.meaning","e.marrs.odd"])}
+    ${card("Synonym challenge","15 synonym questions, in context and on their own. They get harder as he improves.","Start synonym challenge","syn",["e.synonyms"])}
+  </div>
+  <section class="card"><h3 style="font-size:19px">Study the words</h3><p class="small muted" style="margin:2px 0 8px">Read through these before a test. Tap a heading to open it.</p>
+    ${[1,2,3].map(l=>`<details><summary><b>Synonyms, level ${l}</b> <span class="muted small">(${SYN.filter(x=>x[5]===l).length} words)</span></summary><div class="table-wrap"><table><thead><tr><th>Word</th><th>Meaning</th><th>Synonyms</th><th>Opposite</th></tr></thead><tbody>${bySyn(l)}</tbody></table></div></details>`).join("")}
+    <details><summary><b>MaRRS Level 4: word meanings</b> <span class="muted small">(${MARRS.match.flat().length} words)</span></summary><div class="table-wrap"><table><thead><tr><th>Word</th><th>Meaning</th></tr></thead><tbody>${MARRS.match.flat().map(([w,mn])=>`<tr><td><b>${esc(w)}</b></td><td class="wrap">${esc(mn)}</td></tr>`).join("")}</tbody></table></div></details>
+    <details><summary><b>MaRRS Level 4: spelling list</b> <span class="muted small">(${MARRS.words.length} words)</span></summary><div class="table-wrap"><table><thead><tr><th>Word</th><th>Meaning</th></tr></thead><tbody>${MARRS.words.map(([w,mn])=>`<tr><td><b>${esc(w)}</b></td><td class="wrap">${esc(mn)}</td></tr>`).join("")}</tbody></table></div></details>
+    <details><summary><b>MaRRS Level 4: odd one out</b> <span class="muted small">(${MARRS.odd.length} sets)</span></summary><div class="table-wrap"><table><thead><tr><th>Words</th><th>Odd one out</th><th>Why</th></tr></thead><tbody>${MARRS.odd.map(([ws,k,g,om])=>`<tr><td class="wrap">${ws.map(esc).join(", ")}</td><td><b>${esc(ws[k])}</b></td><td class="wrap">The others mean “${esc(g)}”; ${esc(om)}.</td></tr>`).join("")}</tbody></table></div></details>
+  </section>`;
+}
 function subjectView(subj){
   const skills = subj==="math" ? MATH : ENG_SKILLS, label = subj==="math"?"Maths":"English";
   const strands = [...new Set(skills.map(s=>s.strand))];
@@ -740,7 +803,8 @@ function subjectView(subj){
   const fullN = subj==="math" ? MATH.length : 20;
   return `<div class="shead"><div><div class="eyebrow">${securedCount(skills)} of ${skills.length} skills secure</div><h1><span class="dot d-${subj}"></span>${label}</h1></div>
     <div class="row"><span class="small muted">Overall mastery</span><div style="width:200px">${meter(m,subj)}</div><button class="btn solid" type="button" data-fulltest="${subj}">Full check-up · ${fullN} questions</button></div></div>
-  <p class="note">${subj==="math" ? "Maths questions are made fresh each time and get harder as a skill becomes secure (level 1 → 3). Every answer shows the worked method." : "Grammar, spelling, figurative language and reading. Every answer shows the rule behind it."} “Mastery” weighs recent answers more than old ones, so it reflects what Rishay knows now.</p>
+  <p class="note">${subj==="math" ? "Maths questions are made fresh each time and get harder as a skill becomes secure (level 1 → 3). Every answer shows the worked method." : "Grammar, spelling bee, synonyms, figurative language and reading. Every answer shows the rule or meaning behind it."} “Mastery” weighs recent answers more than old ones, so it reflects what Rishay knows now.</p>
+  ${subj==="eng" ? engFeatured() : ""}
   ${strands.map(st=>{ const ss=skills.filter(s=>s.strand===st); return `<section class="card strand"><div class="strand-h"><h3>${esc(st)}</h3><button class="btn sm" type="button" data-strand="${subj}|${esc(st)}">Test this strand · ${Math.min(ss.length*2,16)} questions</button></div><div class="list">${ss.map(s=>skillRow(s,subj)).join("")}</div></section>`; }).join("")}`;
 }
 
@@ -846,14 +910,19 @@ function startQuiz(title, subject, items){
 }
 function prepare(){
   const it = quiz.items[quiz.i];
-  if(it.lazy){ const sk = skillById(it.skill); const base = levelFor(it.skill), adj = quiz.run[it.skill]||0; it.level = Math.max(1,Math.min(3,base+adj)); it.q = sk.gen(it.level); }
-  quiz.sel = null; quiz.checked = false; quiz.fb = null;
+  if(it.lazy){ const sk = skillById(it.skill); const base = levelFor(it.skill), adj = quiz.run[it.skill]||0; it.level = Math.max(1,Math.min(3,base+adj)); it.q = sk.gen(it.level, quiz.used || (quiz.used = new Set())); }
+  quiz.sel = null; quiz.checked = false; quiz.fb = null; quiz.hintUsed = false;
 }
 function quizView(){
   const it = quiz.items[quiz.i], q = it.q, sk = skillById(it.skill), subj = subjOf(it.skill);
   const n = quiz.items.length, p = quiz.i/n*100;
   let input = "";
   if(q.type==="mcq") input = `<div class="choices">${q.opts.map((o,k)=>{ let cls="choice"; if(quiz.checked){ if(k===q.ans) cls+=" right"; else if(k===quiz.sel) cls+=" wrong"; } return `<button type="button" class="${cls}" data-choice="${k}" aria-pressed="${quiz.sel===k}" ${quiz.checked?"disabled":""}><span class="k">${String.fromCharCode(65+k)}</span><span>${o}</span></button>`; }).join("")}</div>`;
+  else if(q.type==="multi") input = `<div class="choices">${q.opts.map((o,k)=>{ const on=(quiz.sel||[]).includes(k); let cls="choice"; if(quiz.checked){ if(q.correct.includes(k)) cls+=" right"; else if(on && !q.optional.includes(k)) cls+=" wrong"; } return `<button type="button" class="${cls}" data-mchoice="${k}" aria-pressed="${on}" ${quiz.checked?"disabled":""}><span class="k">${on?"✓":String.fromCharCode(65+k)}</span><span>${esc(o)}</span></button>`; }).join("")}</div>`;
+  else if(q.type==="spell") input = `<div class="bee">${SPEECH ? `<div class="row"><button class="btn solid" type="button" data-say="word">Hear the word</button><button class="btn sm" type="button" data-say="slow">Say it slowly</button><button class="btn sm" type="button" data-say="def">Hear the meaning</button>${q.sent?`<button class="btn sm" type="button" data-say="sent">Hear it in a sentence</button>`:""}</div>` : `<p class="note">Sound isn’t available in this browser, so use the meaning${q.sent?" and the sentence":""} below. A parent can also read the word aloud.</p>`}
+      <p style="margin:12px 0 2px"><b>Meaning:</b> ${esc(q.def)}</p>${q.sent?`<p class="muted" style="margin:0 0 12px"><b>Sentence:</b> ${esc(blankWord(q.sent,q.word))}</p>`:`<div style="height:10px"></div>`}</div>
+      <div class="ans"><input id="ans" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" value="${esc(quiz.sel||"")}" ${quiz.checked?"disabled":""} aria-label="Type the spelling"></div>
+      ${quiz.checked ? "" : `<div class="hint">${quiz.hintUsed ? `Hint: ${q.word.length} letters, starting with “${esc(q.word[0])}”. A correct answer now earns half a mark.` : `<button class="btn sm" type="button" id="beeHint">Show a hint (half a mark)</button>`}</div>`}`;
   else if(q.type==="explain") input = `<div class="ans"><textarea id="ans" ${quiz.checked?"disabled":""} placeholder="Write your answer in two to four sentences.">${esc(quiz.sel||"")}</textarea></div>`;
   else { const mode = ["num","qr"].includes(q.type)?"decimal":"text"; input = `<div class="ans">${q.pre?`<span class="unitlbl">${esc(q.unit)}</span>`:""}<input id="ans" autocomplete="off" inputmode="${q.type==="num"?"decimal":"text"}" value="${esc(quiz.sel||"")}" ${quiz.checked?"disabled":""} aria-label="Your answer">${q.unit&&!q.pre?`<span class="unitlbl">${esc(q.unit)}</span>`:""}</div>${q.hint?`<div class="hint">${esc(q.hint)}</div>`:""}`; }
   const passage = it.q.passage || (it.passage);
@@ -862,12 +931,12 @@ function quizView(){
     <div class="qtop"><div><div class="eyebrow">${esc(quiz.title)}</div><b>Question ${quiz.i+1} of ${n}</b></div><button class="btn sm" type="button" id="endQuiz">${quiz.confirmEnd?"Tap again to finish now":"Finish early"}</button></div>
     <div class="qprog" aria-hidden="true"><i style="width:${p}%"></i></div>
     <section class="qcard">
-      <div class="qmeta"><span class="tag"><span class="dot d-${subj}"></span>${esc(sk?sk.name:"")}</span>${it.level?`<span class="lvl" aria-label="Level ${it.level} of 3">${[1,2,3].map(x=>`<i class="${x<=it.level?"on":""}"></i>`).join("")} Level ${it.level}</span>`:""}</div>
+      <div class="qmeta"><span class="tag"><span class="dot d-${subj}"></span>${esc(sk?sk.name:"")}</span>${it.level && !(sk&&sk.flat)?`<span class="lvl" aria-label="Level ${it.level} of 3">${[1,2,3].map(x=>`<i class="${x<=it.level?"on":""}"></i>`).join("")} Level ${it.level}</span>`:""}</div>
       ${pass}
       <div class="prompt">${q.prompt}</div>
       ${input}
       <div id="fbBox">${quiz.fb ? fbHTML() : ""}</div>
-      <div class="qactions"><span class="small muted">${q.type==="mcq"?"Press A–D or click an answer.":"Press Enter to check."}</span>
+      <div class="qactions"><span class="small muted">${q.type==="mcq"?"Press A–D or click an answer.":q.type==="multi"?"Click every correct word, then check.":"Press Enter to check."}</span>
         ${quiz.checked ? `<button class="btn solid" type="button" id="nextQ">${quiz.i+1<n?"Next question":"See results"}</button>` : quiz.pendingSelf ? "" : `<button class="btn solid" type="button" id="checkQ" ${quiz.busy?"disabled":""}>${quiz.busy?"Checking…":"Check answer"}</button>`}
       </div>
     </section></div>`;
@@ -876,14 +945,15 @@ function fbHTML(){
   const f = quiz.fb, q = quiz.items[quiz.i].q;
   if(f.self) return `<div class="fb part"><h4>Compare with the model answer</h4><div class="model"><b>Model answer:</b> ${q.show}</div><p class="small" style="margin:10px 0 6px">How close was your answer?</p><div class="row"><button class="btn sm uoi" type="button" data-self="1">Got the main ideas</button><button class="btn sm" type="button" data-self="0.5">Partly</button><button class="btn sm danger" type="button" data-self="0">Missed it</button></div></div>`;
   const cls = f.score>=1?"good":f.score>0?"part":"badf", head = f.score>=1?"✓ Correct":f.score>0?"◐ Partly right":"✗ Not quite";
-  return `<div class="fb ${cls}" role="status"><h4>${head}</h4>${f.note?`<div class="small">${esc(f.note)}</div>`:""}${f.score<1 && q.type!=="explain" ? `<div class="ex">The answer is <b>${q.show}</b>.</div>`:""}${f.claude?`<div class="ex">${esc(f.claude)}</div>`:""}${q.ex?`<div class="ex small">${q.ex}</div>`:""}${q.type==="explain"?`<div class="model"><b>Model answer:</b> ${q.show}</div>`:""}</div>`;
+  return `<div class="fb ${cls}" role="status"><h4>${head}</h4>${f.note?`<div class="small">${esc(f.note)}</div>`:""}${f.score<1 && q.type==="spell" ? `<div class="ex">You wrote <b>${esc(quiz.sel||"")}</b>. The correct spelling is <span class="bigword">${markDiff(String(quiz.sel||""), q.word)}</span></div>` : f.score<1 && q.type!=="explain" ? `<div class="ex">The answer is <b>${q.type==="multi"?esc(q.show):q.show}</b>.</div>`:""}${f.claude?`<div class="ex">${esc(f.claude)}</div>`:""}${q.ex?`<div class="ex small">${q.ex}</div>`:""}${q.type==="explain"?`<div class="model"><b>Model answer:</b> ${q.show}</div>`:""}</div>`;
 }
 function readInput(){ const el = $("#ans"); if(el) quiz.sel = el.value; }
 async function doCheck(){
   const it = quiz.items[quiz.i], q = it.q;
-  if(q.type!=="mcq") readInput();
+  if(q.type!=="mcq" && q.type!=="multi") readInput();
   if(q.type==="mcq" && quiz.sel===null) return;
-  if(q.type!=="mcq" && !String(quiz.sel||"").trim()) { const el=$("#ans"); if(el){ el.focus(); el.setAttribute("placeholder","Type your answer first"); } return; }
+  if(q.type==="multi" && !(quiz.sel||[]).length) return;
+  if(q.type!=="mcq" && q.type!=="multi" && !String(quiz.sel||"").trim()) { const el=$("#ans"); if(el){ el.focus(); el.setAttribute("placeholder","Type your answer first"); } return; }
   if(q.type==="explain"){
     if(sample){
       quiz.busy = true; render();
@@ -905,6 +975,7 @@ Reply with only JSON: {"score": 1 or 0.5 or 0, "feedback": "one or two encouragi
     quiz.pendingSelf = true; quiz.fb = {self:true}; render(); return;
   }
   const r = check(q, quiz.sel);
+  if(q.type==="spell" && quiz.hintUsed && r.score===1){ r.score = 0.5; r.note = ((r.note||"")+" Correct, with a hint: half a mark.").trim(); }
   finishCheck(r.score, {note:r.note});
 }
 function finishCheck(score, extra={}){
@@ -913,7 +984,7 @@ function finishCheck(score, extra={}){
   record(it.skill, score, it.concept);
   if(it.lazy){ const r = quiz.run, k = it.skill; const recent = (quiz.results.filter(x=>x.skill===k).map(x=>x.score)).concat(score);
     if(recent.slice(-2).every(x=>x>=1) && recent.length>=2) r[k] = Math.min(2,(r[k]||0)+1); if(score<1 && recent.slice(-2).every(x=>x<1) && recent.length>=2) r[k] = Math.max(-2,(r[k]||0)-1); }
-  const given = q.type==="mcq" ? (quiz.sel===null?"":stripHtml(q.opts[quiz.sel])) : String(quiz.sel||"");
+  const given = q.type==="mcq" ? (quiz.sel===null?"":stripHtml(q.opts[quiz.sel])) : q.type==="multi" ? (quiz.sel||[]).map(i=>q.opts[i]).join(", ") : String(quiz.sel||"");
   quiz.results.push({skill:it.skill, score, p:stripHtml(q.prompt).slice(0,220), given:given.slice(0,300), correct:stripHtml(q.show).slice(0,300), ex:q.ex, promptHtml:q.prompt, showHtml:q.show});
   render();
 }
@@ -961,6 +1032,13 @@ app.addEventListener("click", async e => {
   if(t.dataset.unit){ S.settings.currentUnit = t.dataset.unit; saveSettings(); return render(); }
   if(t.dataset.unittest){ const u=unitById(t.dataset.unittest); return startQuiz(`${u.title}: unit test`,"uoi",unitItems(u,20,{balanced:true})); }
   if(t.dataset.unitquick){ const u=unitById(t.dataset.unitquick); return startQuiz(`${u.title}: quick quiz`,"uoi",unitItems(u,8,{noExplain:true})); }
+  if(t.dataset.mchoice!==undefined && quiz && !quiz.checked){ const k=Number(t.dataset.mchoice), set=new Set(quiz.sel||[]); set.has(k)?set.delete(k):set.add(k); quiz.sel=[...set].sort(); render(); return; }
+  if(t.dataset.say && quiz){ const q=quiz.items[quiz.i].q, m=t.dataset.say; speak(m==="def"?q.def:m==="sent"?q.sent:q.word, m==="slow"?0.5:0.82); return; }
+  if(t.id==="beeHint" && quiz){ readInput(); quiz.hintUsed = true; render(); return; }
+  if(t.dataset.quiz){ const k=t.dataset.quiz;
+    if(k==="bee") return startQuiz("Spelling bee: school word list","eng",poolItems(skillById("e.marrs.spell"),15));
+    if(k==="syn") return startQuiz("Synonym challenge","eng",poolItems(skillById("e.synonyms"),15));
+    if(k==="marrs") return startQuiz("MaRRS Level 4 practice test","eng",["e.marrs.correct","e.marrs.anagram","e.marrs.meaning","e.marrs.odd"].flatMap(id=>poolItems(skillById(id),5))); }
   if(t.dataset.choice!==undefined && quiz && !quiz.checked){ quiz.sel = Number(t.dataset.choice); render(); return; }
   if(t.id==="checkQ") return doCheck();
   if(t.id==="nextQ") return nextQ();
@@ -980,7 +1058,7 @@ document.addEventListener("keydown", e => {
   if(view.name!=="quiz" || !quiz || quiz.done) return;
   const q = quiz.items[quiz.i].q;
   if(e.key==="Enter" && !e.shiftKey){ if(e.target.tagName==="TEXTAREA") return; if(e.target.tagName==="BUTTON" && e.target.id!=="nextQ" && e.target.id!=="checkQ" && !e.target.dataset.choice) return; e.preventDefault(); if(quiz.checked) nextQ(); else if(!quiz.pendingSelf && !quiz.busy) doCheck(); return; }
-  if(q.type==="mcq" && !quiz.checked && /^[a-dA-D1-4]$/.test(e.key) && e.target.tagName!=="INPUT"){ const k = isNaN(e.key) ? e.key.toLowerCase().charCodeAt(0)-97 : Number(e.key)-1; if(k < q.opts.length){ quiz.sel=k; render(); } }
+  if((q.type==="mcq"||q.type==="multi") && !quiz.checked && /^[a-dA-D1-4]$/.test(e.key) && e.target.tagName!=="INPUT"){ const k = isNaN(e.key) ? e.key.toLowerCase().charCodeAt(0)-97 : Number(e.key)-1; if(k < q.opts.length){ if(q.type==="mcq") quiz.sel=k; else { const set=new Set(quiz.sel||[]); set.has(k)?set.delete(k):set.add(k); quiz.sel=[...set].sort(); } render(); } }
 });
 app.addEventListener("input", e => { if(e.target.id==="ans" && quiz) quiz.sel = e.target.value; });
 app.addEventListener("change", e => { if(e.target.id==="qf-t"){ const o=$("#qf-opts"); if(o) o.hidden = e.target.value!=="mcq"; } });
