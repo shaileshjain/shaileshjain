@@ -202,6 +202,21 @@ details{border-top:1px solid var(--line);padding:8px 0}
 details summary{cursor:pointer}
 .bigword{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:.04em}
 .bigword mark{background:transparent;color:var(--eng);text-decoration:underline 3px;text-underline-offset:4px}
+.figwrap{overflow-x:auto;margin:4px 0 12px}
+.fig line{stroke:var(--ink);stroke-width:3;stroke-linecap:round}
+.fig circle{fill:var(--ink)}
+.fig text{fill:var(--muted);font:11px var(--font-body)}
+table.mini{width:auto;margin:6px 0 14px;font-size:16px}
+table.mini th,table.mini td{border:1px solid var(--line);padding:4px 10px;text-align:center}
+table.mini th{color:var(--ink);font-family:var(--font-body);font-size:15px}
+table.mini .pic{text-align:left}
+.pico{fill:var(--math);vertical-align:-3px;margin-right:3px}
+.pico .ring{fill:none;stroke:var(--math);stroke-width:1}
+.sl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.clues{margin:6px 0 0;padding-left:22px;font-size:19px}
+.timer{font-family:var(--font-display);font-weight:800;font-size:20px;font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad)}
+.scheme{font-size:13px;color:var(--muted);font-weight:400}
 /* results */
 .score{font-family:var(--font-display);font-size:64px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
 .review{display:flex;flex-direction:column;gap:10px}
@@ -478,6 +493,8 @@ const MATH = [
  }}
 ];
 
+/*@OLYMPIAD@*/
+
 /* =========================================================
    English
    ========================================================= */
@@ -608,7 +625,7 @@ function unitById(id){ return EX_UNITS.find(u=>u.id===id) || S.units.find(u=>u.i
 function currentUnit(){ const u = unitById(S.settings.currentUnit); return (u && allUnits().includes(u)) ? u : allUnits()[0] || null; }
 function uoiSkills(u){ return u.lois.map((l,i)=>({id:`u.${u.id}.${i}`, strand:u.title, name:l, desc:"", unit:u, loi:i})); }
 function skillById(id){
-  if(id.startsWith("m.")) return MATH.find(s=>s.id===id);
+  if(id.startsWith("m.")) return MATH.find(s=>s.id===id) || OLY.find(s=>s.id===id);
   if(id.startsWith("e.")) return ENG_SKILLS.find(s=>s.id===id);
   const m = id.match(/^u\.(.+)\.(\d+)$/); if(!m) return null; const u = unitById(m[1]); return u ? uoiSkills(u)[+m[2]] : null;
 }
@@ -665,7 +682,7 @@ function unitItems(u, n, opts={}){
 }
 function todaysMix(){
   const items = [];
-  const ms = MATH.slice().sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,5);
+  const ms = [...MATH.slice().sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,4), OLY.slice().sort((a,b)=>priority(b.id)-priority(a.id))[0]];
   ms.forEach(s=>items.push({skill:s.id, lazy:true}));
   const forced = ["e.synonyms","e.marrs.spell"].map(skillById); forced.forEach(s=>items.push(...poolItems(s,1)));
   ENG_SKILLS.filter(s=>!forced.includes(s)).sort((a,b)=>priority(b.id)-priority(a.id)).slice(0,2).forEach(s=>items.push(...poolItems(s,1)));
@@ -768,7 +785,7 @@ function homeView(){
     <button class="btn solid" type="button" id="startMix">Start today’s mix</button>
   </section>
   <div class="grid3">
-    ${subjCard("math","Maths",MATH)}
+    ${subjCard("math","Maths",[...MATH,...OLY])}
     ${subjCard("eng","English",ENG_SKILLS)}
     ${u ? subjCard("uoi","Unit of Inquiry",uoiSkills(u),`<div class="small"><b>${esc(u.title)}</b> · <span class="muted">${esc(u.theme)}</span></div>`) : `<section class="card subj"><h3><span class="dot d-uoi"></span>Unit of Inquiry</h3><p class="muted small">Add Rishay’s current unit to start.</p><div class="row"><button class="btn uoi" type="button" data-go="unitform">Add a unit</button></div></section>`}
   </div>
@@ -776,10 +793,23 @@ function homeView(){
   <section class="card"><h3 style="font-size:18px;margin-bottom:6px">Recent sessions</h3>${recent.length ? recent.map(sessRow).join("") : `<p class="muted small">No sessions yet. Start with today’s mix or a full check-up in any subject.</p>`}</section>
   <p class="status" id="sync">${esc(syncMsg)}</p>`;
 }
-function sessRow(s){ const p = s.n ? Math.round(s.score/s.n*100) : 0; return `<div class="sess"><span class="dot d-${s.subject==="mix"?"math":s.subject}" style="${s.subject==="mix"?"background:var(--chart)":""}"></span><span>${esc(s.title)} <span class="muted small">· ${new Date(s.at).toLocaleDateString("en-IN",{day:"numeric",month:"short"})}${s.mins?` · ${s.mins} min`:""}</span></span><span class="sc">${fmtScore(s.score)}/${s.n} · ${p}%</span></div>`; }
+function sessRow(s){ const p = s.n ? Math.round(s.score/s.n*100) : 0; return `<div class="sess"><span class="dot d-${s.subject==="mix"?"math":s.subject}" style="${s.subject==="mix"?"background:var(--chart)":""}"></span><span>${esc(s.title)} <span class="muted small">· ${new Date(s.at).toLocaleDateString("en-IN",{day:"numeric",month:"short"})}${s.mins?` · ${s.mins} min`:""}</span></span><span class="sc">${s.max ? `${s.marks}/${s.max} marks` : `${fmtScore(s.score)}/${s.n} · ${p}%`}</span></div>`; }
 const fmtScore = x => (Math.round(x*2)/2).toString();
 
 function skillRow(s, subj){ const st = stat(s.id); return `<div class="li"><div><div class="nm">${esc(s.name)}</div>${s.desc?`<div class="ds">${esc(s.desc)}</div>`:""}</div>${meter(mastery(st), subj)}${chip(st)}<button class="btn sm ${subj}" type="button" data-practise="${esc(s.id)}">Practise</button></div>`; }
+function mathFeatured(){
+  const best = k => { const xs=S.sessions.filter(x=>x.kind===k && x.max); return xs.length ? Math.max(...xs.map(x=>x.marks)) : null; };
+  const bi=best("oly-ind"), bt=best("oly-team");
+  return `<section class="card">
+    <div class="eyebrow">Maths Olympiad · Sub-Junior Level 2 (Grades 3–5)</div>
+    <h2 style="font-size:24px;margin:4px 0 6px">Competition practice</h2>
+    <p class="small muted" style="margin:0 0 12px">Every syllabus topic: logical thinking, number and figure patterns, operations with whole numbers, fractions and decimals, guessing numbers from their properties, time problems, basic geometry, measurement and data handling. Questions in the rounds are set at the harder levels.</p>
+    <div class="grid3">
+      <div class="subj"><h3>Individual round</h3><p class="small" style="margin:0">30 multiple-choice questions · 60 minutes<br>Correct +4 · wrong −1 · skipped 0</p><p class="small muted" style="margin:0">${bi===null?"Not tried yet":`Best: ${bi}/120`}</p><div class="row"><button class="btn solid" type="button" data-oly="ind">Start individual round</button></div></div>
+      <div class="subj"><h3>Team round</h3><p class="small" style="margin:0">10 problems · 60 minutes · type the answer<br>Correct +10 · no penalty</p><p class="small muted" style="margin:0">${bt===null?"Not tried yet":`Best: ${bt}/100`}</p><div class="row"><button class="btn solid" type="button" data-oly="team">Start team round</button></div></div>
+      <div class="subj"><h3>Quick challenge</h3><p class="small" style="margin:0">10 problems, one from each topic, with the full solution after each answer. Difficulty adapts to Rishay.</p><div class="row"><button class="btn math" type="button" data-oly="quick">Start quick challenge</button></div></div>
+    </div></section>`;
+}
 function engFeatured(){
   const m = id => mastery(stat(id));
   const card = (title, body, btn, key, ids) => `<section class="card subj"><h3>${title}</h3><p class="small muted" style="margin:0">${body}</p>${meter(subjectMastery(ids.map(skillById)),"eng")}<div class="row"><button class="btn solid" type="button" data-quiz="${key}">${btn}</button></div></section>`;
@@ -797,14 +827,14 @@ function engFeatured(){
   </section>`;
 }
 function subjectView(subj){
-  const skills = subj==="math" ? MATH : ENG_SKILLS, label = subj==="math"?"Maths":"English";
+  const skills = subj==="math" ? [...MATH,...OLY] : ENG_SKILLS, label = subj==="math"?"Maths":"English";
   const strands = [...new Set(skills.map(s=>s.strand))];
   const m = subjectMastery(skills);
   const fullN = subj==="math" ? MATH.length : 20;
   return `<div class="shead"><div><div class="eyebrow">${securedCount(skills)} of ${skills.length} skills secure</div><h1><span class="dot d-${subj}"></span>${label}</h1></div>
     <div class="row"><span class="small muted">Overall mastery</span><div style="width:200px">${meter(m,subj)}</div><button class="btn solid" type="button" data-fulltest="${subj}">Full check-up · ${fullN} questions</button></div></div>
   <p class="note">${subj==="math" ? "Maths questions are made fresh each time and get harder as a skill becomes secure (level 1 → 3). Every answer shows the worked method." : "Grammar, spelling bee, synonyms, figurative language and reading. Every answer shows the rule or meaning behind it."} “Mastery” weighs recent answers more than old ones, so it reflects what Rishay knows now.</p>
-  ${subj==="eng" ? engFeatured() : ""}
+  ${subj==="eng" ? engFeatured() : mathFeatured()}
   ${strands.map(st=>{ const ss=skills.filter(s=>s.strand===st); return `<section class="card strand"><div class="strand-h"><h3>${esc(st)}</h3><button class="btn sm" type="button" data-strand="${subj}|${esc(st)}">Test this strand · ${Math.min(ss.length*2,16)} questions</button></div><div class="list">${ss.map(s=>skillRow(s,subj)).join("")}</div></section>`; }).join("")}`;
 }
 
@@ -847,9 +877,9 @@ function unitFormView(){
 
 function parentView(){
   const filt = view.filter || "all";
-  const rows = [...MATH, ...ENG_SKILLS, ...allUnits().flatMap(uoiSkills)].filter(s=>filt==="all"||subjOf(s.id)===filt)
+  const rows = [...MATH, ...OLY, ...ENG_SKILLS, ...allUnits().flatMap(uoiSkills)].filter(s=>filt==="all"||subjOf(s.id)===filt)
     .map(s=>({s, st:stat(s.id), m:mastery(stat(s.id))})).sort((a,b)=>(a.m===null?2:a.m)-(b.m===null?2:b.m));
-  const attention = [...MATH, ...ENG_SKILLS, ...allUnits().flatMap(uoiSkills)].map(s=>({s,st:stat(s.id),m:mastery(stat(s.id))})).filter(x=>x.m!==null && x.st.n>=3 && x.m<0.75).sort((a,b)=>a.m-b.m).slice(0,6);
+  const attention = [...MATH, ...OLY, ...ENG_SKILLS, ...allUnits().flatMap(uoiSkills)].map(s=>({s,st:stat(s.id),m:mastery(stat(s.id))})).filter(x=>x.m!==null && x.st.n>=3 && x.m<0.75).sort((a,b)=>a.m-b.m).slice(0,6);
   let totalN=0,totalC=0; Object.values(S.progress.skills).forEach(st=>{totalN+=st.n;totalC+=st.c});
   const ws = weekStats(), mins7 = S.sessions.filter(s=>Date.now()-s.at<7*864e5).reduce((a,s)=>a+(s.mins||0),0);
   const mistakes = S.sessions.flatMap(s=>(s.wrong||[]).map(w=>({...w, at:s.at}))).slice(0,25);
@@ -903,14 +933,19 @@ function manualQForm(u){
 }
 
 /* ---------- quiz ---------- */
-function startQuiz(title, subject, items){
+let timerT = null;
+const fmtClock = ms => { const sec=Math.max(0,Math.ceil(ms/1000)); return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,"0")}`; };
+function startQuiz(title, subject, items, opts={}){
   if(!items.length) return;
-  quiz = {id:uid(), title, subject, items, i:0, results:[], startedAt:Date.now(), done:false, run:{}, cur:null, sel:null, checked:false, fb:null};
+  quiz = {id:uid(), title, subject, items, i:0, results:[], startedAt:Date.now(), done:false, run:{}, cur:null, sel:null, checked:false, fb:null,
+    exam:!!opts.exam, scheme:opts.scheme||null, kind:opts.kind||null, deadline: opts.minutes ? Date.now()+opts.minutes*60000 : 0};
+  clearInterval(timerT);
+  if(quiz.deadline) timerT = setInterval(()=>{ if(!quiz || quiz.done){ clearInterval(timerT); return; } const left=quiz.deadline-Date.now(), el=$("#timer"); if(el){ el.textContent=fmtClock(left); el.classList.toggle("low", left<5*60000); } if(left<=0){ clearInterval(timerT); quiz.timeUp=true; endQuiz(true); } }, 1000);
   prepare(); go("quiz");
 }
 function prepare(){
   const it = quiz.items[quiz.i];
-  if(it.lazy){ const sk = skillById(it.skill); const base = levelFor(it.skill), adj = quiz.run[it.skill]||0; it.level = Math.max(1,Math.min(3,base+adj)); it.q = sk.gen(it.level, quiz.used || (quiz.used = new Set())); }
+  if(it.lazy){ const sk = skillById(it.skill); const base = levelFor(it.skill), adj = quiz.run[it.skill]||0; it.level = it.fix || Math.max(1,Math.min(3,base+adj)); it.q = sk.gen(it.level, quiz.used || (quiz.used = new Set())); if(it.asMcq) it.q = toMCQ(it.q); }
   quiz.sel = null; quiz.checked = false; quiz.fb = null; quiz.hintUsed = false;
 }
 function quizView(){
@@ -928,7 +963,7 @@ function quizView(){
   const passage = it.q.passage || (it.passage);
   const pass = passage ? `<details class="passage ${passage.poem?"poem":""} ${passage.letter?"letter":""}" open><summary>${esc(passage.kind)}: ${esc(passage.title)}</summary>${passage.text.split(/\n\s*\n/).map(t=>`<p>${esc(t)}</p>`).join("")}</details>` : "";
   return `<div class="quiz">
-    <div class="qtop"><div><div class="eyebrow">${esc(quiz.title)}</div><b>Question ${quiz.i+1} of ${n}</b></div><button class="btn sm" type="button" id="endQuiz">${quiz.confirmEnd?"Tap again to finish now":"Finish early"}</button></div>
+    <div class="qtop"><div><div class="eyebrow">${esc(quiz.title)}</div><b>Question ${quiz.i+1} of ${n}</b>${quiz.scheme?` <span class="scheme">· correct +${quiz.scheme.right}${quiz.scheme.wrong?`, wrong ${quiz.scheme.wrong}`:", no penalty"}, skipped 0</span>`:""}</div><div class="row">${quiz.deadline?`<span class="timer${quiz.deadline-Date.now()<5*60000?" low":""}" id="timer" aria-label="Time left">${fmtClock(quiz.deadline-Date.now())}</span>`:""}<button class="btn sm" type="button" id="endQuiz">${quiz.confirmEnd?"Tap again to finish now":"Finish early"}</button></div></div>
     <div class="qprog" aria-hidden="true"><i style="width:${p}%"></i></div>
     <section class="qcard">
       <div class="qmeta"><span class="tag"><span class="dot d-${subj}"></span>${esc(sk?sk.name:"")}</span>${it.level && !(sk&&sk.flat)?`<span class="lvl" aria-label="Level ${it.level} of 3">${[1,2,3].map(x=>`<i class="${x<=it.level?"on":""}"></i>`).join("")} Level ${it.level}</span>`:""}</div>
@@ -937,7 +972,7 @@ function quizView(){
       ${input}
       <div id="fbBox">${quiz.fb ? fbHTML() : ""}</div>
       <div class="qactions"><span class="small muted">${q.type==="mcq"?"Press A–D or click an answer.":q.type==="multi"?"Click every correct word, then check.":"Press Enter to check."}</span>
-        ${quiz.checked ? `<button class="btn solid" type="button" id="nextQ">${quiz.i+1<n?"Next question":"See results"}</button>` : quiz.pendingSelf ? "" : `<button class="btn solid" type="button" id="checkQ" ${quiz.busy?"disabled":""}>${quiz.busy?"Checking…":"Check answer"}</button>`}
+        <span class="row">${quiz.exam && !quiz.checked ? `<button class="btn" type="button" id="skipQ">Skip (0 marks)</button>` : ""}${quiz.checked ? `<button class="btn solid" type="button" id="nextQ">${quiz.i+1<n?"Next question":"See results"}</button>` : quiz.pendingSelf ? "" : `<button class="btn solid" type="button" id="checkQ" ${quiz.busy?"disabled":""}>${quiz.busy?"Checking…":quiz.exam?"Submit answer":"Check answer"}</button>`}</span>
       </div>
     </section></div>`;
 }
@@ -986,35 +1021,41 @@ function finishCheck(score, extra={}){
     if(recent.slice(-2).every(x=>x>=1) && recent.length>=2) r[k] = Math.min(2,(r[k]||0)+1); if(score<1 && recent.slice(-2).every(x=>x<1) && recent.length>=2) r[k] = Math.max(-2,(r[k]||0)-1); }
   const given = q.type==="mcq" ? (quiz.sel===null?"":stripHtml(q.opts[quiz.sel])) : q.type==="multi" ? (quiz.sel||[]).map(i=>q.opts[i]).join(", ") : String(quiz.sel||"");
   quiz.results.push({skill:it.skill, score, p:stripHtml(q.prompt).slice(0,220), given:given.slice(0,300), correct:stripHtml(q.show).slice(0,300), ex:q.ex, promptHtml:q.prompt, showHtml:q.show});
+  if(quiz.exam){ nextQ(); return; }
   render();
 }
 function nextQ(){ if(quiz.i+1 < quiz.items.length){ quiz.i++; prepare(); render(); } else endQuiz(false); }
 function endQuiz(early){
   if(!quiz || quiz.done) return;
-  quiz.done = true;
-  const res = quiz.results; if(!res.length){ quiz = null; return; }
+  quiz.done = true; clearInterval(timerT);
+  const res = quiz.results; if(!res.length && !quiz.scheme){ quiz = null; return; }
   const score = res.reduce((a,r)=>a+r.score,0), mins = Math.max(1, Math.round((Date.now()-quiz.startedAt)/60000));
   const skills = {}; res.forEach(r=>{ const s=skills[r.skill]||(skills[r.skill]=[0,0]); s[0]++; s[1]+=r.score; });
   const sess = {id:quiz.id, at:Date.now(), title:quiz.title+(early?" (finished early)":""), subject:quiz.subject, n:res.length, score, mins, skills,
-    wrong:res.filter(r=>r.score<1).slice(0,20).map(r=>({skill:r.skill, p:r.p, given:r.given, correct:r.correct}))};
+    wrong:res.filter(r=>r.score<1).slice(0,20).map(r=>({skill:r.skill, p:r.p, given:r.skipped?"(skipped)":r.given, correct:r.correct}))};
+  if(quiz.scheme){ const c=res.filter(r=>r.score>=1).length, w=res.filter(r=>!r.skipped && r.score<1).length, sk=res.filter(r=>r.skipped).length, na=quiz.items.length-res.length;
+    sess.marks = c*quiz.scheme.right + w*quiz.scheme.wrong; sess.max = quiz.items.length*quiz.scheme.right; sess.kind = quiz.kind; quiz.tally = {c, w, sk, na, marks:sess.marks, max:sess.max}; }
   S.sessions.unshift(sess); if(S.sessions.length>300) S.sessions.length=300;
   persistLocal(); dbWrite("sessions/"+sess.id, sess); flushProgress();
   view = {name:"results"}; render(); window.scrollTo({top:0});
 }
 function resultsView(){
-  const res = quiz.results, n = res.length, score = res.reduce((a,r)=>a+r.score,0), pct = Math.round(score/n*100);
+  const res = quiz.results, n = res.length, score = res.reduce((a,r)=>a+r.score,0), pct = n ? Math.round(score/n*100) : 0, T = quiz.tally;
   const msg = pct>=90?"Outstanding work!":pct>=75?"Great job — you know most of this well.":pct>=50?"Good effort. Look at the mistakes below and try again.":"This is tricky. Read each explanation, then practise the weakest skill.";
   const bySkill = {}; res.forEach(r=>{ const s=bySkill[r.skill]||(bySkill[r.skill]=[0,0]); s[0]++; s[1]+=r.score; });
   const worst = Object.entries(bySkill).sort((a,b)=>a[1][1]/a[1][0]-b[1][1]/b[1][0])[0];
   return `<div class="quiz"><section class="qcard">
     <div class="eyebrow">${esc(quiz.title)}</div>
-    <div class="row" style="gap:20px;margin-top:8px"><span class="score">${fmtScore(score)}<span class="muted" style="font-size:32px">/${n}</span></span><div><h2 style="font-size:24px">${msg}</h2><p class="muted" style="margin:4px 0 0">${pct}% correct · ${Math.max(1,Math.round((Date.now()-quiz.startedAt)/60000))} minutes</p></div></div>
+    ${T ? `<div class="row" style="gap:20px;margin-top:8px"><span class="score">${T.marks}<span class="muted" style="font-size:32px">/${T.max}</span></span><div><h2 style="font-size:24px">${quiz.timeUp?"Time’s up! ":""}${T.marks>=T.max*0.75?"Excellent, competition-ready!":T.marks>=T.max*0.5?"Strong effort. Study the solutions below.":"These are hard problems. Learn from every solution below."}</h2>
+      <p class="muted" style="margin:4px 0 0">${T.c} correct (+${T.c*quiz.scheme.right})${quiz.scheme.wrong?` · ${T.w} wrong (${T.w*quiz.scheme.wrong})`:` · ${T.w} wrong`} · ${T.sk} skipped${T.na?` · ${T.na} not reached`:""} · ${(m=>`${m} minute${m===1?"":"s"}`)(Math.max(1,Math.round((Date.now()-quiz.startedAt)/60000)))}</p></div></div>
+      ${quiz.scheme.wrong ? `<p class="note" style="margin-top:12px">Marking tip: with +${quiz.scheme.right} for correct and ${quiz.scheme.wrong} for wrong, an educated guess pays off. If you can rule out even one option, guessing gains marks on average. Skip only when you have no idea at all and time is short.</p>` : ""}`
+    : `<div class="row" style="gap:20px;margin-top:8px"><span class="score">${fmtScore(score)}<span class="muted" style="font-size:32px">/${n}</span></span><div><h2 style="font-size:24px">${msg}</h2><p class="muted" style="margin:4px 0 0">${pct}% correct · ${(m=>`${m} minute${m===1?"":"s"}`)(Math.max(1,Math.round((Date.now()-quiz.startedAt)/60000)))}</p></div></div>`}
     <div class="table-wrap" style="margin-top:16px"><table><thead><tr><th>Skill</th><th class="num">Score</th><th>Mastery now</th></tr></thead><tbody>
     ${Object.entries(bySkill).map(([id,[k,c]])=>{ const sk=skillById(id); return `<tr><td class="wrap"><span class="dot d-${subjOf(id)}"></span> ${esc(sk?sk.name:id)}</td><td class="num">${fmtScore(c)}/${k}</td><td style="min-width:160px">${meter(mastery(stat(id)),subjOf(id))}</td></tr>`; }).join("")}
     </tbody></table></div>
     <div class="row" style="margin-top:16px">${worst && worst[1][1]<worst[1][0] ? `<button class="btn solid" type="button" data-practise="${esc(worst[0])}">Practise ${esc((skillById(worst[0])||{name:""}).name)}</button>`:""}<button class="btn" type="button" data-go="home">Back to home</button></div>
   </section>
-  ${res.some(r=>r.score<1) ? `<section class="qcard"><h3 style="font-size:20px;margin-bottom:10px">Look again at these</h3><div class="review">${res.filter(r=>r.score<1).map(r=>`<div class="rv"><div class="p">${r.promptHtml}</div><div class="a">Your answer: <b>${esc(r.given||"(blank)")}</b> · Correct: <b>${r.showHtml}</b></div>${r.ex?`<div class="a muted">${r.ex}</div>`:""}</div>`).join("")}</div></section>` : ""}
+  ${res.some(r=>r.score<1) ? `<section class="qcard"><h3 style="font-size:20px;margin-bottom:10px">${T?"Solutions to the ones you missed":"Look again at these"}</h3><div class="review">${res.filter(r=>r.score<1).map(r=>`<div class="rv"><div class="p">${r.promptHtml}</div><div class="a">Your answer: <b>${r.skipped?"skipped":esc(r.given||"(blank)")}</b> · Correct: <b>${r.showHtml}</b></div>${r.ex?`<div class="a muted">${r.ex}</div>`:""}</div>`).join("")}</div></section>` : ""}
   </div>`;
 }
 function focusAnswer(){ const el = $("#ans"); if(el && !el.disabled) el.focus({preventScroll:true}); else { const nb=$("#nextQ"); if(nb) nb.focus({preventScroll:true}); } }
@@ -1027,7 +1068,7 @@ app.addEventListener("click", async e => {
   if(t.dataset.practise){ const sk = skillById(t.dataset.practise); if(!sk) return; return startQuiz(`Practice: ${sk.name}`, subjOf(sk.id), poolItems(sk, 10)); }
   if(t.dataset.fulltest){ const subj=t.dataset.fulltest; if(subj==="math") return startQuiz("Maths full check-up","math",shuffle(MATH).map(s=>({skill:s.id,lazy:true})));
     return startQuiz("English full check-up","eng",shuffle([...ENG_SKILLS.flatMap(s=>poolItems(s,1)), ...poolItems(ENG_SKILLS.find(s=>s.id==="e.reading"),2), ...poolItems(ENG_SKILLS.find(s=>s.id==="e.spelling"),1)]).slice(0,20)); }
-  if(t.dataset.strand){ const [subj, st] = t.dataset.strand.split("|"); const skills=(subj==="math"?MATH:ENG_SKILLS).filter(s=>s.strand===st); const per = skills.length>=8?2:Math.ceil(16/skills.length);
+  if(t.dataset.strand){ const [subj, st] = t.dataset.strand.split("|"); const skills=(subj==="math"?[...MATH,...OLY]:ENG_SKILLS).filter(s=>s.strand===st); const per = skills.length>=8?2:Math.ceil(16/skills.length);
     return startQuiz(`${st} test`, subj, shuffle(skills.flatMap(s=>poolItems(s,per))).slice(0,16)); }
   if(t.dataset.unit){ S.settings.currentUnit = t.dataset.unit; saveSettings(); return render(); }
   if(t.dataset.unittest){ const u=unitById(t.dataset.unittest); return startQuiz(`${u.title}: unit test`,"uoi",unitItems(u,20,{balanced:true})); }
@@ -1041,6 +1082,11 @@ app.addEventListener("click", async e => {
     if(k==="marrs") return startQuiz("MaRRS Level 4 practice test","eng",["e.marrs.correct","e.marrs.anagram","e.marrs.meaning","e.marrs.odd"].flatMap(id=>poolItems(skillById(id),5))); }
   if(t.dataset.choice!==undefined && quiz && !quiz.checked){ quiz.sel = Number(t.dataset.choice); render(); return; }
   if(t.id==="checkQ") return doCheck();
+  if(t.id==="skipQ" && quiz && quiz.exam){ const it=quiz.items[quiz.i]; quiz.results.push({skill:it.skill, score:0, skipped:true, p:stripHtml(it.q.prompt).slice(0,220), given:"", correct:stripHtml(it.q.show).slice(0,300), ex:it.q.ex, promptHtml:it.q.prompt, showHtml:it.q.show}); return nextQ(); }
+  if(t.dataset.oly){ const k=t.dataset.oly;
+    if(k==="ind") return startQuiz("Olympiad: Individual round","math",[...shuffle(OLY).map(s=>({skill:s.id,lazy:true,fix:2,asMcq:true})), ...shuffle([...OLY,...OLY]).map(s=>({skill:s.id,lazy:true,fix:3,asMcq:true}))],{exam:true,scheme:{right:4,wrong:-1},minutes:60,kind:"oly-ind"});
+    if(k==="team") return startQuiz("Olympiad: Team round","math",shuffle(OLY).map(s=>({skill:s.id,lazy:true,fix:3})),{exam:true,scheme:{right:10,wrong:0},minutes:60,kind:"oly-team"});
+    return startQuiz("Olympiad quick challenge","math",shuffle(OLY).map(s=>({skill:s.id,lazy:true}))); }
   if(t.id==="nextQ") return nextQ();
   if(t.dataset.self!==undefined){ quiz.pendingSelf=false; return finishCheck(Number(t.dataset.self), {note: Number(t.dataset.self)>=1?"Nice — you included the main ideas.":"Read the model answer again and notice what you left out."}); }
   if(t.id==="endQuiz"){ if(!quiz.confirmEnd){ quiz.confirmEnd=true; render(); setTimeout(()=>{ if(quiz && !quiz.done){ quiz.confirmEnd=false; if(view.name==="quiz") render(); } },4000); return; } if(quiz.results.length) endQuiz(true); else { quiz=null; go("home"); } return; }
