@@ -1,0 +1,32 @@
+@page { size: A4; margin: 16mm 18mm 18mm; }
+* { box-sizing: border-box; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 11.5pt; color: #111; line-height: 1.45; margin: 0; }
+.page { page-break-after: always; }
+.page:last-child { page-break-after: auto; }
+.cover { text-align: center; padding-top: 40px; }
+.brand { font-size: 30pt; font-weight: bold; color: #6b3fa0; letter-spacing: 3px; }
+.tag { color: #777; font-size: 10pt; margin-top: 4px; }
+.round { color: #6b3fa0; font-weight: bold; font-size: 16pt; margin: 34px 0 24px; }
+.meta { display: flex; justify-content: space-between; color: #555; font-weight: bold; font-family: Georgia, serif; font-size: 13pt; margin: 8px 20px; text-align: left; }
+.box { border: 1px solid #333; padding: 14px 26px; margin: 28px 0 20px; text-align: left; }
+.box h3 { margin: 0 0 6px; text-decoration: underline; font-size: 13pt; }
+.box ul { margin: 0 0 10px; }
+.box li { margin: 5px 0; }
+.note { font-size: 10.5pt; }
+.foot { text-align: center; font-weight: bold; font-size: 10pt; margin-top: 14px; color: #333; }
+h2.sec { color: #6b3fa0; border-bottom: 2px solid #6b3fa0; padding-bottom: 4px; font-size: 14pt; }
+.q { margin: 0 0 20px; page-break-inside: avoid; }
+.q .n { font-weight: bold; }
+.opts { display: flex; flex-wrap: wrap; gap: 6px 30px; margin: 8px 0 0 26px; }
+.opts.col { flex-direction: column; gap: 3px; }
+.opts span b { margin-right: 4px; }
+.fig { text-align: center; margin: 8px 0; }
+.frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: 0.95em; margin: 0 2px; }
+.frac > span:first-child { border-bottom: 1px solid #111; padding: 0 2px; }
+table.grid { border-collapse: collapse; margin: 6px auto; }
+table.grid td { border: 1px solid #111; width: 44px; height: 38px; text-align: center; font-family: Georgia, serif; font-style: italic; }
+table.sheet { border-collapse: collapse; width: 100%; margin-top: 10px; }
+table.sheet td, table.sheet th { border: 1px solid #555; padding: 5px 8px; font-size: 10.5pt; }
+table.sheet th { background: #eee; }
+.ans { font-weight: bold; color: #6b3fa0; }
+.sol { margin: 0 0 9px; page-break-inside: avoid; font-size: 10.5pt; }
