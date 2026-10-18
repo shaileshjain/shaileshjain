@@ -1,0 +1,533 @@
+<title>JBCN Stars Practice</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: an exam desk on graph paper. One question card at a time, a sticky
+   timer bar above it, and a 30-cell answer grid like the paper response sheet. */
+:root {
+  --paper: #f7f8f4;
+  --grid: #e3e7dc;
+  --card: #ffffff;
+  --ink: #1c2433;
+  --muted: #5d6676;
+  --line: #d4d9cf;
+  --accent: #e2a21b;
+  --accent-ink: #2a1d00;
+  --accent-soft: #fbedc9;
+  --brand: #3d3a8c;
+  --brand-soft: #e7e6f6;
+  --good: #1f8a55;
+  --good-soft: #dcf1e5;
+  --bad: #c2412d;
+  --bad-soft: #f8e0db;
+  --fig-fill: #d8dbe3;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #13161d; --grid: #1c2029; --card: #1b1f28; --ink: #e9ebf0; --muted: #a2a9b7;
+    --line: #2f3542; --accent: #f0b43a; --accent-ink: #231800; --accent-soft: #3a2f14;
+    --brand: #a9a5f2; --brand-soft: #2a2950; --good: #4cc488; --good-soft: #173527;
+    --bad: #f07a65; --bad-soft: #3d1f1a; --fig-fill: #3a4050; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #13161d; --grid: #1c2029; --card: #1b1f28; --ink: #e9ebf0; --muted: #a2a9b7;
+  --line: #2f3542; --accent: #f0b43a; --accent-ink: #231800; --accent-soft: #3a2f14;
+  --brand: #a9a5f2; --brand-soft: #2a2950; --good: #4cc488; --good-soft: #173527;
+  --bad: #f07a65; --bad-soft: #3d1f1a; --fig-fill: #3a4050; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.wrap { max-width: 980px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn { border: 1.5px solid var(--line); background: var(--card); border-radius: 10px; padding: 10px 18px; font-weight: 700; }
+.btn:hover { border-color: var(--ink); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.05); }
+.btn.ghost { background: transparent; }
+.btn:disabled { opacity: .45; cursor: default; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+/* Home */
+.hero { padding-block: 40px 24px; display: grid; gap: 10px; }
+.hero h1 { font-size: clamp(34px, 6vw, 56px); font-weight: 800; letter-spacing: -.02em; }
+.hero h1 span { color: var(--brand); }
+.hero p { margin: 0; max-width: 60ch; color: var(--muted); }
+.name-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+.name-row label { font-weight: 700; }
+.name-row input { font: inherit; padding: 8px 12px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); width: 200px; max-width: 100%; }
+.rounds { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.round { background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 22px; display: grid; gap: 12px; align-content: start; }
+.round h2 { font-size: 26px; }
+.round .order { font-family: var(--font-mono); font-size: 12px; color: var(--brand); background: var(--brand-soft); border-radius: 999px; padding: 3px 10px; justify-self: start; }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0; }
+.facts div { border-top: 2px solid var(--ink); padding-top: 6px; min-width: 0; }
+.facts dt { font-size: 12px; color: var(--muted); }
+.facts dd { margin: 0; font-family: var(--font-mono); font-weight: 700; font-size: 18px; }
+.round p { margin: 0; color: var(--muted); font-size: 15px; }
+.resume { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; font-size: 15px; }
+.history { margin-top: 32px; background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 20px; }
+.history h2 { font-size: 22px; margin-bottom: 4px; }
+.history .sub { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+.table-scroll { overflow-x: auto; }
+table.hist { width: 100%; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+table.hist th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 400; border-bottom: 1.5px solid var(--line); padding: 6px 8px; white-space: nowrap; }
+table.hist td { border-bottom: 1px solid var(--line); padding: 8px; white-space: nowrap; }
+table.hist td.score { font-family: var(--font-mono); font-weight: 700; }
+.empty { color: var(--muted); font-size: 15px; padding: 8px 0; }
+.tips { margin-top: 20px; font-size: 15px; color: var(--muted); display: grid; gap: 4px; }
+
+/* Test */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); padding-block: 12px; border-bottom: 1.5px solid var(--line); display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.bar .title { display: grid; }
+.bar .title strong { font-family: var(--font-display); font-size: 20px; }
+.bar .right { display: flex; gap: 12px; align-items: center; }
+.timer { font-family: var(--font-mono); font-weight: 700; font-size: 24px; font-variant-numeric: tabular-nums; padding: 4px 12px; border-radius: 10px; background: var(--card); border: 1.5px solid var(--line); }
+.timer.low { background: var(--bad-soft); color: var(--bad); border-color: var(--bad); }
+.notice { margin-top: 12px; background: var(--accent-soft); border-radius: 10px; padding: 10px 14px; font-weight: 700; }
+.test { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; margin-top: 20px; align-items: start; }
+@media (max-width: 760px) { .test { grid-template-columns: minmax(0, 1fr); } }
+.qcard { background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 24px; min-width: 0; }
+.qhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+.qnum { font-family: var(--font-display); font-weight: 800; font-size: 30px; color: var(--brand); }
+.flag { border: 1.5px solid var(--line); background: transparent; border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+.flag[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); font-weight: 700; }
+.qtext { font-size: 19px; }
+.qtext p { margin: 0 0 8px; }
+.fig { display: flex; justify-content: center; margin: 14px 0; overflow-x: auto; }
+.fig svg { max-width: 100%; height: auto; color: var(--ink); }
+.fig svg text { fill: var(--ink); }
+.statements { margin: 6px 0 8px 18px; }
+.frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: .9em; line-height: 1.15; margin: 0 2px; }
+.frac > span:first-child { border-bottom: 1.5px solid currentColor; padding: 0 3px; }
+table.magic { border-collapse: collapse; margin: 0 auto; }
+table.magic td { border: 1.5px solid var(--ink); width: 54px; height: 46px; text-align: center; font-family: var(--font-mono); font-weight: 700; }
+.opts { display: grid; gap: 10px; margin-top: 18px; }
+.opt { display: flex; align-items: center; gap: 14px; text-align: left; border: 1.5px solid var(--line); background: var(--card); border-radius: 12px; padding: 10px 14px; min-height: 52px; }
+.opt:hover { border-color: var(--ink); }
+.opt .letter { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--ink); display: grid; place-items: center; font-family: var(--font-mono); font-weight: 700; }
+.opt[aria-pressed="true"] { border-color: var(--brand); background: var(--brand-soft); }
+.opt[aria-pressed="true"] .letter { background: var(--brand); border-color: var(--brand); color: var(--card); }
+.open-ans { margin-top: 18px; display: grid; gap: 8px; }
+.open-ans label { font-weight: 700; }
+.open-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.open-row input { font: inherit; font-family: var(--font-mono); font-size: 20px; padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); width: 180px; max-width: 100%; }
+.open-row .unit { color: var(--muted); }
+.hint { font-size: 14px; color: var(--muted); }
+.qnav { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+.side { background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 16px; display: grid; gap: 12px; }
+.side h3 { font-size: 16px; }
+.cells { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.cell { aspect-ratio: 1; max-width: 100%; border: 1.5px solid var(--line); background: var(--card); border-radius: 8px; font-family: var(--font-mono); font-size: 14px; font-weight: 700; position: relative; padding: 0; }
+.cell.done { background: var(--brand); border-color: var(--brand); color: var(--card); }
+.cell.flagged::after { content: ""; position: absolute; top: 3px; right: 3px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.cell.current { outline: 3px solid var(--accent); outline-offset: 1px; }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; border: 1.5px solid var(--line); }
+.sw.done { background: var(--brand); border-color: var(--brand); }
+.sw.flag { background: var(--accent); border-color: var(--accent); border-radius: 50%; }
+.counts { font-size: 14px; color: var(--muted); }
+
+/* Modal */
+.overlay { position: fixed; inset: 0; background: rgb(10 12 20 / .5); display: grid; place-items: center; padding: 16px; z-index: 20; }
+.modal { background: var(--card); border-radius: 16px; padding: 24px; max-width: 420px; width: 100%; display: grid; gap: 12px; border: 1.5px solid var(--line); }
+.modal h2 { font-size: 24px; }
+.modal p { margin: 0; color: var(--muted); }
+.modal .actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+
+/* Results */
+.res-head { padding-block: 32px 16px; display: grid; gap: 14px; }
+.scoreline { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.big { font-family: var(--font-display); font-weight: 800; font-size: clamp(56px, 12vw, 96px); line-height: 1; color: var(--brand); font-variant-numeric: tabular-nums; }
+.outof { font-family: var(--font-mono); font-size: 22px; color: var(--muted); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { border-radius: 999px; padding: 4px 12px; font-size: 14px; font-weight: 700; background: var(--card); border: 1.5px solid var(--line); }
+.chip.good { background: var(--good-soft); color: var(--good); border-color: transparent; }
+.chip.bad { background: var(--bad-soft); color: var(--bad); border-color: transparent; }
+.saved { font-size: 14px; color: var(--muted); }
+.filters { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+.filters button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.review { display: grid; gap: 12px; }
+.ritem { background: var(--card); border: 1.5px solid var(--line); border-left: 6px solid var(--line); border-radius: 12px; padding: 16px 18px; min-width: 0; }
+.ritem.right { border-left-color: var(--good); }
+.ritem.wrong { border-left-color: var(--bad); }
+.ritem.blank { border-left-color: var(--muted); }
+.ritem .top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-weight: 700; }
+.ritem .mark { font-family: var(--font-mono); }
+.ritem .mark.right { color: var(--good); } .ritem .mark.wrong { color: var(--bad); } .ritem .mark.blank { color: var(--muted); }
+.ritem .qtext { font-size: 16px; margin-top: 6px; }
+.ritem .ans { display: flex; gap: 16px; flex-wrap: wrap; font-size: 15px; margin-top: 8px; }
+.ritem .sol { margin-top: 8px; background: var(--paper); border-radius: 8px; padding: 10px 12px; font-size: 15px; }
+.res-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+@media (prefers-reduced-motion: no-preference) { .opt, .cell, .btn { transition: background .12s, border-color .12s; } }
+</style>
+
+<div class="wrap" id="app"></div>
+
+<script>
+(() => {
+const L = "ABCDE";
+const F = (n, d) => `<span class="frac"><span>${n}</span><span>${d}</span></span>`;
+
+const FIG_L = `<svg width="270" height="190" viewBox="0 0 270 190" font-family="Atkinson Hyperlegible, sans-serif" font-size="13" role="img" aria-label="L-shaped figure"><path d="M30 15 H110 V95 H230 V175 H30 Z" style="fill:var(--fig-fill)" stroke="currentColor" stroke-width="1.5"/><text x="55" y="11">4 cm</text><text x="0" y="100">8 cm</text><text x="110" y="189">10 cm</text><text x="234" y="140">4 cm</text></svg>`;
+const FIG_HEX = `<svg width="240" height="180" viewBox="40 30 180 140" font-family="Georgia, serif" font-style="italic" font-size="14" role="img" aria-label="Hexagon and square sharing side AB"><polygon points="143.3,75 100,50 56.7,75 56.7,125 100,150 143.3,125" fill="none" stroke="currentColor" stroke-width="1.5"/><polygon points="143.3,75 193.3,75 193.3,125 143.3,125" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M131.2 68 A14 14 0 0 1 157.3 75" fill="none" style="stroke:var(--accent)" stroke-width="2"/><text x="143" y="58" style="fill:var(--accent)">x</text><text x="130" y="92">A</text><text x="130" y="120">B</text></svg>`;
+const FIG_LEAF = `<svg width="200" height="190" viewBox="0 0 190 190" font-family="Georgia, serif" font-style="italic" font-size="14" role="img" aria-label="Square ABCD with two quarter circles"><path d="M20 20 A140 140 0 0 1 160 160 A140 140 0 0 1 20 20 Z" style="fill:var(--fig-fill)" stroke="currentColor"/><rect x="20" y="20" width="140" height="140" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="4" y="16">A</text><text x="164" y="16">B</text><text x="164" y="176">C</text><text x="4" y="176">D</text><text x="78" y="182" font-style="normal" font-size="12">14 cm</text></svg>`;
+const MAGIC = `<table class="magic" aria-label="Magic square"><tr><td>−3</td><td></td><td>Y</td></tr><tr><td>+4</td><td></td><td></td></tr><tr><td>−1</td><td></td><td>+3</td></tr></table>`;
+
+const IND = [
+ {q:"For any numbers <i>a</i> and <i>b</i>, <i>a</i> ★ <i>b</i> = 2<i>a</i> + <i>ab</i>. What is (2 ★ 3) ★ 1?", o:["24","26","28","30","36"], a:3, s:"2 ★ 3 = 4 + 6 = 10. Then 10 ★ 1 = 20 + 10 = 30."},
+ {q:"How many two-digit numbers have digits that add up to 9?", o:["8","9","10","11","12"], a:1, s:"18, 27, 36, 45, 54, 63, 72, 81, 90. That is 9 numbers (don't forget 90)."},
+ {q:"A movie starts at 4:45 pm and lasts 2 hours 35 minutes. At what time does it end?", o:["7:10 pm","7:15 pm","7:20 pm","7:25 pm","7:30 pm"], a:2, s:"4:45 + 2 h = 6:45. Add 35 min: 6:45 + 15 = 7:00, + 20 = 7:20."},
+ {q:"15% of 300 is equal to 30% of", o:["45","90","100","120","150"], a:4, s:"15% of 300 = 45, and 30% of 150 = 45. (Doubling the percent means halving the number.)"},
+ {q:"How many of these five numbers are perfect squares?<p style='text-align:center;margin-top:8px'>2<sup>4</sup> &nbsp; 3<sup>5</sup> &nbsp; 4<sup>3</sup> &nbsp; 5<sup>6</sup> &nbsp; 6<sup>5</sup></p>", o:["1","2","3","4","5"], a:2, s:"2⁴ = 4², 4³ = 64 = 8², 5⁶ = 125². 3⁵ and 6⁵ have odd powers, so they are not squares."},
+ {q:"The sum of four consecutive odd numbers is 72. What is the largest of these numbers?", o:["19","21","23","25","17"], a:1, s:"The average is 72 ÷ 4 = 18, so the numbers are 15, 17, 19, 21."},
+ {q:`Which of these fractions lies between ${F(3,5)} and ${F(2,3)}?`, o:[F(5,8),F(7,12),F(11,16),F(4,7),F(7,10)], a:0, s:"3/5 = 0.6 and 2/3 ≈ 0.667. 5/8 = 0.625 is between them. The others are 0.583, 0.6875, 0.571 and 0.7."},
+ {q:"Peter the penguin went fishing. He realised that if he had caught four times as many fish as he actually did, he would have had 27 more fish. How many fish did Peter catch?", o:["6","7","8","9","12"], a:3, s:"4x − x = 3x = 27, so x = 9."},
+ {q:"A sheet of paper is folded in half, then in half again, and so on, until it has been folded in half 6 times. How many layers of paper are there?", o:["12","24","32","36","64"], a:4, s:"Each fold doubles the layers: 2, 4, 8, 16, 32, 64."},
+ {q:"In a class of 40 children, the ratio of boys to girls is 3 : 5. How many girls must leave so that the numbers of boys and girls are equal?", o:["5","8","10","12","15"], a:2, s:"40 ÷ 8 = 5 per part, so 15 boys and 25 girls. 25 − 15 = 10."},
+ {q:"The mean of five numbers is 20. Tara adds 2 to the first number, 4 to the second, 6 to the third, 8 to the fourth and 10 to the fifth. What is the mean of the new numbers?", o:["26","30","50","21","24"], a:0, s:"The total goes up by 2 + 4 + 6 + 8 + 10 = 30, so the mean goes up by 30 ÷ 5 = 6. 20 + 6 = 26."},
+ {q:"One angle of a triangle is 40°. The other two angles are in the ratio 2 : 5. What is the largest angle of the triangle?", o:["60°","80°","90°","95°","100°"], a:4, s:"The other two angles add to 180 − 40 = 140° = 7 parts, so 1 part = 20°. They are 40° and 100°."},
+ {q:"What is the units digit of 7<sup>2025</sup>?", o:["7","9","3","1","5"], a:0, s:"Units digits of powers of 7 repeat 7, 9, 3, 1 (every 4). 2025 = 4 × 506 + 1, so it is the 1st in the cycle: 7."},
+ {q:"The length of a rectangle is increased by 20% and its width is decreased by 20%. The new area is what percent of the old area?", o:["100%","96%","104%","90%","80%"], a:1, s:"1.2 × 0.8 = 0.96, so 96%. (Try a 10 × 10 square: 12 × 8 = 96.)"},
+ {q:"A square has a perimeter of 36 cm. A rectangle has the same area as the square and a width of 3 cm. What is the perimeter of the rectangle?", o:["48 cm","54 cm","56 cm","60 cm","66 cm"], a:3, s:"Square side 9, area 81. Rectangle 3 × 27, perimeter 2(3 + 27) = 60."},
+ {q:"In a certain month, three of the Saturdays fall on even-numbered dates. On what day of the week is the 25th of that month?", o:["Sunday","Monday","Tuesday","Thursday","Friday"], a:1, s:"Saturdays switch between even and odd dates. Three even ones need Saturdays on 2, 9, 16, 23, 30. The 23rd is a Saturday, so the 25th is a Monday."},
+ {q:"How many positive whole numbers are factors of 2025?", o:["9","12","15","16","18"], a:2, s:"2025 = 3⁴ × 5². Number of factors = (4 + 1)(2 + 1) = 15."},
+ {q:"Asha, Bina and Chetan all have different heights. Exactly <b>one</b> of these statements is true:<div class='statements'>I. Asha is the tallest.<br>II. Bina is not the tallest.<br>III. Chetan is not the shortest.</div>Arrange them from tallest to shortest.", o:["Bina, Chetan, Asha","Bina, Asha, Chetan","Chetan, Bina, Asha","Asha, Chetan, Bina","Chetan, Asha, Bina"], a:0, s:"If I is true, II is false so Bina is tallest, which clashes with I. If only II is true, Chetan must be tallest, but III being false makes him shortest, which is impossible. So only III is true: Bina is tallest (II false), then Chetan (not shortest), then Asha."},
+ {q:"3 apples weigh the same as 2 oranges, and 4 oranges weigh the same as 3 melons. How many apples weigh the same as 6 melons?", o:["8","9","10","12","16"], a:3, s:"6 melons = 8 oranges (double 3 melons = 4 oranges). 8 oranges = 12 apples (4 × (2 oranges = 3 apples))."},
+ {q:"A tap drips 1 mL of water every 3 seconds. How many hours will it take to fill a 2.4 litre bottle?", o:["1","2","3","4","6"], a:1, s:"2.4 L = 2400 mL. 2400 × 3 s = 7200 s = 120 min = 2 hours."},
+ {q:"A car travels at a constant speed of 40 km/h. A motorbike starts 30 km behind the car and catches up with it in 1½ hours. What is the speed of the motorbike?", o:["50 km/h","55 km/h","60 km/h","65 km/h","70 km/h"], a:2, s:"The bike closes a 30 km gap in 1.5 h, so it is 20 km/h faster than the car: 60 km/h."},
+ {q:"All the corners of this shape are right angles. What is its perimeter?", fig:FIG_L, o:["28 cm","30 cm","32 cm","34 cm","36 cm"], a:4, s:"Push the inner step outwards and you get a 10 × 8 rectangle with the same perimeter: 2(10 + 8) = 36 cm."},
+ {q:"A regular hexagon and a square share the side <i>AB</i>, as shown. What is the size of angle <i>x</i>?", fig:FIG_HEX, o:["120°","135°","150°","160°","210°"], a:2, s:"Angles around point A add to 360°. The hexagon's angle is 120° and the square's is 90°, so x = 360 − 120 − 90 = 150°."},
+ {q:"How many different four-digit numbers can be made by rearranging the digits of 2205? (A number cannot start with 0.)", o:["6","7","8","9","12"], a:3, s:"Arrangements of 2, 2, 0, 5: 4!/2! = 12. Those starting with 0: 3!/2! = 3. So 12 − 3 = 9."},
+ {q:"A 3 × 3 × 3 cube is painted on all its outside faces and then cut into 27 small cubes. How many small cubes have exactly two painted faces?", o:["1","6","8","10","12"], a:4, s:"Two painted faces means a middle-of-an-edge cube. A cube has 12 edges with 1 such cube each: 12."},
+ {q:"Two opposite corners of a cube are cut off, each cut creating a new triangular face. How many edges does the new solid have?", o:["18","15","20","21","24"], a:0, s:"A cube has 12 edges. Each cut adds a triangle with 3 new edges: 12 + 3 + 3 = 18."},
+ {q:"Six different points are marked on a circle. How many different triangles can be drawn whose corners are all among these points?", o:["12","15","18","20","24"], a:3, s:"Choose any 3 of 6 points: (6 × 5 × 4) ÷ (3 × 2 × 1) = 20."},
+ {q:"In a magic square, every row, column and diagonal has the same sum. This magic square uses each whole number from −4 to +4 exactly once. What is <i>Y</i>?", fig:MAGIC, o:["−2","−1","0","+2","+1"], a:4, s:"The left column gives the magic sum: −3 + 4 − 1 = 0. The diagonal −3, centre, +3 gives centre = 0. The other diagonal: Y + 0 + (−1) = 0, so Y = +1."},
+ {q:"Asha, Bina, Chetan, Dev and Esha sit in a row of five seats. Asha sits in the leftmost seat. Chetan sits next to both Dev and Esha. In how many different orders can they sit?", o:["2","4","6","8","12"], a:1, s:"Dev–Chetan–Esha form a block of 3 with Chetan in the middle (2 orders). With Asha in seat 1, the block fills seats 2–4 (Bina in seat 5) or seats 3–5 (Bina in seat 2). 2 × 2 = 4."},
+ {q:"How many whole numbers from 1 to 100 are divisible by 3 or by 5, but <b>not</b> by both?", o:["41","47","53","35","39"], a:0, s:"Multiples of 3: 33. Multiples of 5: 20. Multiples of both (15): 6. Remove the 6 from each list: 27 + 14 = 41."}
+];
+
+const TEAM = [
+ {q:"Riya sold 40 bookmarks and Kabir sold 60 bookmarks, all at the same price. Together they received ₹750. How much money did Kabir receive?", pre:"₹", unit:"", a:450, show:"₹450", s:"100 bookmarks for ₹750 is ₹7.50 each. Kabir: 60 × 7.50 = ₹450."},
+ {q:"The volume of a cube is 512 cm<sup>3</sup>. What is the total surface area of the cube?", unit:"cm²", a:384, show:"384 cm²", s:"8 × 8 × 8 = 512, so the side is 8 cm. Surface area = 6 × 8 × 8 = 384 cm²."},
+ {q:"In a football league a team gets 3 points for a win, 1 for a draw and 0 for a loss. Pi United had 52 points after playing 30 games. They drew 7 games. How many games did they lose?", unit:"games", a:8, show:"8", s:"7 draws give 7 points, leaving 45 points from wins: 15 wins. Losses = 30 − 15 − 7 = 8."},
+ {q:"The sum of the squares of two consecutive positive whole numbers is 313. What is the sum of the two numbers?", unit:"", a:25, show:"25", s:"313 ÷ 2 ≈ 156, near 12² = 144. 12² + 13² = 144 + 169 = 313, so 12 + 13 = 25."},
+ {q:"A bus is carrying 54 people, all men or women. When 6 men get off, the ratio of men to women on the bus becomes 1 : 3. How many women are on the bus?", unit:"women", a:36, show:"36", s:"48 people are left in the ratio 1 : 3, so 12 men and 36 women."},
+ {q:"A snail is at the bottom of a pole 20 m tall. Every day it climbs up 4 m, and every night it slips down 3 m. On which day does it first reach the top?", pre:"Day", unit:"", a:17, show:"Day 17", s:"After 16 days and nights it has gained 16 m. On day 17 it climbs 4 m from 16 m and reaches 20 m before it can slip."},
+ {q:"Pipes A and B can fill a tank in 4 hours and 6 hours. Pipe C can empty the full tank in 8 hours. If all three are opened together on an empty tank, how long will it take to fill it? Round to the nearest minute.", hm:true, a:[3,26], show:"3 h 26 min", s:"In 1 hour: 1/4 + 1/6 − 1/8 = 6/24 + 4/24 − 3/24 = 7/24 of the tank. Time = 24/7 h = 3 h 25 5⁄7 min ≈ 3 h 26 min."},
+ {q:"The average age of a group of children is 12.5 years. A teacher aged 38 joins, and the average rises to 14 years. How many children were in the group?", unit:"children", a:16, show:"16", s:"12.5n + 38 = 14(n + 1), so 38 − 14 = 1.5n, giving n = 16."},
+ {q:"<i>a</i> and <i>b</i> are positive whole numbers with <i>a</i> &lt; <i>b</i> and <i>a</i> + <i>ab</i> + <i>b</i> = 34. Find <i>a</i> + <i>b</i>.", unit:"", a:10, show:"10", s:"Add 1 to both sides: (a + 1)(b + 1) = 35 = 5 × 7, so a = 4 and b = 6. (1 × 35 would make a = 0, which is not positive.)"},
+ {q:`<i>ABCD</i> is a square of side 14 cm. Two quarter circles of radius 14 cm are drawn inside it, with centres <i>B</i> and <i>D</i>. Find the area of the shaded leaf where they overlap. (Take π = ${F(22,7)}.)`, fig:FIG_LEAF, unit:"cm²", a:112, show:"112 cm²", s:"Each quarter circle = 1/4 × 22/7 × 14 × 14 = 154. The leaf is two pieces of (quarter circle − triangle) = 2 × (154 − 98) = 112 cm²."}
+];
+
+const ROUNDS = {
+  individual: { name:"Individual Round", short:"Individual", qs:IND, kind:"mcq", max:120, mins:60 },
+  team: { name:"Team Round", short:"Team", qs:TEAM, kind:"open", max:100, mins:60 }
+};
+
+const KEY_RUN = "jbcn-run-v1", KEY_NAME = "jbcn-name", KEY_HIST = "jbcn-hist-v1";
+const store = {
+  get(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} }
+};
+
+let state = { view:"home", run:null, result:null, filter:"all", modal:null };
+let db = null, dbHistory = null, tick = null;
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = sec => { sec = Math.max(0, Math.round(sec)); const m = Math.floor(sec/60), s = sec%60; return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; };
+const playerName = () => (store.get(KEY_NAME) || "Vihaan");
+
+function startRun(key) {
+  const R = ROUNDS[key];
+  state.run = { key, i:0, ans:Array(R.qs.length).fill(null), flags:Array(R.qs.length).fill(false), startAt:Date.now(), endAt:Date.now() + R.mins*60000, name:playerName() };
+  store.set(KEY_RUN, state.run);
+  state.view = "test"; state.modal = null;
+  startTick(); render(); window.scrollTo(0,0);
+}
+function saveRun() { if (state.run) store.set(KEY_RUN, state.run); }
+function startTick() {
+  clearInterval(tick);
+  tick = setInterval(() => {
+    if (state.view !== "test" || !state.run) return;
+    const left = (state.run.endAt - Date.now())/1000;
+    const t = document.getElementById("timer");
+    if (t) { t.textContent = fmt(left); t.classList.toggle("low", left <= 300); }
+    const n = document.getElementById("notice");
+    if (n) n.hidden = left > 300;
+    if (left <= 0) finish(true);
+  }, 500);
+}
+
+function teamCorrect(q, v) {
+  if (v == null) return null;
+  if (q.hm) {
+    const h = parseInt(v.h, 10), m = parseInt(v.m, 10);
+    if (isNaN(h) && isNaN(m)) return null;
+    return (h||0) === q.a[0] && (m||0) === q.a[1];
+  }
+  const str = String(v).replace(/,/g, "").trim();
+  if (!str) return null;
+  const m = str.match(/-?\d+(\.\d+)?/);
+  return !!m && Math.abs(parseFloat(m[0]) - q.a) < 1e-9;
+}
+function teamShow(q, v) {
+  if (v == null) return "—";
+  if (q.hm) { if (!v.h && !v.m) return "—"; return `${v.h||0} h ${v.m||0} min`; }
+  return String(v).trim() || "—";
+}
+function isAnswered(R, v) {
+  if (v == null) return false;
+  if (R.kind === "mcq") return true;
+  if (typeof v === "object") return !!(String(v.h||"").trim() || String(v.m||"").trim());
+  return String(v).trim() !== "";
+}
+
+function finish(auto) {
+  const run = state.run; if (!run) return;
+  clearInterval(tick);
+  const R = ROUNDS[run.key];
+  let right = 0, wrong = 0, blank = 0, score = 0;
+  const marks = R.qs.map((q, i) => {
+    const v = run.ans[i];
+    let ok;
+    if (R.kind === "mcq") ok = v == null ? null : v === q.a;
+    else ok = isAnswered(R, v) ? teamCorrect(q, v) : null;
+    if (ok === null) blank++; else if (ok) right++; else wrong++;
+    return ok;
+  });
+  score = R.kind === "mcq" ? right*4 - wrong : right*10;
+  const used = Math.min(R.mins*60, Math.round((Date.now() - run.startAt)/1000));
+  const result = { key:run.key, name:run.name, ans:run.ans, marks, right, wrong, blank, score, max:R.max, used, auto:!!auto, finishedAt:new Date().toISOString(), saved:"saving" };
+  state.result = result; state.run = null; state.view = "results"; state.filter = "all"; state.modal = null;
+  store.del(KEY_RUN);
+  const rec = { name:result.name, round:result.key, score, max:R.max, right, wrong, blank, timeUsedSec:used, autoSubmitted:!!auto, finishedAt:result.finishedAt, answers:run.ans.map((v, i) => v == null ? null : (R.kind === "mcq" ? L[v] : teamShow(R.qs[i], v))) };
+  const local = store.get(KEY_HIST) || []; local.unshift(rec); store.set(KEY_HIST, local.slice(0, 50));
+  render(); window.scrollTo(0,0);
+  if (db) {
+    db.collection("attempts").add(rec).then(() => { result.saved = "cloud"; render(); })
+      .catch(() => { result.saved = "local"; render(); });
+  } else { result.saved = "local"; render(); }
+}
+
+/* ---------- views ---------- */
+function historyRows() {
+  const rows = dbHistory || store.get(KEY_HIST) || [];
+  return rows.slice(0, 20);
+}
+function viewHome() {
+  const pending = store.get(KEY_RUN);
+  const live = pending && pending.endAt > Date.now();
+  const hist = historyRows();
+  const best = k => { const s = hist.filter(r => r.round === k).map(r => r.score); return s.length ? Math.max(...s) : null; };
+  const card = (k, order, blurb) => {
+    const R = ROUNDS[k], b = best(k);
+    return `<section class="round">
+      <span class="order">${order}</span>
+      <h2>${R.name}</h2>
+      <dl class="facts">
+        <div><dt>Questions</dt><dd>${R.qs.length}</dd></div>
+        <div><dt>Time</dt><dd>${R.mins} min</dd></div>
+        <div><dt>Marks</dt><dd>${R.max}</dd></div>
+      </dl>
+      <p>${blurb}</p>
+      ${b != null ? `<p>Best so far: <b>${b} / ${R.max}</b></p>` : ""}
+      <button class="btn primary" data-act="start" data-k="${k}">Start ${R.short} Round</button>
+    </section>`;
+  };
+  return `
+  <header class="hero">
+    <span class="eyebrow">Junior level · practice paper</span>
+    <h1>JBCN Stars <span>Practice</span></h1>
+    <p>Two timed rounds in the real competition format. You get your score and step-by-step solutions as soon as you finish.</p>
+    <div class="name-row"><label for="name">Your name</label><input id="name" value="${esc(playerName())}" maxlength="30" autocomplete="off"></div>
+  </header>
+  ${live ? `<div class="resume" style="margin-bottom:16px"><span>You have a ${ROUNDS[pending.key].name} in progress with ${fmt((pending.endAt-Date.now())/1000)} left.</span><button class="btn primary" data-act="resume">Continue</button></div>` : ""}
+  <div class="rounds">
+    ${card("team", "On the day: 08:00 – 09:15", "10 problems that get harder as you go. Type the number for each answer. 10 marks each, no minus marks.")}
+    ${card("individual", "On the day: 09:35 – 10:45", "30 multiple-choice questions. +4 for a right answer, −1 for a wrong one, 0 if you leave it blank.")}
+  </div>
+  <div class="tips">
+    <span>No calculator. Keep paper and a pencil next to you for working.</span>
+    <span>In the Individual Round, guess only if you can rule out at least two options.</span>
+  </div>
+  <section class="history">
+    <h2>Past attempts</h2>
+    <p class="sub">${db ? "Saved to this page, so everyone who opens it sees the same list." : "Saved on this device."}</p>
+    ${hist.length ? `<div class="table-scroll"><table class="hist">
+      <tr><th>Date</th><th>Name</th><th>Round</th><th>Score</th><th>Right</th><th>Wrong</th><th>Blank</th><th>Time</th></tr>
+      ${hist.map(r => `<tr><td>${esc(new Date(r.finishedAt).toLocaleString([], {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"}))}</td><td>${esc(r.name||"")}</td><td>${esc(ROUNDS[r.round]?.short||r.round)}</td><td class="score">${esc(r.score)} / ${esc(r.max)}</td><td>${esc(r.right)}</td><td>${esc(r.wrong)}</td><td>${esc(r.blank)}</td><td>${fmt(r.timeUsedSec||0)}</td></tr>`).join("")}
+    </table></div>` : `<p class="empty">No attempts yet. Finish a round and its score shows up here.</p>`}
+  </section>`;
+}
+
+function viewQuestion(R, q, i, run) {
+  const v = run.ans[i];
+  let ans;
+  if (R.kind === "mcq") {
+    ans = `<div class="opts" role="group" aria-label="Choices">${q.o.map((o, k) => `<button class="opt" data-act="pick" data-k="${k}" aria-pressed="${v === k}"><span class="letter">${L[k]}</span><span>${o}</span></button>`).join("")}</div>`;
+  } else if (q.hm) {
+    const hv = v || {};
+    ans = `<div class="open-ans"><label>Your answer</label><div class="open-row">
+      <input id="ans-h" inputmode="numeric" value="${esc(hv.h||"")}" aria-label="Hours" style="width:90px"><span class="unit">hours</span>
+      <input id="ans-m" inputmode="numeric" value="${esc(hv.m||"")}" aria-label="Minutes" style="width:90px"><span class="unit">minutes</span></div></div>`;
+  } else {
+    ans = `<div class="open-ans"><label for="ans-t">Your answer</label><div class="open-row">${q.pre ? `<span class="unit">${q.pre}</span>` : ""}<input id="ans-t" inputmode="decimal" value="${esc(v||"")}" autocomplete="off">${q.unit ? `<span class="unit">${q.unit}</span>` : ""}</div><span class="hint">Type just the number.</span></div>`;
+  }
+  return `<article class="qcard">
+    <div class="qhead"><span class="qnum">Q${i+1}</span><button class="flag" data-act="flag" aria-pressed="${run.flags[i]}">${run.flags[i] ? "Marked for review" : "Mark for review"}</button></div>
+    <div class="qtext">${q.q}</div>
+    ${q.fig ? `<div class="fig">${q.fig}</div>` : ""}
+    ${ans}
+    <div class="qnav">
+      <button class="btn" data-act="prev" ${i === 0 ? "disabled" : ""}>← Previous</button>
+      ${R.kind === "mcq" ? `<button class="btn ghost" data-act="clear" ${v == null ? "disabled" : ""}>Clear answer</button>` : ""}
+      ${i < R.qs.length - 1 ? `<button class="btn primary" data-act="next">Next →</button>` : `<button class="btn primary" data-act="submit">Finish round</button>`}
+    </div>
+  </article>`;
+}
+
+function viewTest() {
+  const run = state.run, R = ROUNDS[run.key], i = run.i, q = R.qs[i];
+  const left = (run.endAt - Date.now())/1000;
+  const done = run.ans.filter(v => isAnswered(R, v)).length;
+  const flagged = run.flags.filter(Boolean).length;
+  return `
+  <div class="bar">
+    <div class="title"><span class="eyebrow">${esc(run.name)} · Junior</span><strong>${R.name}</strong></div>
+    <div class="right"><span id="timer" class="timer ${left <= 300 ? "low" : ""}" aria-label="Time left">${fmt(left)}</span><button class="btn primary" data-act="submit">Submit</button></div>
+  </div>
+  <div class="notice" id="notice" ${left > 300 ? "hidden" : ""}>5 minutes left. Check your answers now.</div>
+  <div class="test">
+    ${viewQuestion(R, q, i, run)}
+    <aside class="side">
+      <h3>Answer sheet</h3>
+      <div class="cells">${R.qs.map((_, k) => `<button class="cell ${isAnswered(R, run.ans[k]) ? "done" : ""} ${run.flags[k] ? "flagged" : ""} ${k === i ? "current" : ""}" data-act="go" data-k="${k}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <div class="legend"><span><i class="sw done"></i>Answered</span><span><i class="sw"></i>Not yet</span><span><i class="sw flag"></i>Review</span></div>
+      <div class="counts">${done} of ${R.qs.length} answered${flagged ? ` · ${flagged} marked for review` : ""}</div>
+    </aside>
+  </div>
+  ${state.modal === "submit" ? (() => {
+    const left = R.qs.length - done;
+    return `<div class="overlay"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt">
+      <h2 id="mt">Finish the ${R.short} Round?</h2>
+      <p>${left ? `You have ${left} question${left > 1 ? "s" : ""} left blank.` : "You have answered every question."}${flagged ? ` ${flagged} marked for review.` : ""} You can't change answers after this.</p>
+      <div class="actions"><button class="btn" data-act="cancel">Keep working</button><button class="btn primary" data-act="confirm">Finish and see score</button></div>
+    </div></div>`; })() : ""}`;
+}
+
+function viewResults() {
+  const r = state.result, R = ROUNDS[r.key];
+  const pct = Math.round(Math.max(0, r.score) / r.max * 100);
+  const msg = pct >= 80 ? "Excellent work!" : pct >= 60 ? "Good job. Look at the mistakes below." : pct >= 40 ? "A solid start. The solutions below show the tricks." : "Keep practising. Read each solution carefully.";
+  const items = R.qs.map((q, i) => {
+    const ok = r.marks[i], cls = ok === null ? "blank" : ok ? "right" : "wrong";
+    if (state.filter === "mistakes" && ok === true) return "";
+    const pts = R.kind === "mcq" ? (ok === null ? "0" : ok ? "+4" : "−1") : (ok ? "+10" : "0");
+    const yours = R.kind === "mcq" ? (r.ans[i] == null ? "—" : `${L[r.ans[i]]} (${q.o[r.ans[i]]})`) : esc(teamShow(q, r.ans[i]));
+    const correct = R.kind === "mcq" ? `${L[q.a]} (${q.o[q.a]})` : q.show;
+    return `<article class="ritem ${cls}">
+      <div class="top"><span>Q${i+1}</span><span class="mark ${cls}">${ok === null ? "Blank" : ok ? "Right" : "Wrong"} · ${pts}</span></div>
+      <div class="qtext">${q.q}</div>
+      ${q.fig ? `<div class="fig">${q.fig}</div>` : ""}
+      <div class="ans"><span>Your answer: <b>${yours}</b></span><span>Correct: <b>${correct}</b></span></div>
+      <div class="sol">${q.s}</div>
+    </article>`;
+  }).join("");
+  const savedTxt = r.saved === "cloud" ? "Score saved to Past attempts." : r.saved === "local" ? "Score saved on this device." : "Saving score…";
+  return `
+  <header class="res-head">
+    <span class="eyebrow">${esc(r.name)} · ${R.name}${r.auto ? " · time ran out" : ""}</span>
+    <div class="scoreline"><span class="big">${r.score}</span><span class="outof">/ ${r.max}</span></div>
+    <h2>${msg}</h2>
+    <div class="chips"><span class="chip good">${r.right} right</span><span class="chip bad">${r.wrong} wrong</span><span class="chip">${r.blank} blank</span><span class="chip">Time ${fmt(r.used)}</span></div>
+    <span class="saved">${savedTxt}</span>
+  </header>
+  <div class="filters"><button class="btn" data-act="filter" data-k="all" aria-pressed="${state.filter === "all"}">All questions</button><button class="btn" data-act="filter" data-k="mistakes" aria-pressed="${state.filter === "mistakes"}">Only mistakes and blanks</button></div>
+  <div class="review">${items || `<p class="empty">No mistakes to show. Every answer was right!</p>`}</div>
+  <div class="res-actions"><button class="btn primary" data-act="home">Back to start</button><button class="btn" data-act="start" data-k="${r.key}">Try this round again</button></div>`;
+}
+
+function render() {
+  if (state.view === "test" && state.run) app.innerHTML = viewTest();
+  else if (state.view === "results" && state.result) app.innerHTML = viewResults();
+  else { state.view = "home"; app.innerHTML = viewHome(); }
+}
+
+/* ---------- events ---------- */
+app.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const act = b.dataset.act, k = b.dataset.k, run = state.run;
+  switch (act) {
+    case "start": startRun(k); break;
+    case "resume": { const p = store.get(KEY_RUN); if (p) { state.run = p; state.view = "test"; startTick(); render(); } break; }
+    case "pick": run.ans[run.i] = +k; saveRun(); render(); break;
+    case "clear": run.ans[run.i] = null; saveRun(); render(); break;
+    case "flag": run.flags[run.i] = !run.flags[run.i]; saveRun(); render(); break;
+    case "prev": run.i = Math.max(0, run.i - 1); saveRun(); render(); break;
+    case "next": run.i = Math.min(ROUNDS[run.key].qs.length - 1, run.i + 1); saveRun(); render(); break;
+    case "go": run.i = +k; saveRun(); render(); break;
+    case "submit": state.modal = "submit"; render(); break;
+    case "cancel": state.modal = null; render(); break;
+    case "confirm": finish(false); break;
+    case "filter": state.filter = k; render(); break;
+    case "home": state.view = "home"; state.result = null; render(); window.scrollTo(0,0); break;
+  }
+});
+app.addEventListener("input", e => {
+  const t = e.target;
+  if (t.id === "name") { store.set(KEY_NAME, t.value.trim() || "Vihaan"); return; }
+  const run = state.run; if (!run) return;
+  if (t.id === "ans-t") run.ans[run.i] = t.value;
+  else if (t.id === "ans-h" || t.id === "ans-m") {
+    const cur = run.ans[run.i] || {};
+    run.ans[run.i] = { h: t.id === "ans-h" ? t.value : (cur.h||""), m: t.id === "ans-m" ? t.value : (cur.m||"") };
+  } else return;
+  saveRun();
+  const R = ROUNDS[run.key], cell = app.querySelectorAll(".cell")[run.i];
+  if (cell) cell.classList.toggle("done", isAnswered(R, run.ans[run.i]));
+  const c = app.querySelector(".counts");
+  if (c) { const done = run.ans.filter(v => isAnswered(R, v)).length, fl = run.flags.filter(Boolean).length; c.textContent = `${done} of ${R.qs.length} answered${fl ? ` · ${fl} marked for review` : ""}`; }
+});
+app.addEventListener("keydown", e => {
+  if (e.key === "Enter" && e.target.matches(".open-row input")) { const n = app.querySelector('[data-act="next"],[data-act="submit"]'); if (n) n.click(); }
+});
+
+/* ---------- boot ---------- */
+const pending = store.get(KEY_RUN);
+if (pending && pending.endAt <= Date.now()) { state.run = pending; finish(true); }
+render();
+
+(async () => {
+  try {
+    db = await window.claude?.use?.("db");
+  } catch { db = null; }
+  if (!db) return;
+  db.collection("attempts").orderBy("finishedAt", "desc").limit(50).onSnapshot(snap => {
+    dbHistory = snap.docs.map(d => d.data());
+    if (state.view === "home" && document.activeElement?.id !== "name") render();
+  }, () => { dbHistory = null; });
+  if (state.view === "home") render();
+})();
+})();
+</script>
