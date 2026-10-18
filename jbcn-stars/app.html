@@ -615,6 +615,15 @@ app.addEventListener("keydown", e => {
 });
 
 /* ---------- boot ---------- */
+/* A test started before the question bank grew used the first 30/10 questions in fixed option order. */
+const oldRun = store.get("jbcn-run-v1");
+if (oldRun && !store.get(KEY_RUN)) {
+  const n = oldRun.ans.length;
+  oldRun.qids = Array.from({length:n}, (_, i) => i);
+  oldRun.perm = oldRun.qids.map(() => ROUNDS[oldRun.key].kind === "mcq" ? [0,1,2,3,4] : null);
+  store.set(KEY_RUN, oldRun);
+}
+store.del("jbcn-run-v1");
 const pending = store.get(KEY_RUN);
 if (pending && pending.endAt <= Date.now()) { state.run = pending; finish(true); }
 render();
