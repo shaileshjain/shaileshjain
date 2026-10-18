@@ -239,12 +239,103 @@ const TEAM = [
  {q:`<i>ABCD</i> is a square of side 14 cm. Two quarter circles of radius 14 cm are drawn inside it, with centres <i>B</i> and <i>D</i>. Find the area of the shaded leaf where they overlap. (Take π = ${F(22,7)}.)`, fig:FIG_LEAF, unit:"cm²", a:112, show:"112 cm²", s:"Each quarter circle = 1/4 × 22/7 × 14 × 14 = 154. The leaf is two pieces of (quarter circle − triangle) = 2 × (154 − 98) = 112 cm²."}
 ];
 
+
+/* ---------- extra bank: correct option listed first (a:0); options are shuffled per attempt ---------- */
+IND.push(
+ {d:1, q:"What is 25 × 36 ÷ 9?", o:["100","90","120","225","81"], a:0, s:"36 ÷ 9 = 4 first, then 25 × 4 = 100."},
+ {d:1, q:"Which of these numbers is the largest?", o:["0.505","0.5","0.45","0.055","0.4999"], a:0, s:"Compare digit by digit: 0.505 > 0.5000 > 0.4999 > 0.45 > 0.055."},
+ {d:1, q:"A train leaves at 10:48 am and arrives at 1:15 pm the same day. How long is the journey?", o:["2 h 27 min","2 h 33 min","3 h 27 min","2 h 37 min","3 h 33 min"], a:0, s:"10:48 to 12:48 is 2 h. 12:48 to 1:15 is 27 min. Total 2 h 27 min."},
+ {d:1, q:`What is ${F(1,2)} + ${F(1,3)} + ${F(1,6)}?`, o:["1",F(3,11),F(5,6),F(1,11),"2"], a:0, s:"Use sixths: 3/6 + 2/6 + 1/6 = 6/6 = 1."},
+ {d:1, q:"What is the smallest whole number you must add to 2025 to make it divisible by 7?", o:["5","2","3","4","6"], a:0, s:"7 × 289 = 2023, so 2025 leaves remainder 2. Add 5 to reach 2030 = 7 × 290."},
+ {d:1, q:"A square has a perimeter of 28 cm. What is its area?", o:["49 cm²","28 cm²","56 cm²","64 cm²","196 cm²"], a:0, s:"Side = 28 ÷ 4 = 7 cm. Area = 7 × 7 = 49 cm²."},
+ {d:1, q:`How many minutes are there in ${F(3,4)} of a day?`, o:["1080","720","960","1200","1440"], a:0, s:"3/4 of 24 h = 18 h. 18 × 60 = 1080 minutes."},
+ {d:1, q:"What is the mean of 4, 8, 15, 16, 23 and 42?", o:["18","15","16","20","21"], a:0, s:"Sum = 108. 108 ÷ 6 = 18."},
+ {d:1, q:"What is 40% of 60 plus 60% of 40?", o:["48","24","50","100","36"], a:0, s:"40% of 60 = 24 and 60% of 40 = 24. Total 48."},
+ {d:1, q:"How many edges does a triangular prism have?", o:["9","6","8","12","15"], a:0, s:"Two triangles have 3 edges each (6), plus 3 edges joining them: 9."},
+ {d:1, q:"What number comes next? &nbsp; 2, 6, 12, 20, 30, …", o:["42","40","36","44","48"], a:0, s:"The gaps are 4, 6, 8, 10, so the next gap is 12: 30 + 12 = 42. (Also 1×2, 2×3, 3×4, … 6×7.)"},
+ {d:1, q:"What is MMXXV − XLIX? Give the answer as an ordinary number.", o:["1976","1974","1986","1966","1996"], a:0, s:"MMXXV = 2025 and XLIX = 49. 2025 − 49 = 1976."},
+ {d:1, q:"3 pens cost ₹45. How much do 7 pens cost?", o:["₹105","₹90","₹115","₹120","₹135"], a:0, s:"One pen costs ₹15. 7 × 15 = ₹105."},
+ {d:1, q:"How many prime numbers are there between 20 and 40?", o:["4","3","5","6","2"], a:0, s:"23, 29, 31, 37."},
+ {d:1, q:"What is the angle between the hands of a clock at exactly 4 o'clock?", o:["120°","90°","100°","150°","60°"], a:0, s:"Each hour mark is 360 ÷ 12 = 30° apart. 4 × 30 = 120°."},
+ {d:1, q:"What is 1 + 2 + 3 + … + 20?", o:["210","200","220","190","420"], a:0, s:"Pair the ends: (1 + 20) × 20 ÷ 2 = 210."},
+ {d:1, q:"Riya is 4th from the front and 9th from the back of a queue. How many people are in the queue?", o:["12","13","11","14","10"], a:0, s:"4 + 9 − 1 = 12 (Riya is counted twice)."},
+ {d:1, q:"What is 0.25 × 0.4?", o:["0.1","1","0.01","0.65","0.001"], a:0, s:"25 × 4 = 100, with 3 decimal places: 0.100 = 0.1."},
+ {d:1, q:"Which of these is <b>not</b> a multiple of 6?", o:["316","114","222","402","600"], a:0, s:"A multiple of 6 must be even and have a digit sum divisible by 3. 316 has digit sum 10."},
+
+ {d:2, q:"A bag has red and blue marbles in the ratio 2 : 3, with 45 marbles in total. 6 more red marbles are added. What is the new ratio of red to blue?", o:["8 : 9","2 : 3","4 : 5","3 : 4","1 : 1"], a:0, s:"18 red and 27 blue. After adding 6 red: 24 : 27 = 8 : 9."},
+ {d:2, q:"Two numbers add up to 50 and differ by 14. What is the larger number?", o:["32","36","18","28","34"], a:0, s:"Larger = (50 + 14) ÷ 2 = 32."},
+ {d:2, q:"What is the HCF of 12 and 18 multiplied by their LCM?", o:["216","108","72","36","432"], a:0, s:"HCF = 6, LCM = 36, and 6 × 36 = 216. (It always equals 12 × 18.)"},
+ {d:2, q:"Meera walks 6 km in 1 hour 30 minutes. What is her speed?", o:["4 km/h","6 km/h","3 km/h","4.5 km/h","5 km/h"], a:0, s:"6 ÷ 1.5 = 4 km/h."},
+ {d:2, q:"An equilateral triangle has a perimeter of 24 cm. A square has the same perimeter. What is the area of the square?", o:["36 cm²","64 cm²","24 cm²","48 cm²","16 cm²"], a:0, s:"Square side = 24 ÷ 4 = 6 cm, area 36 cm²."},
+ {d:2, q:"A ₹500 toy's price is raised by 10%, and then the new price is reduced by 10%. What is the final price?", o:["₹495","₹500","₹505","₹490","₹450"], a:0, s:"500 → 550 → 550 − 55 = 495."},
+ {d:2, q:"How many three-digit numbers have only odd digits?", o:["125","100","150","75","243"], a:0, s:"Each of the 3 places can be 1, 3, 5, 7 or 9: 5 × 5 × 5 = 125."},
+ {d:2, q:"In how many different orders can 4 children stand in a line?", o:["24","12","16","4","64"], a:0, s:"4 × 3 × 2 × 1 = 24."},
+ {d:2, q:"5 workers can build a wall in 12 days. How many days would 6 workers take, working at the same rate?", o:["10","14","9","11","8"], a:0, s:"The job is 5 × 12 = 60 worker-days. 60 ÷ 6 = 10 days."},
+ {d:2, q:"The average of five numbers is 30. When one number is removed, the average of the other four is 28. Which number was removed?", o:["38","30","28","32","2"], a:0, s:"Total 150. The other four total 112. Removed: 150 − 112 = 38."},
+ {d:2, q:"What is the units digit of 3<sup>100</sup>?", o:["1","3","9","7","0"], a:0, s:"Units digits of powers of 3 repeat 3, 9, 7, 1. 100 is a multiple of 4, so it ends in 1."},
+ {d:2, q:"A cube has a total surface area of 150 cm². What is its volume?", o:["125 cm³","150 cm³","25 cm³","216 cm³","100 cm³"], a:0, s:"Each face is 150 ÷ 6 = 25 cm², so the side is 5 cm. Volume = 125 cm³."},
+ {d:2, q:"What is the sum of the interior angles of a pentagon?", o:["540°","360°","720°","450°","900°"], a:0, s:"A pentagon splits into 3 triangles: 3 × 180° = 540°."},
+ {d:2, q:"What is the size of each exterior angle of a regular octagon?", o:["45°","135°","40°","60°","36°"], a:0, s:"Exterior angles add to 360°. 360 ÷ 8 = 45°."},
+ {d:2, q:"How many squares of all sizes are there in a 3 × 3 grid of small squares?", o:["14","9","13","10","18"], a:0, s:"9 of size 1×1, 4 of size 2×2, 1 of size 3×3: 14."},
+ {d:2, q:"A father is 4 times as old as his son. In 5 years he will be 3 times as old as his son. How old is the son now?", o:["10","5","8","12","15"], a:0, s:"4s + 5 = 3(s + 5), so s = 10. (Father 40, then 45 and 15.)"},
+ {d:2, q:"1 January 2025 was a Wednesday. What day of the week was 1 March 2025?", o:["Saturday","Friday","Sunday","Wednesday","Thursday"], a:0, s:"January (31) + February (28) = 59 days later. 59 = 8 weeks + 3 days. Wednesday + 3 = Saturday."},
+ {d:2, q:"After a 20% discount, a shirt costs ₹800. What was the price before the discount?", o:["₹1000","₹960","₹820","₹640","₹900"], a:0, s:"₹800 is 80% of the price. 800 ÷ 0.8 = ₹1000."},
+ {d:2, q:"How many of the whole numbers from 1 to 50 contain the digit 3?", o:["14","15","13","10","5"], a:0, s:"3, 13, 23, 43, plus 30 to 39 (10 numbers): 14. (33 is counted once.)"},
+ {d:2, q:"A rectangle has a perimeter of 30 cm, and its length is twice its width. What is its area?", o:["50 cm²","30 cm²","45 cm²","60 cm²","200 cm²"], a:0, s:"Width + length = 15 and length = 2 × width, so the width is 5 and the length 10. Area 50 cm²."},
+ {d:2, q:"What is the sum of the digits of 10<sup>10</sup> − 1?", o:["90","81","99","10","100"], a:0, s:"10¹⁰ − 1 = 9999999999, ten 9s. 10 × 9 = 90."},
+
+ {d:3, q:"How many zeros are at the end of 25! (that is, 25 × 24 × 23 × … × 2 × 1)?", o:["6","5","4","7","10"], a:0, s:"Each zero needs a 5 (2s are plentiful). 5, 10, 15, 20 give one 5 each and 25 gives two: 6 zeros."},
+ {d:3, q:`What is ${F(1,"1 × 2")} + ${F(1,"2 × 3")} + ${F(1,"3 × 4")} + … + ${F(1,"9 × 10")}?`, o:[F(9,10),"1",F(1,10),F(10,9),F(11,10)], a:0, s:"Each term is 1/n − 1/(n+1). Everything cancels except 1 − 1/10 = 9/10."},
+ {d:3, q:"How many rectangles of all sizes (squares included) are there in a grid 2 squares tall and 3 squares wide?", o:["18","6","12","17","24"], a:0, s:"Choose 2 of the 3 horizontal lines (3 ways) and 2 of the 4 vertical lines (6 ways): 3 × 6 = 18."},
+ {d:3, q:"What is the smallest number greater than 1 that leaves a remainder of 1 when divided by 2, 3, 4, 5 and 6?", o:["61","31","121","59","41"], a:0, s:"LCM of 2, 3, 4, 5, 6 is 60. 60 + 1 = 61."},
+ {d:3, q:"At a party of 8 people, everyone shakes hands with everyone else once. How many handshakes are there?", o:["28","56","64","36","16"], a:0, s:"8 × 7 ÷ 2 = 28."},
+ {d:3, q:"A number leaves remainder 4 when divided by 6. What remainder does twice the number leave when divided by 6?", o:["2","4","8","0","1"], a:0, s:"2 × 4 = 8, and 8 leaves remainder 2 when divided by 6. (Try 10: 20 ÷ 6 leaves 2.)"},
+ {d:3, q:"What is the angle between the hands of a clock at 3:30?", o:["75°","90°","60°","80°","105°"], a:0, s:"The minute hand is at 180°. The hour hand is halfway from 3 to 4: 90 + 15 = 105°. 180 − 105 = 75°."},
+ {d:3, q:"How many digits are printed to number the pages of a book from 1 to 120?", o:["252","240","120","360","243"], a:0, s:"1–9: 9 digits. 10–99: 90 × 2 = 180. 100–120: 21 × 3 = 63. Total 252."},
+ {d:3, q:"What is the sum of all two-digit numbers that are divisible by 9?", o:["585","495","594","540","675"], a:0, s:"18, 27, …, 99 is 10 numbers. Sum = (18 + 99) × 10 ÷ 2 = 585."},
+ {d:3, q:"The product of two consecutive even numbers is 168. What is their sum?", o:["26","24","28","22","30"], a:0, s:"12 × 14 = 168, so 12 + 14 = 26."},
+ {d:3, q:"A 4 × 4 × 4 cube is painted on the outside and cut into 64 small cubes. How many small cubes have no paint at all?", o:["8","27","24","16","0"], a:0, s:"The unpainted inside is a 2 × 2 × 2 cube: 8."},
+ {d:3, q:"In the sequence 1, 1, 2, 3, 5, 8, …, each number is the sum of the two before it. What is the 10th number?", o:["55","34","89","21","144"], a:0, s:"1, 1, 2, 3, 5, 8, 13, 21, 34, 55."},
+ {d:3, q:"A, B and C each either always tell the truth or always lie. A says “B is a liar.” B says “C is a liar.” C says “A and B are both liars.” Who tells the truth?", o:["Only B","Only A","Only C","A and C","None of them"], a:0, s:"If B lies, C is truthful, so A and B both lie. But then A's statement “B is a liar” would be true, a contradiction. So B is truthful: C lies, and A (who called B a liar) lies."},
+ {d:3, q:"How many two-digit numbers are equal to 4 times the sum of their digits?", o:["4","3","5","2","1"], a:0, s:"10a + b = 4a + 4b gives b = 2a: 12, 24, 36, 48."},
+ {d:3, q:"What is 2<sup>10</sup> − 2<sup>9</sup> − 2<sup>8</sup>?", o:["256","2","512","128","1"], a:0, s:"Take out 2⁸: 2⁸ × (4 − 2 − 1) = 2⁸ = 256."},
+ {d:3, q:"A car drives from P to Q at 60 km/h and returns from Q to P at 40 km/h. What is its average speed for the whole trip?", o:["48 km/h","50 km/h","45 km/h","52 km/h","100 km/h"], a:0, s:"Try 120 km each way: 2 h there and 3 h back. 240 km in 5 h = 48 km/h. (Not 50, because it spends longer at the slow speed.)"},
+ {d:3, q:"What is the remainder when 2<sup>2025</sup> is divided by 7?", o:["1","2","4","6","0"], a:0, s:"Remainders of powers of 2 repeat 2, 4, 1. 2025 is a multiple of 3, so the remainder is 1."},
+ {d:3, q:"What is the smallest perfect square that is divisible by 12, 15 and 18?", o:["900","3600","180","1800","360"], a:0, s:"LCM = 180 = 2² × 3² × 5. A square needs an even power of 5, so multiply by 5: 900 = 30²."},
+ {d:3, q:"How many factors of 3600 are perfect squares?", o:["12","9","6","15","8"], a:0, s:"3600 = 2⁴ × 3² × 5². A square factor uses even powers: 2⁰, 2², 2⁴ (3 ways) × 3⁰, 3² (2) × 5⁰, 5² (2) = 12."}
+);
+
+TEAM.push(
+ {d:1, q:"I think of a number, multiply it by 4 and then add 7. The answer is 51. What was my number?", unit:"", a:11, show:"11", s:"Undo the steps: 51 − 7 = 44, then 44 ÷ 4 = 11."},
+ {d:1, q:"A rectangle has an area of 84 cm² and a length of 12 cm. What is its perimeter?", unit:"cm", a:38, show:"38 cm", s:"Width = 84 ÷ 12 = 7 cm. Perimeter = 2(12 + 7) = 38 cm."},
+ {d:1, q:"12 notebooks cost ₹396. How much do 20 notebooks cost?", pre:"₹", unit:"", a:660, show:"₹660", s:"One notebook costs 396 ÷ 12 = ₹33. 20 × 33 = ₹660."},
+ {d:1, q:"Kavya reads 18 pages a day. Her book has 300 pages. On which day does she finish the book?", pre:"Day", unit:"", a:17, show:"Day 17", s:"16 days give 288 pages, and 12 pages are left for day 17."},
+ {d:1, q:"How many seconds are there in 2.5 hours?", unit:"seconds", a:9000, show:"9000", s:"2.5 × 60 = 150 minutes. 150 × 60 = 9000 seconds."},
+ {d:1, q:"What is the sum of all the odd numbers from 1 to 49?", unit:"", a:625, show:"625", s:"There are 25 odd numbers, and the sum of the first n odd numbers is n². 25² = 625."},
+ {d:2, q:"Two trains are 450 km apart and travel towards each other at 70 km/h and 80 km/h. After how many hours do they meet?", unit:"hours", a:3, show:"3 hours", s:"They close the gap at 70 + 80 = 150 km/h. 450 ÷ 150 = 3 hours."},
+ {d:2, q:"The ages of two cousins are in the ratio 2 : 5. In 8 years, the ratio will be 1 : 2. How old is the older cousin now?", unit:"years", a:40, show:"40 years", s:"Ages 2x and 5x. 2(2x + 8) = 5x + 8 gives x = 8. Older = 40 (16 and 40 now, 24 and 48 later)."},
+ {d:2, q:"What is the smallest four-digit number that is divisible by 12, 15 and 20?", unit:"", a:1020, show:"1020", s:"LCM of 12, 15, 20 is 60. 60 × 16 = 960 is too small, so 60 × 17 = 1020."},
+ {d:2, q:"A water tank is 3/5 full. After 24 litres are used, it is 1/3 full. What is the capacity of the tank?", unit:"litres", a:90, show:"90 litres", s:"3/5 − 1/3 = 4/15 of the tank is 24 L. So 1/15 is 6 L and the tank holds 90 L."},
+ {d:2, q:"How many squares of all sizes are there on an 8 × 8 chessboard?", unit:"", a:204, show:"204", s:"1² + 2² + … + 8² = 1 + 4 + 9 + 16 + 25 + 36 + 49 + 64 = 204."},
+ {d:2, q:"Four children were born 3 years apart. The sum of their ages is 54. How old is the youngest?", unit:"years", a:9, show:"9 years", s:"y + (y + 3) + (y + 6) + (y + 9) = 4y + 18 = 54, so y = 9."},
+ {d:2, q:"Find the simple interest on ₹5000 at 8% per year for 3 years.", pre:"₹", unit:"", a:1200, show:"₹1200", s:"8% of 5000 = ₹400 per year. 3 × 400 = ₹1200."},
+ {d:3, q:"How many digits are needed to write all the whole numbers from 1 to 300?", unit:"digits", a:792, show:"792", s:"1–9: 9. 10–99: 90 × 2 = 180. 100–300: 201 × 3 = 603. Total 792."},
+ {d:3, q:"What is the remainder when 7<sup>100</sup> is divided by 5?", unit:"", a:1, show:"1", s:"Units digits of powers of 7 repeat 7, 9, 3, 1. 100 is a multiple of 4, so 7¹⁰⁰ ends in 1 and leaves remainder 1."},
+ {d:3, q:"What is the smallest positive whole number that has exactly 10 factors?", unit:"", a:48, show:"48", s:"10 factors means p⁹ or p⁴ × q. The smallest options are 2⁹ = 512, 2⁴ × 3 = 48, 3⁴ × 2 = 162. So 48 (1, 2, 3, 4, 6, 8, 12, 16, 24, 48)."},
+ {d:3, q:"At a party, every person shook hands with every other person exactly once. There were 66 handshakes. How many people were at the party?", unit:"people", a:12, show:"12", s:"n(n − 1) ÷ 2 = 66, so n(n − 1) = 132 = 12 × 11. n = 12."},
+ {d:3, q:"A 5 × 5 × 5 cube is painted on the outside and cut into 125 small cubes. How many small cubes have exactly one painted face?", unit:"", a:54, show:"54", s:"On each face, the inner 3 × 3 = 9 cubes have one painted face. 6 × 9 = 54."},
+ {d:3, q:"Find (1 + 2 + 3 + … + 100) − (1 + 3 + 5 + … + 99).", unit:"", a:2550, show:"2550", s:"What's left is 2 + 4 + … + 100 = 2 × (1 + … + 50) = 2 × 1275 = 2550. (Or 5050 − 2500.)"},
+ {d:3, q:"In an arithmetic sequence, the 6th term is 23 and the 12th term is 47. What is the 30th term?", unit:"", a:119, show:"119", s:"6 steps add 24, so each step is 4. 30th = 47 + 18 × 4 = 119."}
+);
+IND.forEach((q, i) => { q.d = q.d || (i < 11 ? 1 : i < 21 ? 2 : 3); });
+TEAM.forEach((q, i) => { q.d = q.d || (i < 4 ? 1 : i < 8 ? 2 : 3); });
+
 const ROUNDS = {
-  individual: { name:"Individual Round", short:"Individual", qs:IND, kind:"mcq", max:120, mins:60 },
-  team: { name:"Team Round", short:"Team", qs:TEAM, kind:"open", max:100, mins:60 }
+  individual: { name:"Individual Round", short:"Individual", qs:IND, kind:"mcq", max:120, mins:60, n:30, mix:{1:10, 2:11, 3:9} },
+  team: { name:"Team Round", short:"Team", qs:TEAM, kind:"open", max:100, mins:60, n:10, mix:{1:3, 2:4, 3:3} }
 };
 
-const KEY_RUN = "jbcn-run-v1", KEY_NAME = "jbcn-name", KEY_HIST = "jbcn-hist-v1";
+const KEY_RUN = "jbcn-run-v2", KEY_NAME = "jbcn-name", KEY_HIST = "jbcn-hist-v1";
 const store = {
   get(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
@@ -258,9 +349,17 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">"
 const fmt = sec => { sec = Math.max(0, Math.round(sec)); const m = Math.floor(sec/60), s = sec%60; return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; };
 const playerName = () => (store.get(KEY_NAME) || "Vihaan");
 
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+/* A fresh paper: R.mix[d] random questions from each difficulty tier, easy first. */
+function buildPaper(R) {
+  const qids = [];
+  for (const d of [1, 2, 3]) qids.push(...shuffle(R.qs.map((q, i) => q.d === d ? i : -1).filter(i => i >= 0)).slice(0, R.mix[d]));
+  return qids;
+}
 function startRun(key) {
   const R = ROUNDS[key];
-  state.run = { key, i:0, ans:Array(R.qs.length).fill(null), flags:Array(R.qs.length).fill(false), startAt:Date.now(), endAt:Date.now() + R.mins*60000, name:playerName() };
+  const qids = buildPaper(R);
+  state.run = { key, qids, perm:qids.map(() => R.kind === "mcq" ? shuffle([0,1,2,3,4]) : null), i:0, ans:Array(qids.length).fill(null), flags:Array(qids.length).fill(false), startAt:Date.now(), endAt:Date.now() + R.mins*60000, name:playerName() };
   store.set(KEY_RUN, state.run);
   state.view = "test"; state.modal = null;
   startTick(); render(); window.scrollTo(0,0);
@@ -308,7 +407,8 @@ function finish(auto) {
   clearInterval(tick);
   const R = ROUNDS[run.key];
   let right = 0, wrong = 0, blank = 0, score = 0;
-  const marks = R.qs.map((q, i) => {
+  const marks = run.qids.map((id, i) => {
+    const q = R.qs[id];
     const v = run.ans[i];
     let ok;
     if (R.kind === "mcq") ok = v == null ? null : v === q.a;
@@ -318,10 +418,10 @@ function finish(auto) {
   });
   score = R.kind === "mcq" ? right*4 - wrong : right*10;
   const used = Math.min(R.mins*60, Math.round((Date.now() - run.startAt)/1000));
-  const result = { key:run.key, name:run.name, ans:run.ans, marks, right, wrong, blank, score, max:R.max, used, auto:!!auto, finishedAt:new Date().toISOString(), saved:"saving" };
+  const result = { key:run.key, name:run.name, qids:run.qids, perm:run.perm, ans:run.ans, marks, right, wrong, blank, score, max:R.max, used, auto:!!auto, finishedAt:new Date().toISOString(), saved:"saving" };
   state.result = result; state.run = null; state.view = "results"; state.filter = "all"; state.modal = null;
   store.del(KEY_RUN);
-  const rec = { name:result.name, round:result.key, score, max:R.max, right, wrong, blank, timeUsedSec:used, autoSubmitted:!!auto, finishedAt:result.finishedAt, answers:run.ans.map((v, i) => v == null ? null : (R.kind === "mcq" ? L[v] : teamShow(R.qs[i], v))) };
+  const rec = { name:result.name, round:result.key, score, max:R.max, right, wrong, blank, timeUsedSec:used, autoSubmitted:!!auto, finishedAt:result.finishedAt, answers:run.ans.map((v, i) => v == null ? null : (R.kind === "mcq" ? L[run.perm[i].indexOf(v)] : teamShow(R.qs[run.qids[i]], v))) };
   const local = store.get(KEY_HIST) || []; local.unshift(rec); store.set(KEY_HIST, local.slice(0, 50));
   render(); window.scrollTo(0,0);
   if (db) {
@@ -346,7 +446,7 @@ function viewHome() {
       <span class="order">${order}</span>
       <h2>${R.name}</h2>
       <dl class="facts">
-        <div><dt>Questions</dt><dd>${R.qs.length}</dd></div>
+        <div><dt>Questions</dt><dd>${R.n}</dd></div>
         <div><dt>Time</dt><dd>${R.mins} min</dd></div>
         <div><dt>Marks</dt><dd>${R.max}</dd></div>
       </dl>
@@ -364,8 +464,8 @@ function viewHome() {
   </header>
   ${live ? `<div class="resume" style="margin-bottom:16px"><span>You have a ${ROUNDS[pending.key].name} in progress with ${fmt((pending.endAt-Date.now())/1000)} left.</span><button class="btn primary" data-act="resume">Continue</button></div>` : ""}
   <div class="rounds">
-    ${card("team", "On the day: 08:00 – 09:15", "10 problems that get harder as you go. Type the number for each answer. 10 marks each, no minus marks.")}
-    ${card("individual", "On the day: 09:35 – 10:45", "30 multiple-choice questions. +4 for a right answer, −1 for a wrong one, 0 if you leave it blank.")}
+    ${card("team", "On the day: 08:00 – 09:15", `A new set of 10 problems from ${TEAM.length} each time, getting harder as you go. Type the number for each answer. 10 marks each, no minus marks.`)}
+    ${card("individual", "On the day: 09:35 – 10:45", `A new set of 30 multiple-choice questions from ${IND.length} each time. +4 for a right answer, −1 for a wrong one, 0 if you leave it blank.`)}
   </div>
   <div class="tips">
     <span>No calculator. Keep paper and a pencil next to you for working.</span>
@@ -385,7 +485,7 @@ function viewQuestion(R, q, i, run) {
   const v = run.ans[i];
   let ans;
   if (R.kind === "mcq") {
-    ans = `<div class="opts" role="group" aria-label="Choices">${q.o.map((o, k) => `<button class="opt" data-act="pick" data-k="${k}" aria-pressed="${v === k}"><span class="letter">${L[k]}</span><span>${o}</span></button>`).join("")}</div>`;
+    ans = `<div class="opts" role="group" aria-label="Choices">${run.perm[i].map((orig, k) => `<button class="opt" data-act="pick" data-k="${orig}" aria-pressed="${v === orig}"><span class="letter">${L[k]}</span><span>${q.o[orig]}</span></button>`).join("")}</div>`;
   } else if (q.hm) {
     const hv = v || {};
     ans = `<div class="open-ans"><label>Your answer</label><div class="open-row">
@@ -402,13 +502,13 @@ function viewQuestion(R, q, i, run) {
     <div class="qnav">
       <button class="btn" data-act="prev" ${i === 0 ? "disabled" : ""}>← Previous</button>
       ${R.kind === "mcq" ? `<button class="btn ghost" data-act="clear" ${v == null ? "disabled" : ""}>Clear answer</button>` : ""}
-      ${i < R.qs.length - 1 ? `<button class="btn primary" data-act="next">Next →</button>` : `<button class="btn primary" data-act="submit">Finish round</button>`}
+      ${i < run.qids.length - 1 ? `<button class="btn primary" data-act="next">Next →</button>` : `<button class="btn primary" data-act="submit">Finish round</button>`}
     </div>
   </article>`;
 }
 
 function viewTest() {
-  const run = state.run, R = ROUNDS[run.key], i = run.i, q = R.qs[i];
+  const run = state.run, R = ROUNDS[run.key], i = run.i, q = R.qs[run.qids[i]];
   const left = (run.endAt - Date.now())/1000;
   const done = run.ans.filter(v => isAnswered(R, v)).length;
   const flagged = run.flags.filter(Boolean).length;
@@ -422,13 +522,13 @@ function viewTest() {
     ${viewQuestion(R, q, i, run)}
     <aside class="side">
       <h3>Answer sheet</h3>
-      <div class="cells">${R.qs.map((_, k) => `<button class="cell ${isAnswered(R, run.ans[k]) ? "done" : ""} ${run.flags[k] ? "flagged" : ""} ${k === i ? "current" : ""}" data-act="go" data-k="${k}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
+      <div class="cells">${run.qids.map((_, k) => `<button class="cell ${isAnswered(R, run.ans[k]) ? "done" : ""} ${run.flags[k] ? "flagged" : ""} ${k === i ? "current" : ""}" data-act="go" data-k="${k}" aria-label="Question ${k+1}">${k+1}</button>`).join("")}</div>
       <div class="legend"><span><i class="sw done"></i>Answered</span><span><i class="sw"></i>Not yet</span><span><i class="sw flag"></i>Review</span></div>
-      <div class="counts">${done} of ${R.qs.length} answered${flagged ? ` · ${flagged} marked for review` : ""}</div>
+      <div class="counts">${done} of ${run.qids.length} answered${flagged ? ` · ${flagged} marked for review` : ""}</div>
     </aside>
   </div>
   ${state.modal === "submit" ? (() => {
-    const left = R.qs.length - done;
+    const left = run.qids.length - done;
     return `<div class="overlay"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt">
       <h2 id="mt">Finish the ${R.short} Round?</h2>
       <p>${left ? `You have ${left} question${left > 1 ? "s" : ""} left blank.` : "You have answered every question."}${flagged ? ` ${flagged} marked for review.` : ""} You can't change answers after this.</p>
@@ -440,12 +540,13 @@ function viewResults() {
   const r = state.result, R = ROUNDS[r.key];
   const pct = Math.round(Math.max(0, r.score) / r.max * 100);
   const msg = pct >= 80 ? "Excellent work!" : pct >= 60 ? "Good job. Look at the mistakes below." : pct >= 40 ? "A solid start. The solutions below show the tricks." : "Keep practising. Read each solution carefully.";
-  const items = R.qs.map((q, i) => {
+  const items = r.qids.map((id, i) => {
+    const q = R.qs[id], perm = r.perm[i];
     const ok = r.marks[i], cls = ok === null ? "blank" : ok ? "right" : "wrong";
     if (state.filter === "mistakes" && ok === true) return "";
     const pts = R.kind === "mcq" ? (ok === null ? "0" : ok ? "+4" : "−1") : (ok ? "+10" : "0");
-    const yours = R.kind === "mcq" ? (r.ans[i] == null ? "—" : `${L[r.ans[i]]} (${q.o[r.ans[i]]})`) : esc(teamShow(q, r.ans[i]));
-    const correct = R.kind === "mcq" ? `${L[q.a]} (${q.o[q.a]})` : q.show;
+    const yours = R.kind === "mcq" ? (r.ans[i] == null ? "—" : `${L[perm.indexOf(r.ans[i])]} (${q.o[r.ans[i]]})`) : esc(teamShow(q, r.ans[i]));
+    const correct = R.kind === "mcq" ? `${L[perm.indexOf(q.a)]} (${q.o[q.a]})` : q.show;
     return `<article class="ritem ${cls}">
       <div class="top"><span>Q${i+1}</span><span class="mark ${cls}">${ok === null ? "Blank" : ok ? "Right" : "Wrong"} · ${pts}</span></div>
       <div class="qtext">${q.q}</div>
@@ -485,7 +586,7 @@ app.addEventListener("click", e => {
     case "clear": run.ans[run.i] = null; saveRun(); render(); break;
     case "flag": run.flags[run.i] = !run.flags[run.i]; saveRun(); render(); break;
     case "prev": run.i = Math.max(0, run.i - 1); saveRun(); render(); break;
-    case "next": run.i = Math.min(ROUNDS[run.key].qs.length - 1, run.i + 1); saveRun(); render(); break;
+    case "next": run.i = Math.min(run.qids.length - 1, run.i + 1); saveRun(); render(); break;
     case "go": run.i = +k; saveRun(); render(); break;
     case "submit": state.modal = "submit"; render(); break;
     case "cancel": state.modal = null; render(); break;
@@ -507,7 +608,7 @@ app.addEventListener("input", e => {
   const R = ROUNDS[run.key], cell = app.querySelectorAll(".cell")[run.i];
   if (cell) cell.classList.toggle("done", isAnswered(R, run.ans[run.i]));
   const c = app.querySelector(".counts");
-  if (c) { const done = run.ans.filter(v => isAnswered(R, v)).length, fl = run.flags.filter(Boolean).length; c.textContent = `${done} of ${R.qs.length} answered${fl ? ` · ${fl} marked for review` : ""}`; }
+  if (c) { const done = run.ans.filter(v => isAnswered(R, v)).length, fl = run.flags.filter(Boolean).length; c.textContent = `${done} of ${run.qids.length} answered${fl ? ` · ${fl} marked for review` : ""}`; }
 });
 app.addEventListener("keydown", e => {
   if (e.key === "Enter" && e.target.matches(".open-row input")) { const n = app.querySelector('[data-act="next"],[data-act="submit"]'); if (n) n.click(); }
